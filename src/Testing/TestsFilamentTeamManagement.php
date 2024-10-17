@@ -1,13 +1,13 @@
 <?php
 
-namespace VendorName\Skeleton\Testing;
+namespace Stats4sd\FilamentTeamManagement\Testing;
 
 use Livewire\Features\SupportTesting\Testable;
 
 /**
  * @mixin Testable
  */
-class TestsSkeleton
+class TestsFilamentTeamManagement
 {
     //
 }

@@ -1,15 +1,15 @@
 <?php
 
-namespace VendorName\Skeleton;
+namespace Stats4sd\FilamentTeamManagement;
 
 use Filament\Contracts\Plugin;
 use Filament\Panel;
 
-class SkeletonPlugin implements Plugin
+class FilamentTeamManagementPlugin implements Plugin
 {
     public function getId(): string
     {
-        return 'skeleton';
+        return 'filament-team-management';
     }
 
     public function register(Panel $panel): void

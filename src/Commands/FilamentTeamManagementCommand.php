@@ -1,12 +1,12 @@
 <?php
 
-namespace VendorName\Skeleton\Commands;
+namespace Stats4sd\FilamentTeamManagement\Commands;
 
 use Illuminate\Console\Command;
 
-class SkeletonCommand extends Command
+class FilamentTeamManagementCommand extends Command
 {
-    public $signature = 'skeleton';
+    public $signature = 'filament-team-management';
 
     public $description = 'My command';
 

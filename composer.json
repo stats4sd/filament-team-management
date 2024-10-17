@@ -1,29 +1,27 @@
 {
-    "name": ":vendor_slug/:package_slug",
-    "description": ":package_description",
+    "name": "stats4sd/filament-team-management",
+    "description": "Package for an opinionated 'teams' setup, including invites and integration with Laravel Filament + Spatie User Roles",
     "keywords": [
-        ":vendor_name",
+        "stats4sd",
         "laravel",
-        ":package_slug"
+        "filament-team-management"
     ],
-    "homepage": "https://github.com/:vendor_slug/:package_slug",
+    "homepage": "https://github.com/stats4sd/filament-team-management",
     "support": {
-        "issues": "https://github.com/:vendor_slug/:package_slug/issues",
-        "source": "https://github.com/:vendor_slug/:package_slug"
+        "issues": "https://github.com/stats4sd/filament-team-management/issues",
+        "source": "https://github.com/stats4sd/filament-team-management"
     },
     "license": "MIT",
     "authors": [
         {
-            "name": ":author_name",
-            "email": "author@domain.com",
+            "name": "Stats4SD",
+            "email": "support@stats4sd.org",
             "role": "Developer"
         }
     ],
     "require": {
         "php": "^8.1",
         "filament/filament": "^3.0",
-        "filament/forms": "^3.0",
-        "filament/tables": "^3.0",
         "spatie/laravel-package-tools": "^1.15.0"
     },
     "require-dev": {
@@ -41,13 +39,13 @@
     },
     "autoload": {
         "psr-4": {
-            "VendorName\\Skeleton\\": "src/",
-            "VendorName\\Skeleton\\Database\\Factories\\": "database/factories/"
+            "Stats4sd\\FilamentTeamManagement\\": "src/",
+            "Stats4sd\\FilamentTeamManagement\\Database\\Factories\\": "database/factories/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "VendorName\\Skeleton\\Tests\\": "tests/"
+            "Stats4sd\\FilamentTeamManagement\\Tests\\": "tests/"
         }
     },
     "scripts": {
@@ -67,10 +65,10 @@
     "extra": {
         "laravel": {
             "providers": [
-                "VendorName\\Skeleton\\SkeletonServiceProvider"
+                "Stats4sd\\FilamentTeamManagement\\FilamentTeamManagementServiceProvider"
             ],
             "aliases": {
-                "Skeleton": "VendorName\\Skeleton\\Facades\\Skeleton"
+                "FilamentTeamManagement": "Stats4sd\\FilamentTeamManagement\\Facades\\FilamentTeamManagement"
             }
         }
     },
