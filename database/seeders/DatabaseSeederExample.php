@@ -2,7 +2,6 @@
 
 namespace Stats4sd\FilamentTeamManagement\Database\Seeders;
 
-use App\Models\User;
 use Illuminate\Database\Seeder;
 use Stats4sd\FilamentOdkLink\Database\Seeders\PlatformSeeder;
 
