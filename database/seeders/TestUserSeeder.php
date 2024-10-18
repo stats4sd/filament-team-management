@@ -3,7 +3,6 @@
 namespace Stats4sd\FilamentTeamManagement\Database\Seeders;
 
 use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
 
@@ -15,7 +14,6 @@ class TestUserSeeder extends Seeder
         $superAdminRole = Role::create(['name' => 'Super Admin']);
         $programAdminRole = Role::create(['name' => 'Program Admin']);
 
-
         // create permissions
         $permissions = [
             ['name' => 'access admin panel'],
@@ -26,14 +24,13 @@ class TestUserSeeder extends Seeder
 
         $superAdminRole->permissions()->createMany($permissions);
 
-
         // create users
         $user = User::create([
             'name' => 'Test User',
             'email' => 'test@example.com',
             'password' => bcrypt('password'),
             'latest_team_id' => 1,
-            'latest_program_id' => NULL,
+            'latest_program_id' => null,
         ]);
 
         $admin = User::create([
@@ -51,7 +48,6 @@ class TestUserSeeder extends Seeder
             'latest_team_id' => 2,
             'latest_program_id' => 1,
         ]);
-
 
         // assign role to users
         $admin->assignRole('Super Admin');

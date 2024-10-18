@@ -6,7 +6,6 @@ use Illuminate\Database\Seeder;
 
 class RoleHasPermissionsTableSeeder extends Seeder
 {
-
     /**
      * Auto generated seed file
      *
@@ -15,35 +14,29 @@ class RoleHasPermissionsTableSeeder extends Seeder
     public function run()
     {
 
-
         \DB::table('role_has_permissions')->delete();
 
-        \DB::table('role_has_permissions')->insert(array(
-            0 =>
-            array(
+        \DB::table('role_has_permissions')->insert([
+            0 => [
                 'permission_id' => 1,
                 'role_id' => 1,
-            ),
-            1 =>
-            array(
+            ],
+            1 => [
                 'permission_id' => 2,
                 'role_id' => 1,
-            ),
-            2 =>
-            array(
+            ],
+            2 => [
                 'permission_id' => 3,
                 'role_id' => 1,
-            ),
-            3 =>
-            array(
+            ],
+            3 => [
                 'permission_id' => 4,
                 'role_id' => 1,
-            ),
-            4 =>
-            array(
+            ],
+            4 => [
                 'permission_id' => 2,
                 'role_id' => 2,
-            ),
-        ));
+            ],
+        ]);
     }
 }
