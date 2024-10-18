@@ -2,12 +2,12 @@
 
 namespace Stats4sd\FilamentTeamManagement\Filament\App\Resources\XlsformResource\Pages;
 
-use Filament\Resources\Pages\Page;
 use App\Filament\App\Resources\XlsformResource;
 use App\Http\Controllers\SurveyMonitoringController;
-use Stats4sd\FilamentOdkLink\Services\OdkLinkService;
-use Filament\Resources\Pages\Concerns\InteractsWithRecord;
 use Filament\Actions\Action;
+use Filament\Resources\Pages\Concerns\InteractsWithRecord;
+use Filament\Resources\Pages\Page;
+use Stats4sd\FilamentOdkLink\Services\OdkLinkService;
 
 class MonitorXlsform extends Page
 {
@@ -33,12 +33,11 @@ class MonitorXlsform extends Page
     // Is it possible to define a public variable to store the summary array?
     public function getSummary(): array
     {
-        $surveyMonitoringController = new SurveyMonitoringController();
+        $surveyMonitoringController = new SurveyMonitoringController;
         $summary = $surveyMonitoringController->getSubmissionSummary($this->record->owner, false);
 
         return $summary;
     }
-
 
     // TODO: Update this to link to the formatted Excel version
     public function exportAsExcelFile()
@@ -53,7 +52,7 @@ class MonitorXlsform extends Page
         return [
             Action::make('download raw survey data')
                 ->label('Download Raw Survey Data')
-                ->action(fn() => $this->exportAsExcelFile()),
+                ->action(fn () => $this->exportAsExcelFile()),
         ];
     }
 }

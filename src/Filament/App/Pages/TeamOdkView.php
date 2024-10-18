@@ -24,17 +24,18 @@ use Illuminate\Support\HtmlString;
 use Stats4sd\FilamentOdkLink\Models\OdkLink\Xlsform;
 use Stats4sd\FilamentOdkLink\Services\OdkLinkService;
 
-class TeamOdkView extends Page implements HasTable, HasInfolists
+class TeamOdkView extends Page implements HasInfolists, HasTable
 {
-    use InteractsWithTable;
     use InteractsWithForms;
     use InteractsWithInfolists;
+    use InteractsWithTable;
 
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
 
     protected static string $view = 'filament.app.pages.team-odk-view';
 
-    protected ?string $heading = "ODK Form Management";
+    protected ?string $heading = 'ODK Form Management';
+
     protected static ?string $navigationLabel = 'ODK Form Management';
 
     protected function getHeaderActions(): array
@@ -60,30 +61,29 @@ class TeamOdkView extends Page implements HasTable, HasInfolists
             ]);
     }
 
-
     public function table(Table $table): Table
     {
         return $table
-            ->relationship(fn(): MorphMany => HelperService::getSelectedTeam()->xlsforms())
+            ->relationship(fn (): MorphMany => HelperService::getSelectedTeam()->xlsforms())
             ->inverseRelationship('owner')
             ->recordTitleAttribute('title')
             ->columns([
                 TextColumn::make('title')
                     ->grow(false),
                 TextColumn::make('status')
-                    ->color(fn($state) => match ($state) {
+                    ->color(fn ($state) => match ($state) {
                         'UPDATES AVAILABLE' => 'danger',
                         'LIVE' => 'success',
                         'DRAFT' => 'info',
                         default => 'light',
                     })
-                    ->iconColor(fn($state) => match ($state) {
+                    ->iconColor(fn ($state) => match ($state) {
                         'UPDATES AVAILABLE' => 'danger',
                         'LIVE' => 'success',
                         'DRAFT' => 'info',
                         default => 'light',
                     })
-                    ->icon(fn($state) => match ($state) {
+                    ->icon(fn ($state) => match ($state) {
                         'UPDATES AVAILABLE' => 'heroicon-o-exclamation-circle',
                         'LIVE' => 'heroicon-o-check',
                         'DRAFT' => 'heroicon-o-pencil',
@@ -104,32 +104,32 @@ class TeamOdkView extends Page implements HasTable, HasInfolists
                     ->modalFooterActions([
                         Action::make('ok')
                             ->label('Return')
-                            ->close()
+                            ->close(),
                     ])
                     ->form([
                         Shout::make('note')
                             ->type('danger')
-                            ->content('TBC: Note - at present this feature is not available. All team forms are centrally managed by the system administrators in collaboration with the team leaders. In the future, this will allow teams to have multiple HOLPA survey forms active at the same time, for example a standard HOLPA and a "HOLPA National" survey, or 2 surveys to allow conducting Steps 1 and 2 at different times.')
-                    ])
+                            ->content('TBC: Note - at present this feature is not available. All team forms are centrally managed by the system administrators in collaboration with the team leaders. In the future, this will allow teams to have multiple HOLPA survey forms active at the same time, for example a standard HOLPA and a "HOLPA National" survey, or 2 surveys to allow conducting Steps 1 and 2 at different times.'),
+                    ]),
             ])
             ->actions([
 
                 TableAction::make('show submissions')
-                    ->url(fn(Xlsform $record) => XlsformResource::getUrl('view', ['record' => $record]))
+                    ->url(fn (Xlsform $record) => XlsformResource::getUrl('view', ['record' => $record]))
                     ->label('Show Submissions'),
 
                 // add Publish button
                 TableAction::make('publish')
                     ->label('Publish')
                     ->icon('heroicon-m-arrow-up-tray')
-                    ->visible(fn(Xlsform $record) => !$record->is_active)
+                    ->visible(fn (Xlsform $record) => ! $record->is_active)
                     ->requiresConfirmation()
                     ->action(function (Xlsform $record) {
 
                         $odkLinkService = app()->make(OdkLinkService::class);
 
                         // create draft if there is no draft yet
-                        if (!$record->has_draft) {
+                        if (! $record->has_draft) {
                             $odkLinkService->createDraftForm($record);
                         }
 
@@ -138,7 +138,7 @@ class TeamOdkView extends Page implements HasTable, HasInfolists
                     }),
 
                 TableAction::make('update_published_version')
-                    ->visible(fn(Xlsform $record) => !$record->has_latest_template)
+                    ->visible(fn (Xlsform $record) => ! $record->has_latest_template)
                     ->label('Deploy Updates')
                     ->requiresConfirmation()
                     ->modalDescription('This will update the form to the latest version of the xlsform template uploaded to the platform. Are you sure you want to proceed? (NOTE: if this form is live, you may need to tell your enumerators to re-download the form to get the latest version)')
@@ -159,7 +159,7 @@ class TeamOdkView extends Page implements HasTable, HasInfolists
                     ->label('Publish Latest Lookup Data')
                     ->requiresConfirmation()
                     ->modalDescription(new HtmlString('This will publish the latest team data from the platform to be used in the form. Are you sure you want to proceed? <br/><br/><b>NOTE</b>: if this form is live, you may need to tell your enumerators to re-download the form to get the latest version'))
-                    ->visible(fn(Xlsform $record) => !$record->has_latest_media)
+                    ->visible(fn (Xlsform $record) => ! $record->has_latest_media)
                     ->action(function (Xlsform $record) {
                         $record->publishForm(app()->make(OdkLinkService::class));
 
@@ -170,7 +170,7 @@ class TeamOdkView extends Page implements HasTable, HasInfolists
                             ->body("The form {$record->title} now has the latest lookup data entered into the platform by your team.")
                             ->color('success')
                             ->send();
-                    })
+                    }),
                 //
                 //                // add Pull Submissions button
                 //                TableAction::make('export')

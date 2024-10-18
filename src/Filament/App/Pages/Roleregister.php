@@ -2,21 +2,19 @@
 
 namespace Stats4sd\FilamentTeamManagement\Filament\App\Pages;
 
-use Filament\Forms;
-use App\Models\User;
-use Livewire\Attributes\Url;
-use App\Models\UserInvitation;
-use Filament\Facades\Filament;
-use Spatie\Permission\Models\Role;
-use Filament\Forms\Components\Select;
-use Illuminate\Auth\Events\Registered;
 use App\Http\Responses\RegisterResponse;
-use Filament\Forms\Components\Component;
-use Filament\Notifications\Notification;
 use App\Models\TeamManagement\RoleInvite;
-use Filament\Pages\Auth\Register as BaseRegister;
-use Filament\Http\Responses\Auth\Contracts\RegistrationResponse;
+use App\Models\User;
 use DanHarrin\LivewireRateLimiting\Exceptions\TooManyRequestsException;
+use Filament\Facades\Filament;
+use Filament\Forms;
+use Filament\Forms\Components\Component;
+use Filament\Http\Responses\Auth\Contracts\RegistrationResponse;
+use Filament\Notifications\Notification;
+use Filament\Pages\Auth\Register as BaseRegister;
+use Illuminate\Auth\Events\Registered;
+use Livewire\Attributes\Url;
+use Spatie\Permission\Models\Role;
 
 class Roleregister extends BaseRegister
 {

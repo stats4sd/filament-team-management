@@ -30,7 +30,7 @@ class VariablesRelationManager extends RelationManager
                     ->label('The label for the variable')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\Textarea::make('description')
+                Forms\Components\Textarea::make('description'),
             ])
             ->columns(1);
     }

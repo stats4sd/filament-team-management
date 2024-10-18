@@ -2,12 +2,12 @@
 
 namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\UserResource\Pages;
 
-use Filament\Forms;
-use Filament\Actions;
-use Spatie\Permission\Models\Role;
-use Awcodes\Shout\Components\Shout;
-use Filament\Resources\Pages\ListRecords;
 use App\Filament\Admin\Resources\UserResource;
+use Awcodes\Shout\Components\Shout;
+use Filament\Actions;
+use Filament\Forms;
+use Filament\Resources\Pages\ListRecords;
+use Spatie\Permission\Models\Role;
 
 class ListUsers extends ListRecords
 {
@@ -34,13 +34,13 @@ class ListUsers extends ListRecords
                             // Super admin should create a program then invite program admin for that program
                             Forms\Components\Select::make('role')
                                 ->options(Role::where('name', 'Super Admin')->pluck('name', 'id'))
-                                ->required()
+                                ->required(),
                         ])
                         ->reorderable(false)
                         ->columns(2)
-                        ->addActionLabel('Add Another Email Address')
+                        ->addActionLabel('Add Another Email Address'),
                 ])
-                ->action(fn(array $data, ListRecords $livewire) => $this->handleInvitation($data)),
+                ->action(fn (array $data, ListRecords $livewire) => $this->handleInvitation($data)),
             Actions\CreateAction::make(),
         ];
     }

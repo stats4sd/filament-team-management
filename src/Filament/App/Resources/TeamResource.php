@@ -2,25 +2,25 @@
 
 namespace Stats4sd\FilamentTeamManagement\Filament\App\Resources;
 
-use Filament\Forms;
-use App\Models\Team;
-use Filament\Tables;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
-use Filament\Facades\Filament;
-use Filament\Infolists\Infolist;
-use Filament\Resources\Resource;
-use Filament\Navigation\NavigationItem;
-use Illuminate\Database\Eloquent\Builder;
-use Filament\Infolists\Components\TextEntry;
 use App\Filament\App\Resources\TeamResource\Pages;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\App\Resources\TeamResource\RelationManagers;
+use App\Models\Team;
+use Filament\Facades\Filament;
+use Filament\Forms;
+use Filament\Forms\Form;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Infolist;
+use Filament\Navigation\NavigationItem;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Table;
 
 class TeamResource extends Resource
 {
     protected static ?string $navigationIcon = 'heroicon-o-building-office-2';
+
     protected static ?string $navigationGroup = 'Settings';
+
     protected static ?string $model = Team::class;
 
     // when user click on sidebar item, it shows the view page of the selected team directly
@@ -33,7 +33,7 @@ class TeamResource extends Resource
                 ->label(__('My Team'))
                 ->icon('heroicon-o-home')
                 ->group('Settings')
-                ->url(self::getUrl('view', ['record' => Filament::getTenant()]))
+                ->url(self::getUrl('view', ['record' => Filament::getTenant()])),
         ];
     }
 

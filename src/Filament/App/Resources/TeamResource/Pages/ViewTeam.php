@@ -11,7 +11,7 @@ class ViewTeam extends ViewRecord
 {
     protected static string $resource = TeamResource::class;
 
-    public function getTitle(): string|Htmlable
+    public function getTitle(): string | Htmlable
     {
         return $this->getRecord()->name;
     }

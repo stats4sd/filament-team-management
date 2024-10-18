@@ -17,6 +17,7 @@ class XlsformResource extends Resource
     protected static ?string $model = Xlsform::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+
     protected static ?string $tenantOwnershipRelationshipName = 'owner';
 
     // do not show Xlsform resource in side bar
@@ -28,7 +29,7 @@ class XlsformResource extends Resource
             ->schema([
                 ViewEntry::make('submission_summary')
                     ->view('submission_summary_wrapper')
-                    ->columnSpanFull()
+                    ->columnSpanFull(),
             ]);
     }
 

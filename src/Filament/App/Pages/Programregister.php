@@ -2,23 +2,20 @@
 
 namespace Stats4sd\FilamentTeamManagement\Filament\App\Pages;
 
-use Filament\Forms;
-use App\Models\User;
-use App\Models\Program;
-use Livewire\Attributes\Url;
-use App\Models\UserInvitation;
-use Filament\Facades\Filament;
-use Spatie\Permission\Models\Role;
-use Filament\Forms\Components\Select;
-use Illuminate\Auth\Events\Registered;
 use App\Http\Responses\RegisterResponse;
-use Filament\Forms\Components\Component;
-use Filament\Notifications\Notification;
-use App\Models\TeamManagement\RoleInvite;
+use App\Models\Program;
 use App\Models\TeamManagement\ProgramInvite;
-use Filament\Pages\Auth\Register as BaseRegister;
-use Filament\Http\Responses\Auth\Contracts\RegistrationResponse;
+use App\Models\User;
 use DanHarrin\LivewireRateLimiting\Exceptions\TooManyRequestsException;
+use Filament\Facades\Filament;
+use Filament\Forms;
+use Filament\Forms\Components\Component;
+use Filament\Http\Responses\Auth\Contracts\RegistrationResponse;
+use Filament\Notifications\Notification;
+use Filament\Pages\Auth\Register as BaseRegister;
+use Illuminate\Auth\Events\Registered;
+use Livewire\Attributes\Url;
+use Spatie\Permission\Models\Role;
 
 class Programregister extends BaseRegister
 {
@@ -78,7 +75,6 @@ class Programregister extends BaseRegister
 
         // add the newly created user to the dedicated program
         $this->invite->program->users()->attach($user);
-
 
         app()->bind(
             \Illuminate\Auth\Listeners\SendEmailVerificationNotification::class,

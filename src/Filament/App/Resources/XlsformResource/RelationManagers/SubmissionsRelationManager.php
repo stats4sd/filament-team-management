@@ -4,10 +4,10 @@ namespace Stats4sd\FilamentTeamManagement\Filament\App\Resources\XlsformResource
 
 use App\Models\LookupTables\Enumerator;
 use Filament\Forms;
-use Filament\Tables;
 use Filament\Forms\Form;
-use Filament\Tables\Table;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Tables;
+use Filament\Tables\Table;
 use ValentinMorice\FilamentJsonColumn\FilamentJsonColumn;
 
 class SubmissionsRelationManager extends RelationManager

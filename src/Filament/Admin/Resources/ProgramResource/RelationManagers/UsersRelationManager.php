@@ -2,15 +2,13 @@
 
 namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\ProgramResource\RelationManagers;
 
-use Filament\Forms;
-use Filament\Tables;
 use App\Models\Program;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
 use Awcodes\Shout\Components\Shout;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Forms;
+use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Tables;
+use Filament\Tables\Table;
 
 class UsersRelationManager extends RelationManager
 {
@@ -63,9 +61,9 @@ class UsersRelationManager extends RelationManager
                                     ->required()
                             )
                             ->reorderable(false)
-                            ->addActionLabel('Add Another Email Address')
+                            ->addActionLabel('Add Another Email Address'),
                     ])
-                    ->action(fn(array $data, RelationManager $livewire) => $this->handleInvitation($data, $livewire->getOwnerRecord())),
+                    ->action(fn (array $data, RelationManager $livewire) => $this->handleInvitation($data, $livewire->getOwnerRecord())),
                 Tables\Actions\AttachAction::make()
                     ->label('Add Existing User to program'),
             ])

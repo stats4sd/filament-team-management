@@ -17,9 +17,9 @@ class ListDatasets extends ListRecords
         return [
             'all' => Tab::make(),
             'lookup_tables' => Tab::make()
-                ->modifyQueryUsing(fn(Builder $query) => $query->where('lookup_table', '=', 1)),
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('lookup_table', '=', 1)),
             'holpa_datasets' => Tab::make()
-                ->modifyQueryUsing(fn(Builder $query) => $query->where('lookup_table', '=', 0)),
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('lookup_table', '=', 0)),
 
         ];
     }

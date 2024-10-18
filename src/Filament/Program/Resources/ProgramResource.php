@@ -2,25 +2,25 @@
 
 namespace Stats4sd\FilamentTeamManagement\Filament\Program\Resources;
 
-use Filament\Forms;
-use Filament\Tables;
-use App\Models\Program;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
-use Filament\Facades\Filament;
-use Filament\Infolists\Infolist;
-use Filament\Resources\Resource;
-use Filament\Navigation\NavigationItem;
-use Illuminate\Database\Eloquent\Builder;
-use Filament\Infolists\Components\TextEntry;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Program\Resources\ProgramResource\Pages;
 use App\Filament\Program\Resources\ProgramResource\RelationManagers;
+use App\Models\Program;
+use Filament\Facades\Filament;
+use Filament\Forms;
+use Filament\Forms\Form;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Infolist;
+use Filament\Navigation\NavigationItem;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Table;
 
 class ProgramResource extends Resource
 {
     protected static ?string $navigationIcon = 'heroicon-o-building-library';
+
     protected static ?string $navigationGroup = 'Settings';
+
     protected static ?string $model = Program::class;
 
     // when user click on sidebar item, it shows the view page of the selected program directly
@@ -31,7 +31,7 @@ class ProgramResource extends Resource
                 ->label(__('My Program'))
                 ->icon('heroicon-o-home')
                 ->group('Settings')
-                ->url(self::getUrl('view', ['record' => Filament::getTenant()]))
+                ->url(self::getUrl('view', ['record' => Filament::getTenant()])),
         ];
     }
 

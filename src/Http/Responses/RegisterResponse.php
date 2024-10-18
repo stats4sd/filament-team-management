@@ -7,7 +7,6 @@ use Filament\Http\Responses\Auth\Contracts\RegistrationResponse;
 class RegisterResponse implements RegistrationResponse
 {
     /**
-     * @param  $request
      * @return mixed
      */
     public function toResponse($request)

@@ -3,7 +3,6 @@
 namespace Stats4sd\FilamentTeamManagement\Filament\Actions;
 
 use App\Exports\MainSurveyExport;
-use App\Http\Controllers\DataExportController;
 use Filament\Actions\Action;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
@@ -16,6 +15,7 @@ class ExportDataAction extends Action
 
         $this->action(function () {
             $filePath = $this->exportAllTape();
+
             return $this->download($filePath);
         });
     }
@@ -24,7 +24,7 @@ class ExportDataAction extends Action
     {
         // $filePath = 'HOLPA-data-export' . '-' . now()->toDateTimeString() . '.xlsx';
         $filePath = 'HOLPA-data-export.xlsx';
-        Excel::store(new MainSurveyExport(), $filePath);
+        Excel::store(new MainSurveyExport, $filePath);
 
         return $filePath;
     }

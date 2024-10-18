@@ -16,7 +16,7 @@ class ViewXlsform extends ViewRecord
 
     protected static string $view = 'filament.app.resources.xlsform-resource.pages.view-xlsform';
 
-    public function getHeading(): string|Htmlable
+    public function getHeading(): string | Htmlable
     {
         return 'Submissions for form: ' . $this->record->title;
     }
@@ -35,7 +35,7 @@ class ViewXlsform extends ViewRecord
     // Is it possible to define a public variable to store the summary array?
     public function getSummary(): array
     {
-        return (new SurveyMonitoringController())->getSubmissionSummary($this->record->owner, false);
+        return (new SurveyMonitoringController)->getSubmissionSummary($this->record->owner, false);
     }
 
     public function exportAsExcelFile()

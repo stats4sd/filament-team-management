@@ -3,26 +3,23 @@
 namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources;
 
 use App\Filament\Admin\Resources\TeamResource\Pages;
-use App\Filament\Admin\Resources\TeamResource\RelationManagers\UsersRelationManager;
 use App\Filament\Admin\Resources\TeamResource\RelationManagers\InvitesRelationManager;
+use App\Filament\Admin\Resources\TeamResource\RelationManagers\UsersRelationManager;
 use App\Models\Team;
-use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Infolist;
-use Filament\Tables\Columns\ImageColumn;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables;
-use Filament\Tables\Table;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Infolists\Components\Section;
-use Filament\Infolists\Components\ViewEntry;
-use Filament\Resources\Resource;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Infolist;
+use Filament\Tables;
+use Filament\Tables\Table;
 use Stats4sd\FilamentOdkLink\Filament\Resources\TeamResource\RelationManagers\XlsformsRelationManager;
 
 class TeamResource extends \Stats4sd\FilamentOdkLink\Filament\Resources\TeamResource
 {
     protected static ?string $navigationIcon = 'heroicon-o-building-office-2';
+
     protected static ?string $navigationGroup = 'Programs, Teams and Users';
+
     protected static ?string $model = Team::class;
 
     public static function form(Form $form): Form

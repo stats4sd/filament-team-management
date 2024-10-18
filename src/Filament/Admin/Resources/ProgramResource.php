@@ -2,23 +2,23 @@
 
 namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources;
 
-use Filament\Forms;
-use Filament\Tables;
-use App\Models\Program;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
-use Filament\Infolists\Infolist;
-use Filament\Resources\Resource;
-use Illuminate\Database\Eloquent\Builder;
-use Filament\Infolists\Components\TextEntry;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Admin\Resources\ProgramResource\Pages;
 use App\Filament\Admin\Resources\ProgramResource\RelationManagers;
+use App\Models\Program;
+use Filament\Forms;
+use Filament\Forms\Form;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Infolist;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Table;
 
 class ProgramResource extends Resource
 {
     protected static ?string $navigationIcon = 'heroicon-o-building-library';
+
     protected static ?string $navigationGroup = 'Programs, Teams and Users';
+
     protected static ?string $model = Program::class;
 
     public static function form(Form $form): Form

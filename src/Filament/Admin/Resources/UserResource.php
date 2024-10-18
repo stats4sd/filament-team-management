@@ -10,11 +10,12 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 
-
 class UserResource extends Resource
 {
     protected static ?string $navigationIcon = 'heroicon-o-users';
+
     protected static ?string $navigationGroup = 'Programs, Teams and Users';
+
     protected static ?string $model = User::class;
 
     public static function form(Form $form): Form
@@ -76,7 +77,7 @@ class UserResource extends Resource
                     ->color('success'),
                 Tables\Columns\TextColumn::make('roles.name')
                     ->badge()
-                    ->searchable()
+                    ->searchable(),
             ])
             ->filters([
                 //

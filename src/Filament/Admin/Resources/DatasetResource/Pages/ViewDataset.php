@@ -10,7 +10,6 @@ class ViewDataset extends ViewRecord
 {
     protected static string $resource = DatasetResource::class;
 
-
     protected function getHeaderActions(): array
     {
         return [
