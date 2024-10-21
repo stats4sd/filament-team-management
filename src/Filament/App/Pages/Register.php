@@ -2,10 +2,6 @@
 
 namespace Stats4sd\FilamentTeamManagement\Filament\App\Pages;
 
-
-use Stats4sd\FilamentTeamManagement\Http\Responses\RegisterResponse;
-use Stats4sd\FilamentTeamManagement\Models\TeamInvite;
-use Stats4sd\FilamentTeamManagement\Models\User;
 use DanHarrin\LivewireRateLimiting\Exceptions\TooManyRequestsException;
 use Filament\Facades\Filament;
 use Filament\Forms;
@@ -15,6 +11,9 @@ use Filament\Notifications\Notification;
 use Filament\Pages\Auth\Register as BaseRegister;
 use Illuminate\Auth\Events\Registered;
 use Livewire\Attributes\Url;
+use Stats4sd\FilamentTeamManagement\Http\Responses\RegisterResponse;
+use Stats4sd\FilamentTeamManagement\Models\TeamInvite;
+use Stats4sd\FilamentTeamManagement\Models\User;
 
 class Register extends BaseRegister
 {
