@@ -2,7 +2,9 @@
 
 namespace Stats4sd\FilamentTeamManagement\Filament\App\Pages;
 
-use App\Http\Responses\RegisterResponse;
+// use App\Http\Responses\RegisterResponse;
+use Stats4sd\FilamentTeamManagement\Http\Responses\RegisterResponse;
+
 use Stats4sd\FilamentTeamManagement\Models\Program;
 use Stats4sd\FilamentTeamManagement\Models\ProgramInvite;
 use Stats4sd\FilamentTeamManagement\Models\User;
