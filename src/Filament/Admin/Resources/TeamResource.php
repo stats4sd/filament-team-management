@@ -2,10 +2,10 @@
 
 namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources;
 
-use App\Filament\Admin\Resources\TeamResource\Pages;
-use App\Filament\Admin\Resources\TeamResource\RelationManagers\InvitesRelationManager;
-use App\Filament\Admin\Resources\TeamResource\RelationManagers\UsersRelationManager;
-use App\Models\Team;
+use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\TeamResource\Pages;
+use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\TeamResource\RelationManagers\InvitesRelationManager;
+use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\TeamResource\RelationManagers\UsersRelationManager;
+use Stats4sd\FilamentTeamManagement\Models\Team;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\TextEntry;

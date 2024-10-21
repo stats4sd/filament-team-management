@@ -2,7 +2,7 @@
 
 namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\ProgramResource\RelationManagers;
 
-use App\Models\Program;
+use Stats4sd\FilamentTeamManagement\Models\Program;
 use Awcodes\Shout\Components\Shout;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -63,7 +63,7 @@ class UsersRelationManager extends RelationManager
                             ->reorderable(false)
                             ->addActionLabel('Add Another Email Address'),
                     ])
-                    ->action(fn (array $data, RelationManager $livewire) => $this->handleInvitation($data, $livewire->getOwnerRecord())),
+                    ->action(fn(array $data, RelationManager $livewire) => $this->handleInvitation($data, $livewire->getOwnerRecord())),
                 Tables\Actions\AttachAction::make()
                     ->label('Add Existing User to program'),
             ])

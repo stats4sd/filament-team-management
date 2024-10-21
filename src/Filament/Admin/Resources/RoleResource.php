@@ -2,7 +2,7 @@
 
 namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources;
 
-use App\Filament\Admin\Resources\RoleResource\Pages;
+use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\RoleResource\Pages;
 use Spatie\Permission\Models\Role;
 
 class RoleResource extends \Althinect\FilamentSpatieRolesPermissions\Resources\RoleResource

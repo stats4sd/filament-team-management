@@ -2,7 +2,10 @@
 
 namespace Stats4sd\FilamentTeamManagement\Http\Middleware;
 
-use App\Models\User;
+// use App\Models\User;
+
+use Stats4sd\FilamentTeamManagement\Models\User;
+
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;

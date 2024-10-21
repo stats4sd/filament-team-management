@@ -2,8 +2,8 @@
 
 namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources;
 
-use App\Filament\Admin\Resources\UserResource\Pages;
-use App\Models\User;
+use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\UserResource\Pages;
+use Stats4sd\FilamentTeamManagement\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;

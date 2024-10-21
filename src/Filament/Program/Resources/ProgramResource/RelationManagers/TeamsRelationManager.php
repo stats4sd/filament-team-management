@@ -12,6 +12,12 @@ class TeamsRelationManager extends RelationManager
 {
     protected static string $relationship = 'teams';
 
+    // turn on Edit mode so that "Add Existing Team to program" button will be showed when viewing program record
+    public function isReadOnly(): bool
+    {
+        return false;
+    }
+
     public function form(Form $form): Form
     {
         return $form

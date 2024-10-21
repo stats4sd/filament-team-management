@@ -2,7 +2,7 @@
 
 namespace Stats4sd\FilamentTeamManagement\Filament\App\Resources\TeamResource\Pages;
 
-use App\Filament\Admin\Resources\TeamResource;
+use Stats4sd\FilamentTeamManagement\Filament\App\Resources\TeamResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 use Illuminate\Contracts\Support\Htmlable;

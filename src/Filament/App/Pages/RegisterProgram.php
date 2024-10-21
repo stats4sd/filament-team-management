@@ -2,7 +2,7 @@
 
 namespace Stats4sd\FilamentTeamManagement\Filament\App\Pages;
 
-use App\Models\Program;
+use Stats4sd\FilamentTeamManagement\Models\Program;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Pages\Tenancy\RegisterTenant;

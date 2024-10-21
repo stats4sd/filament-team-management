@@ -2,9 +2,9 @@
 
 namespace Stats4sd\FilamentTeamManagement\Filament\App\Resources;
 
-use App\Filament\App\Resources\TeamResource\Pages;
-use App\Filament\App\Resources\TeamResource\RelationManagers;
-use App\Models\Team;
+use Stats4sd\FilamentTeamManagement\Filament\App\Resources\TeamResource\Pages;
+use Stats4sd\FilamentTeamManagement\Filament\App\Resources\TeamResource\RelationManagers;
+use Stats4sd\FilamentTeamManagement\Models\Team;
 use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Form;

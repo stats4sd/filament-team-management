@@ -2,7 +2,7 @@
 
 namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\RoleResource\Pages;
 
-use App\Filament\Admin\Resources\RoleResource;
+use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\RoleResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ManageRecords;
 

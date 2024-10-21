@@ -3,8 +3,8 @@
 namespace Stats4sd\FilamentTeamManagement\Filament\App\Pages;
 
 use App\Http\Responses\RegisterResponse;
-use App\Models\TeamManagement\RoleInvite;
-use App\Models\User;
+use Stats4sd\FilamentTeamManagement\Models\RoleInvite;
+use Stats4sd\FilamentTeamManagement\Models\User;
 use DanHarrin\LivewireRateLimiting\Exceptions\TooManyRequestsException;
 use Filament\Facades\Filament;
 use Filament\Forms;

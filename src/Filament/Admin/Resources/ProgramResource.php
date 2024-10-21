@@ -2,9 +2,9 @@
 
 namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources;
 
-use App\Filament\Admin\Resources\ProgramResource\Pages;
-use App\Filament\Admin\Resources\ProgramResource\RelationManagers;
-use App\Models\Program;
+use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\ProgramResource\Pages;
+use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\ProgramResource\RelationManagers;
+use Stats4sd\FilamentTeamManagement\Models\Program;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\TextEntry;
