@@ -2,9 +2,9 @@
 
 namespace Stats4sd\FilamentTeamManagement\Filament\App\Resources\TeamResource\Pages;
 
-use Stats4sd\FilamentTeamManagement\Filament\App\Resources\TeamResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
+use Stats4sd\FilamentTeamManagement\Filament\App\Resources\TeamResource;
 
 class EditTeam extends EditRecord
 {

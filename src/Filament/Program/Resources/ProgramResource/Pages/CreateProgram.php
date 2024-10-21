@@ -2,8 +2,8 @@
 
 namespace Stats4sd\FilamentTeamManagement\Filament\Program\Resources\ProgramResource\Pages;
 
-use Stats4sd\FilamentTeamManagement\Filament\Program\Resources\ProgramResource;
 use Filament\Resources\Pages\CreateRecord;
+use Stats4sd\FilamentTeamManagement\Filament\Program\Resources\ProgramResource;
 
 class CreateProgram extends CreateRecord
 {

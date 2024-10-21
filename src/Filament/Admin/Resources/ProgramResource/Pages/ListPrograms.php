@@ -2,9 +2,9 @@
 
 namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\ProgramResource\Pages;
 
-use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\ProgramResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
+use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\ProgramResource;
 
 class ListPrograms extends ListRecords
 {

@@ -2,8 +2,8 @@
 
 namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources;
 
-use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\PermissionResource\Pages;
 use Spatie\Permission\Models\Permission;
+use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\PermissionResource\Pages;
 
 class PermissionResource extends \Althinect\FilamentSpatieRolesPermissions\Resources\PermissionResource
 {

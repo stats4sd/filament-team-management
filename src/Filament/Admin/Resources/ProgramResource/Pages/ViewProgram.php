@@ -2,10 +2,10 @@
 
 namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\ProgramResource\Pages;
 
-use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\ProgramResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 use Illuminate\Contracts\Support\Htmlable;
+use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\ProgramResource;
 
 class ViewProgram extends ViewRecord
 {
