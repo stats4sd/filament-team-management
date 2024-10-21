@@ -2,9 +2,9 @@
 
 namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\UserResource\Pages;
 
-use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\UserResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
+use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\UserResource;
 
 class EditUser extends EditRecord
 {

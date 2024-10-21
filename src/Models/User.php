@@ -2,33 +2,30 @@
 
 namespace Stats4sd\FilamentTeamManagement\Models;
 
-use Filament\Panel;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Mail;
-use Spatie\Permission\Traits\HasRoles;
-use Illuminate\Database\Eloquent\Model;
-use Filament\Notifications\Notification;
-use Illuminate\Notifications\Notifiable;
-
-use Stats4sd\FilamentTeamManagement\Mail\InviteUser;
-
-use Filament\Models\Contracts\HasTenants;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasDefaultTenant;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Filament\Models\Contracts\HasTenants;
+use Filament\Notifications\Notification;
+use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Althinect\FilamentSpatieRolesPermissions\Concerns\HasSuperAdmin;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
+use Spatie\Permission\Traits\HasRoles;
+use Stats4sd\FilamentTeamManagement\Mail\InviteUser;
 
-class User extends Authenticatable implements FilamentUser, HasTenants, HasDefaultTenant
+class User extends Authenticatable implements FilamentUser, HasDefaultTenant, HasTenants
 {
-    use HasFactory, Notifiable;
+    use HasFactory;
     use HasRoles;
-
+    use Notifiable;
 
     /**
      * The attributes that a
@@ -157,7 +154,7 @@ class User extends Authenticatable implements FilamentUser, HasTenants, HasDefau
 
             // user cannot access this team
             return false;
-        } else if ($tenant->getTable() == 'programs') {
+        } elseif ($tenant->getTable() == 'programs') {
             // program admin panel
             // check permission
             if ($this->can('view all programs')) {
@@ -174,7 +171,7 @@ class User extends Authenticatable implements FilamentUser, HasTenants, HasDefau
         }
     }
 
-    public function getTenants(Panel $panel): array|Collection
+    public function getTenants(Panel $panel): array | Collection
     {
         // add different handling for different panel
         if ($panel->isDefault()) {
@@ -197,7 +194,7 @@ class User extends Authenticatable implements FilamentUser, HasTenants, HasDefau
     public function getAllAccessibleTeamIds(): array
     {
         // find all teams belong to all programs of user
-        $allTeamsIdInPrograms = array();
+        $allTeamsIdInPrograms = [];
 
         foreach ($this->programs as $program) {
             $allPrograms = $program->teams->pluck('id');
@@ -211,7 +208,7 @@ class User extends Authenticatable implements FilamentUser, HasTenants, HasDefau
         $allTeamIds = $this->teams->pluck('id');
 
         // all accessible teams = all teams belong to all programs of user + all teams belong to user
-        $allAccessibleTeamIds = array();
+        $allAccessibleTeamIds = [];
         array_push($allAccessibleTeamIds, Arr::flatten($allTeamsIdInPrograms), Arr::flatten($allTeamIds));
 
         return Arr::flatten($allAccessibleTeamIds);

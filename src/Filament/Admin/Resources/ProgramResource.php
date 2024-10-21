@@ -2,9 +2,6 @@
 
 namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources;
 
-use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\ProgramResource\Pages;
-use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\ProgramResource\RelationManagers;
-use Stats4sd\FilamentTeamManagement\Models\Program;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\TextEntry;
@@ -12,6 +9,9 @@ use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\ProgramResource\Pages;
+use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\ProgramResource\RelationManagers;
+use Stats4sd\FilamentTeamManagement\Models\Program;
 
 class ProgramResource extends Resource
 {

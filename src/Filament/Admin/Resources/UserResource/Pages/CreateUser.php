@@ -2,8 +2,8 @@
 
 namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\UserResource\Pages;
 
-use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\UserResource;
 use Filament\Resources\Pages\CreateRecord;
+use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\UserResource;
 
 class CreateUser extends CreateRecord
 {

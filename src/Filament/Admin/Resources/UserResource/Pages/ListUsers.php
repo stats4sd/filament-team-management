@@ -2,12 +2,12 @@
 
 namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\UserResource\Pages;
 
-use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\UserResource;
 use Awcodes\Shout\Components\Shout;
 use Filament\Actions;
 use Filament\Forms;
 use Filament\Resources\Pages\ListRecords;
 use Spatie\Permission\Models\Role;
+use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\UserResource;
 
 class ListUsers extends ListRecords
 {
@@ -40,7 +40,7 @@ class ListUsers extends ListRecords
                         ->columns(2)
                         ->addActionLabel('Add Another Email Address'),
                 ])
-                ->action(fn(array $data, ListRecords $livewire) => $this->handleInvitation($data)),
+                ->action(fn (array $data, ListRecords $livewire) => $this->handleInvitation($data)),
             Actions\CreateAction::make(),
         ];
     }

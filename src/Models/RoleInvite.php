@@ -2,10 +2,10 @@
 
 namespace Stats4sd\FilamentTeamManagement\Models;
 
-use Spatie\Permission\Models\Role;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Spatie\Permission\Models\Role;
 
 class RoleInvite extends Model
 {

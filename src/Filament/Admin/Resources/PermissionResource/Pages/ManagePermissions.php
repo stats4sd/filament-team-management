@@ -2,9 +2,9 @@
 
 namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\PermissionResource\Pages;
 
-use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\PermissionResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ManageRecords;
+use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\PermissionResource;
 
 class ManagePermissions extends ManageRecords
 {

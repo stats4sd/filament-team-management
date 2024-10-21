@@ -2,27 +2,21 @@
 
 namespace Stats4sd\FilamentTeamManagement\Models;
 
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Database\Eloquent\Model;
 use Filament\Notifications\Notification;
-
-use Stats4sd\FilamentTeamManagement\Mail\InviteMember;
-
-use Stats4sd\FilamentOdkLink\Services\OdkLinkService;
-
-use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
+use Stats4sd\FilamentOdkLink\Services\OdkLinkService;
+use Stats4sd\FilamentTeamManagement\Mail\InviteMember;
 
 class Team extends \Stats4sd\FilamentOdkLink\Models\TeamManagement\Team
 {
     protected $table = 'teams';
 
     protected $guarded = ['id'];
-
 
     // TODO: I think this overrides the booted method on HasXlsForms - ideally we wouldn't need to copy the package stuff here...
     protected static function booted(): void

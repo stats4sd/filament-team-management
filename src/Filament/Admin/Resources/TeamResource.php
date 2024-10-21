@@ -2,10 +2,6 @@
 
 namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources;
 
-use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\TeamResource\Pages;
-use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\TeamResource\RelationManagers\InvitesRelationManager;
-use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\TeamResource\RelationManagers\UsersRelationManager;
-use Stats4sd\FilamentTeamManagement\Models\Team;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\TextEntry;
@@ -13,6 +9,10 @@ use Filament\Infolists\Infolist;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Stats4sd\FilamentOdkLink\Filament\Resources\TeamResource\RelationManagers\XlsformsRelationManager;
+use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\TeamResource\Pages;
+use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\TeamResource\RelationManagers\InvitesRelationManager;
+use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\TeamResource\RelationManagers\UsersRelationManager;
+use Stats4sd\FilamentTeamManagement\Models\Team;
 
 class TeamResource extends \Stats4sd\FilamentOdkLink\Filament\Resources\TeamResource
 {

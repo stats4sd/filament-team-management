@@ -2,13 +2,13 @@
 
 namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources;
 
-use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\UserResource\Pages;
-use Stats4sd\FilamentTeamManagement\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\UserResource\Pages;
+use Stats4sd\FilamentTeamManagement\Models\User;
 
 class UserResource extends Resource
 {

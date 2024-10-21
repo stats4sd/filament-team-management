@@ -2,17 +2,15 @@
 
 namespace Stats4sd\FilamentTeamManagement\Models;
 
+use Filament\Notifications\Notification;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Spatie\Permission\Models\Role;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Database\Eloquent\Model;
-use Filament\Notifications\Notification;
-
 use Stats4sd\FilamentTeamManagement\Mail\InviteProgramAdmin;
-
-use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Program extends Model
 {
@@ -52,7 +50,6 @@ class Program extends Model
                 ->send();
         }
     }
-
 
     public function invites(): HasMany
     {

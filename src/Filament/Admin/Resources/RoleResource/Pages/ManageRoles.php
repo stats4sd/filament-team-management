@@ -2,9 +2,9 @@
 
 namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\RoleResource\Pages;
 
-use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\RoleResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ManageRecords;
+use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\RoleResource;
 
 class ManageRoles extends ManageRecords
 {
