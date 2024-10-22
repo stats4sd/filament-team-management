@@ -2,6 +2,7 @@
 
 namespace Stats4sd\FilamentTeamManagement\Filament\App\Resources;
 
+use App\Models\Team;
 use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -12,10 +13,8 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Stats4sd\FilamentTeamManagement\Filament\App\Resources\TeamResource\Pages;
-use Stats4sd\FilamentTeamManagement\Filament\App\Resources\TeamResource\RelationManagers;
-
 // use Stats4sd\FilamentTeamManagement\Models\Team;
-use App\Models\Team;
+use Stats4sd\FilamentTeamManagement\Filament\App\Resources\TeamResource\RelationManagers;
 
 class TeamResource extends Resource
 {
