@@ -50,10 +50,10 @@ class TeamsRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('website')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('xlsforms_count')
-                    ->label('# Xlsforms')
-                    ->counts('xlsforms')
-                    ->sortable(),
+                // Tables\Columns\TextColumn::make('xlsforms_count')
+                //     ->label('# Xlsforms')
+                //     ->counts('xlsforms')
+                //     ->sortable(),
                 Tables\Columns\TextColumn::make('users_count')
                     ->label('# Users')
                     ->counts('users')
