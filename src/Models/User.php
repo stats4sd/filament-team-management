@@ -24,8 +24,8 @@ use Stats4sd\FilamentTeamManagement\Mail\InviteUser;
 class User extends Authenticatable implements FilamentUser, HasDefaultTenant, HasTenants
 {
     use HasFactory;
-    use Notifiable;
     use HasRoles;
+    use Notifiable;
 
     /**
      * The attributes that a
