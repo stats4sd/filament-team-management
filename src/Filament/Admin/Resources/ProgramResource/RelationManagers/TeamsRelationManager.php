@@ -50,10 +50,16 @@ class TeamsRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('website')
                     ->searchable()
                     ->sortable(),
+
+                // Note: Here it is using filament-team-management Team model, which does not have xlsform relationship yet.
+                // xlsform relationship is added in main repo Team model because it uses HasXlsForms trait.
+                // I think we can comprimise to not to show number of xlsforms belongs to a team here.
+
                 // Tables\Columns\TextColumn::make('xlsforms_count')
                 //     ->label('# Xlsforms')
                 //     ->counts('xlsforms')
                 //     ->sortable(),
+
                 Tables\Columns\TextColumn::make('users_count')
                     ->label('# Users')
                     ->counts('users')

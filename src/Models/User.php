@@ -18,14 +18,16 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
-use Spatie\Permission\Traits\HasRoles;
+// use Spatie\Permission\Traits\HasRoles;
 use Stats4sd\FilamentTeamManagement\Mail\InviteUser;
 
 class User extends Authenticatable implements FilamentUser, HasDefaultTenant, HasTenants
 {
     use HasFactory;
-    use HasRoles;
     use Notifiable;
+
+    // do not use HasRoles trait in submodule User model
+    // use HasRoles;
 
     /**
      * The attributes that a

@@ -77,6 +77,7 @@ class ProgramResource extends Resource
         return [
             RelationManagers\TeamsRelationManager::class,
             RelationManagers\UsersRelationManager::class,
+            RelationManagers\InvitesRelationManager::class,
         ];
     }
 

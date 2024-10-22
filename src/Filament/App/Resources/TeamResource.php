@@ -25,6 +25,17 @@ class TeamResource extends Resource
     protected static ?string $model = Team::class;
 
     // when user click on sidebar item, it shows the view page of the selected team directly
+    //
+    // Note: after speciifying below navigation item, it looks like...
+    // admin panel > Teams resource > user relation manager is showing as app panel > Team resource > user relation manager
+    // In user relation manager, a team member can invite user or add existing user to a team.
+    // (in staging env with filmanet v3.2.115)
+    //
+    // In local env with filament v3.2.119, app  panel > Teams resource > user relation manager is used.
+    // Not quite sure if it is the difference because of different filament version...
+    //
+    // By the way, a team member shuold not be able to invite new team member or add existing user as team member.
+    // This should be done by program admin.
     public static function getNavigationItems(): array
     {
         return [
