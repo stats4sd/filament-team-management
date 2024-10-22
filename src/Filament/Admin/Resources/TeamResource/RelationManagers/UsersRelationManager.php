@@ -9,8 +9,12 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\HtmlString;
-use Stats4sd\FilamentTeamManagement\Models\Team;
-use Stats4sd\FilamentTeamManagement\Models\User;
+
+// use Stats4sd\FilamentTeamManagement\Models\Team;
+// use Stats4sd\FilamentTeamManagement\Models\User;
+
+use App\Models\Team;
+use App\Models\User;
 
 class UsersRelationManager extends RelationManager
 {
@@ -27,9 +31,9 @@ class UsersRelationManager extends RelationManager
         return $form
             ->schema([
                 Shout::make('info')
-                    ->content(fn (User $record) => new HtmlString("Edit user's role within this team<br/>$record->name ($record->email)")),
+                    ->content(fn(User $record) => new HtmlString("Edit user's role within this team<br/>$record->name ($record->email)")),
                 Forms\Components\Checkbox::make('is_admin')
-                    ->label(fn (User $record): string => "$record->name is a Team Admin")
+                    ->label(fn(User $record): string => "$record->name is a Team Admin")
                     ->helperText('Team Admins have full access to all team settings and can manage all team members. They can edit or delete data. Non-admins can only collect data and view data.'),
             ])->columns(1);
     }
@@ -74,7 +78,7 @@ class UsersRelationManager extends RelationManager
                             ->reorderable(false)
                             ->addActionLabel('Add Another Email Address'),
                     ])
-                    ->action(fn (array $data, RelationManager $livewire) => $this->handleInvitation($data, $livewire->getOwnerRecord())),
+                    ->action(fn(array $data, RelationManager $livewire) => $this->handleInvitation($data, $livewire->getOwnerRecord())),
                 Tables\Actions\AttachAction::make()
                     ->label('Add Existing User to team'),
             ])

@@ -13,7 +13,9 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Stats4sd\FilamentTeamManagement\Filament\App\Resources\TeamResource\Pages;
 use Stats4sd\FilamentTeamManagement\Filament\App\Resources\TeamResource\RelationManagers;
-use Stats4sd\FilamentTeamManagement\Models\Team;
+
+// use Stats4sd\FilamentTeamManagement\Models\Team;
+use App\Models\Team;
 
 class TeamResource extends Resource
 {
@@ -26,8 +28,6 @@ class TeamResource extends Resource
     // when user click on sidebar item, it shows the view page of the selected team directly
     public static function getNavigationItems(): array
     {
-        logger('submodule');
-
         return [
             NavigationItem::make()
                 ->label(__('My Team'))
