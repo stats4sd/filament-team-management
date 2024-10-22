@@ -2,12 +2,11 @@
 
 namespace Stats4sd\FilamentTeamManagement\Filament\App\Pages;
 
+use App\Models\Team;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
-use Filament\Pages\Tenancy\RegisterTenant;
-
 // use Stats4sd\FilamentTeamManagement\Models\Team;
-use App\Models\Team;
+use Filament\Pages\Tenancy\RegisterTenant;
 
 class RegisterTeam extends RegisterTenant
 {
