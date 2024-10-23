@@ -129,7 +129,7 @@ class FilamentTeamManagementServiceProvider extends PackageServiceProvider
      */
     protected function getRoutes(): array
     {
-        return [];
+        return ['team-management'];
     }
 
     /**
