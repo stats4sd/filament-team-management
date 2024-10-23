@@ -44,7 +44,7 @@ class InviteUser extends Mailable
     public function content(): Content
     {
         return new Content(
-            markdown: 'vendor.filament-team-management.emails.role_invite',
+            markdown: 'filament-team-management::emails.role_invite',
             with: [
                 'acceptUrl' => URL::signedRoute(
                     'filament.app.roleregister',

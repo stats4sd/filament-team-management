@@ -44,7 +44,7 @@ class InviteMember extends Mailable
     public function content(): Content
     {
         return new Content(
-            markdown: 'vendor.filament-team-management.emails.team_invite',
+            markdown: 'filament-team-management::emails.team_invite',
             with: [
                 'acceptUrl' => URL::signedRoute(
                     'filament.app.register',
