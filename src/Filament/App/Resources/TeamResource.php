@@ -13,7 +13,6 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Stats4sd\FilamentTeamManagement\Filament\App\Resources\TeamResource\Pages;
-// use Stats4sd\FilamentTeamManagement\Models\Team;
 use Stats4sd\FilamentTeamManagement\Filament\App\Resources\TeamResource\RelationManagers;
 
 class TeamResource extends Resource
@@ -56,9 +55,6 @@ class TeamResource extends Resource
                         Forms\Components\TextInput::make('name')
                             ->required()
                             ->maxLength(255),
-                        Forms\Components\TextInput::make('website')
-                            ->url()
-                            ->maxLength(255),
                         Forms\Components\Textarea::make('description'),
                     ]),
             ]);
@@ -69,9 +65,6 @@ class TeamResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->searchable()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('website')
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('users_count')

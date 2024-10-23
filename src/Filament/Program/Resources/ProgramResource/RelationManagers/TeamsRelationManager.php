@@ -40,9 +40,6 @@ class TeamsRelationManager extends RelationManager
                     ->searchable()
                     ->badge()
                     ->color('success'),
-                Tables\Columns\TextColumn::make('website')
-                    ->searchable()
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('users_count')
                     ->label('# Users')
                     ->counts('users')

@@ -2,15 +2,13 @@
 
 namespace Stats4sd\FilamentTeamManagement\Mail;
 
+use Stats4sd\FilamentTeamManagement\Models\ProgramInvite;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\URL;
-// use App\Models\TeamManagement\ProgramInvite;
-
-use Stats4sd\FilamentTeamManagement\Models\ProgramInvite;
 
 class InviteProgramAdmin extends Mailable
 {

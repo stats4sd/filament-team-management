@@ -31,9 +31,6 @@ class TeamResource extends \Stats4sd\FilamentOdkLink\Filament\Resources\TeamReso
                         Forms\Components\TextInput::make('name')
                             ->required()
                             ->maxLength(255),
-                        Forms\Components\TextInput::make('website')
-                            ->url()
-                            ->maxLength(255),
                         Forms\Components\Textarea::make('description'),
                     ]),
             ]);
@@ -50,9 +47,6 @@ class TeamResource extends \Stats4sd\FilamentOdkLink\Filament\Resources\TeamReso
                     ->searchable()
                     ->badge()
                     ->color('success'),
-                Tables\Columns\TextColumn::make('website')
-                    ->searchable()
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('users_count')
                     ->label('# Users')
                     ->counts('users')

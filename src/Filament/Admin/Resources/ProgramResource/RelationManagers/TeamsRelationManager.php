@@ -47,9 +47,6 @@ class TeamsRelationManager extends RelationManager
                     ->searchable()
                     ->badge()
                     ->color('success'),
-                Tables\Columns\TextColumn::make('website')
-                    ->searchable()
-                    ->sortable(),
 
                 // Note: Here it is using filament-team-management Team model, which does not have xlsform relationship yet.
                 // xlsform relationship is added in main repo Team model because it uses HasXlsForms trait.
