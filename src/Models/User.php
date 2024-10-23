@@ -27,16 +27,7 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
     use HasRoles;
     use Notifiable;
 
-    /**
-     * The attributes that a
-     *
-     * @var array<int, string>
-     */
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-    ];
+    protected $guarded = ['id'];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -134,7 +125,7 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
     public function canAccessTenant(Model $tenant): bool
     {
         // add different handling for different panel
-        if ($tenant->getTable() == 'teams') {
+        if ($tenant instanceof (Team::class)) {
             // app panel
             // check permission
             if ($this->can('view all teams')) {
@@ -146,15 +137,15 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
                 return true;
             }
 
-            // check if this team belong to any program belong to user
-            $allAccessibleTeams = Team::whereIn('id', $this->getAllAccessibleTeamIds())->get();
+            $allAccessibleTeams =  $this->getAllAccessibleTeams();
+
             if ($allAccessibleTeams->contains($tenant)) {
                 return true;
             }
 
             // user cannot access this team
             return false;
-        } elseif ($tenant->getTable() == 'programs') {
+        } elseif ($tenant instanceof (Program::class)) {
             // program admin panel
             // check permission
             if ($this->can('view all programs')) {
@@ -180,7 +171,7 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
                 return Team::all();
             } else {
                 // find all accessible Team models
-                $allAccessibleTeams = Team::whereIn('id', $this->getAllAccessibleTeamIds())->get();
+                $allAccessibleTeams = $this->getAllAccessibleTeams();
 
                 return $allAccessibleTeams;
             }
@@ -190,29 +181,31 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
         }
     }
 
-    // to be revised, may not require after using Program model as program admin panel multi-tenancy
-    public function getAllAccessibleTeamIds(): array
+    public function getAllAccessibleTeams(): Collection
     {
-        // find all teams belong to all programs of user
-        $allTeamsIdInPrograms = [];
+        $allAccessibleTeams = collect([]);
 
+        // find all teams belong to all programs of user
         foreach ($this->programs as $program) {
-            $allPrograms = $program->teams->pluck('id');
-            array_push($allTeamsIdInPrograms, $allPrograms);
+            foreach ($program->teams as $team) {
+                $allAccessibleTeams->push($team);
+            }
         }
 
-        // flatten array
-        $allTeamsIdInPrograms = Arr::flatten($allTeamsIdInPrograms);
-
         // find all teams belong to user
-        $allTeamIds = $this->teams->pluck('id');
+        foreach ($this->teams as $team) {
+            $allAccessibleTeams->push($team);
+        }
 
-        // all accessible teams = all teams belong to all programs of user + all teams belong to user
-        $allAccessibleTeamIds = [];
-        array_push($allAccessibleTeamIds, Arr::flatten($allTeamsIdInPrograms), Arr::flatten($allTeamIds));
+        // return $allAccessibleTeams;
 
-        return Arr::flatten($allAccessibleTeamIds);
+        // when return $allAccessibleTeams directly, the collection does not contain the tenant. Not sure the root cause.
+        // to make it work, get Team models in the same way temporary
+        $teamModels = Team::whereIn('id', $allAccessibleTeams->pluck('id'))->get();
+
+        return $teamModels;
     }
+
 
     // The last team the user was on.
     public function latestTeam(): BelongsTo
