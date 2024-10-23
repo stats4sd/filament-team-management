@@ -1,10 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
+use Stats4sd\FilamentTeamManagement\Filament\App\Pages\Programregister;
 use Stats4sd\FilamentTeamManagement\Filament\App\Pages\Register;
 use Stats4sd\FilamentTeamManagement\Filament\App\Pages\Roleregister;
-use Stats4sd\FilamentTeamManagement\Filament\App\Pages\Programregister;
 
 // user registration form for team-invites
 Route::get('register', Register::class)
