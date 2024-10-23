@@ -2,13 +2,13 @@
 
 namespace Stats4sd\FilamentTeamManagement\Mail;
 
-use Stats4sd\FilamentTeamManagement\Models\RoleInvite;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\URL;
+use Stats4sd\FilamentTeamManagement\Models\RoleInvite;
 
 class InviteUser extends Mailable
 {
