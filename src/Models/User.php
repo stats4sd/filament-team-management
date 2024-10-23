@@ -14,7 +14,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
@@ -137,7 +136,7 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
                 return true;
             }
 
-            $allAccessibleTeams =  $this->getAllAccessibleTeams();
+            $allAccessibleTeams = $this->getAllAccessibleTeams();
 
             if ($allAccessibleTeams->contains($tenant)) {
                 return true;
@@ -205,7 +204,6 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
 
         return $teamModels;
     }
-
 
     // The last team the user was on.
     public function latestTeam(): BelongsTo
