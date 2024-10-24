@@ -35,8 +35,7 @@ class FilamentTeamManagementServiceProvider extends PackageServiceProvider
                 $command
                     ->publishConfigFile()
                     ->publishMigrations()
-                    ->askToRunMigrations()
-                    ->askToStarRepoOnGitHub('stats4sd/filament-team-management');
+                    ->askToRunMigrations();
             });
 
         $configFileName = $package->shortName();
@@ -56,6 +55,8 @@ class FilamentTeamManagementServiceProvider extends PackageServiceProvider
         if (file_exists($package->basePath('/../resources/views'))) {
             $package->hasViews(static::$viewNamespace);
         }
+
+        $package->hasRoute('team-management');
     }
 
     public function packageRegistered(): void {}
@@ -100,9 +101,6 @@ class FilamentTeamManagementServiceProvider extends PackageServiceProvider
     protected function getAssets(): array
     {
         return [
-            // AlpineComponent::make('filament-team-management', __DIR__ . '/../resources/dist/components/filament-team-management.js'),
-            Css::make('filament-team-management-styles', __DIR__ . '/../resources/dist/filament-team-management.css'),
-            Js::make('filament-team-management-scripts', __DIR__ . '/../resources/dist/filament-team-management.js'),
         ];
     }
 
