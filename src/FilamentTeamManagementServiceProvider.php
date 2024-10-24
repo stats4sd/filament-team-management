@@ -2,10 +2,7 @@
 
 namespace Stats4sd\FilamentTeamManagement;
 
-use Filament\Support\Assets\AlpineComponent;
 use Filament\Support\Assets\Asset;
-use Filament\Support\Assets\Css;
-use Filament\Support\Assets\Js;
 use Filament\Support\Facades\FilamentAsset;
 use Filament\Support\Facades\FilamentIcon;
 use Illuminate\Filesystem\Filesystem;
@@ -35,8 +32,7 @@ class FilamentTeamManagementServiceProvider extends PackageServiceProvider
                 $command
                     ->publishConfigFile()
                     ->publishMigrations()
-                    ->askToRunMigrations()
-                    ->askToStarRepoOnGitHub('stats4sd/filament-team-management');
+                    ->askToRunMigrations();
             });
 
         $configFileName = $package->shortName();
@@ -56,6 +52,8 @@ class FilamentTeamManagementServiceProvider extends PackageServiceProvider
         if (file_exists($package->basePath('/../resources/views'))) {
             $package->hasViews(static::$viewNamespace);
         }
+
+        $package->hasRoute('team-management');
     }
 
     public function packageRegistered(): void {}
@@ -100,9 +98,6 @@ class FilamentTeamManagementServiceProvider extends PackageServiceProvider
     protected function getAssets(): array
     {
         return [
-            // AlpineComponent::make('filament-team-management', __DIR__ . '/../resources/dist/components/filament-team-management.js'),
-            Css::make('filament-team-management-styles', __DIR__ . '/../resources/dist/filament-team-management.css'),
-            Js::make('filament-team-management-scripts', __DIR__ . '/../resources/dist/filament-team-management.js'),
         ];
     }
 
@@ -129,7 +124,7 @@ class FilamentTeamManagementServiceProvider extends PackageServiceProvider
      */
     protected function getRoutes(): array
     {
-        return [];
+        return ['team-management'];
     }
 
     /**
@@ -146,7 +141,15 @@ class FilamentTeamManagementServiceProvider extends PackageServiceProvider
     protected function getMigrations(): array
     {
         return [
-            'create_filament-team-management_table',
+            '1_create_teams_table',
+            '2_create_team_members_table',
+            '3_create_team_invites_table',
+            '4_create_role_invites_table',
+            '5_create_programs_table',
+            '6_create_program_user_table',
+            '7_create_program_team_table',
+            '8_create_program_invites_table',
+            '9_add_column_to_users_table',
         ];
     }
 }
