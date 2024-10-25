@@ -16,10 +16,21 @@ use Stats4sd\FilamentTeamManagement\Models\Program;
 class ProgramResource extends Resource
 {
     protected static ?string $navigationIcon = 'heroicon-o-building-library';
-
-    protected static ?string $navigationGroup = 'Programs, Teams and Users';
-
     protected static ?string $model = Program::class;
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return config('filament-team-management.use_programs');
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        if (config('filament-team-management.use_programs')) {
+            return 'Programs, Teams and Users';
+        } else {
+            return 'Teams and Users';
+        }
+    }
 
     public static function form(Form $form): Form
     {

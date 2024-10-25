@@ -13,10 +13,16 @@ use Stats4sd\FilamentTeamManagement\Models\User;
 class UserResource extends Resource
 {
     protected static ?string $navigationIcon = 'heroicon-o-users';
-
-    protected static ?string $navigationGroup = 'Programs, Teams and Users';
-
     protected static ?string $model = User::class;
+
+    public static function getNavigationGroup(): string
+    {
+        if (config('filament-team-management.use_programs')) {
+            return 'Programs, Teams and Users';
+        } else {
+            return 'Teams and Users';
+        }
+    }
 
     public static function form(Form $form): Form
     {
@@ -70,7 +76,8 @@ class UserResource extends Resource
                 Tables\Columns\TextColumn::make('programs.name')
                     ->searchable()
                     ->badge()
-                    ->color('success'),
+                    ->color('success')
+                    ->visible(config('filament-team-management.use_programs')),
                 Tables\Columns\TextColumn::make('teams.name')
                     ->searchable()
                     ->badge()

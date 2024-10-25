@@ -22,10 +22,16 @@ use Stats4sd\FilamentTeamManagement\Models\Team;
 class TeamResource extends Resource
 {
     protected static ?string $navigationIcon = 'heroicon-o-building-office-2';
-
-    protected static ?string $navigationGroup = 'Programs, Teams and Users';
-
     protected static ?string $model = Team::class;
+
+    public static function getNavigationGroup(): string
+    {
+        if (config('filament-team-management.use_programs')) {
+            return 'Programs, Teams and Users';
+        } else {
+            return 'Teams and Users';
+        }
+    }
 
     public static function form(Form $form): Form
     {
@@ -51,7 +57,8 @@ class TeamResource extends Resource
                 Tables\Columns\TextColumn::make('programs.name')
                     ->searchable()
                     ->badge()
-                    ->color('success'),
+                    ->color('success')
+                    ->visible(config('filament-team-management.use_programs')),
                 Tables\Columns\TextColumn::make('users_count')
                     ->label('# Users')
                     ->counts('users')
