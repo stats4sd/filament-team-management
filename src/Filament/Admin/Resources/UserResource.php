@@ -13,6 +13,7 @@ use Stats4sd\FilamentTeamManagement\Models\User;
 class UserResource extends Resource
 {
     protected static ?string $navigationIcon = 'heroicon-o-users';
+
     protected static ?string $model = User::class;
 
     public static function getNavigationGroup(): string

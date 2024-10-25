@@ -22,6 +22,7 @@ use Stats4sd\FilamentTeamManagement\Models\Team;
 class TeamResource extends Resource
 {
     protected static ?string $navigationIcon = 'heroicon-o-building-office-2';
+
     protected static ?string $model = Team::class;
 
     public static function getNavigationGroup(): string
