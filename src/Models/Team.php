@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Stats4sd\FilamentTeamManagement\Mail\InviteMember;
 
-// class Team extends \Stats4sd\FilamentOdkLink\Models\TeamManagement\Team
 class Team extends Model
 {
     protected $table = 'teams';

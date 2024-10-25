@@ -30,10 +30,8 @@ class ProgramResource extends Resource
                         Forms\Components\TextInput::make('name')
                             ->required()
                             ->maxLength(255),
-                        Forms\Components\TextInput::make('description')
-                            ->maxLength(255),
-                        Forms\Components\TextInput::make('note')
-                            ->maxLength(255),
+                        Forms\Components\Textarea::make('description'),
+                        Forms\Components\Textarea::make('note'),
                     ]),
             ]);
     }
