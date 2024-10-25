@@ -27,9 +27,6 @@ class TeamsRelationManager extends RelationManager
                         Forms\Components\TextInput::make('name')
                             ->required()
                             ->maxLength(255),
-                        Forms\Components\TextInput::make('website')
-                            ->url()
-                            ->maxLength(255),
                         Forms\Components\Textarea::make('description'),
                     ]),
             ]);
