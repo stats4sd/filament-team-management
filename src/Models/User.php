@@ -169,9 +169,7 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
         if ($panel->isDefault()) {
             // app panel
             if ($this->can('view all teams')) {
-                //TODO: test
-                return [];
-                //return config('filament-team-management.models.team')::all();
+                return config('filament-team-management.models.team')::all();
             } else {
                 // find all accessible Team models
                 $allAccessibleTeams = $this->getAllAccessibleTeams();
