@@ -6,7 +6,6 @@ use Awcodes\Shout\Components\Shout;
 use Filament\Actions;
 use Filament\Forms;
 use Filament\Resources\Pages\ListRecords;
-use Spatie\Permission\Models\Role;
 use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\UserResource;
 
 class ListUsers extends ListRecords
