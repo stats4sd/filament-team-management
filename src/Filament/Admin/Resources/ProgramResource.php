@@ -17,9 +17,21 @@ class ProgramResource extends Resource
 {
     protected static ?string $navigationIcon = 'heroicon-o-building-library';
 
-    protected static ?string $navigationGroup = 'Programs, Teams and Users';
-
     protected static ?string $model = Program::class;
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return config('filament-team-management.use_programs');
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        if (config('filament-team-management.use_programs')) {
+            return 'Programs, Teams and Users';
+        } else {
+            return 'Teams and Users';
+        }
+    }
 
     public static function form(Form $form): Form
     {
@@ -30,10 +42,8 @@ class ProgramResource extends Resource
                         Forms\Components\TextInput::make('name')
                             ->required()
                             ->maxLength(255),
-                        Forms\Components\TextInput::make('description')
-                            ->maxLength(255),
-                        Forms\Components\TextInput::make('note')
-                            ->maxLength(255),
+                        Forms\Components\Textarea::make('description'),
+                        Forms\Components\Textarea::make('note'),
                     ]),
             ]);
     }
