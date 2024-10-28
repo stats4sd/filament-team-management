@@ -17,79 +17,78 @@ use Stats4sd\FilamentTeamManagement\Models\RoleInvite;
 
 class Roleregister extends BaseRegister
 {
-        #[Url]
-        public $token = '';
+    #[Url]
+    public $token = '';
 
-        public ?RoleInvite $invite = null;
+    public ?RoleInvite $invite = null;
 
-        public ?array $data = [];
+    public ?array $data = [];
 
-        public function mount(): void
-        {
-            $this->invite = RoleInvite::where('token', $this->token)->firstOrFail();
+    public function mount(): void
+    {
+        $this->invite = RoleInvite::where('token', $this->token)->firstOrFail();
 
-            $this->form->fill([
-                'email' => $this->invite->email,
-            ]);
+        $this->form->fill([
+            'email' => $this->invite->email,
+        ]);
+    }
+
+    public function register(): ?RegistrationResponse
+    {
+        try {
+            $this->rateLimit(2);
+        } catch (TooManyRequestsException $exception) {
+            Notification::make()
+                ->title(__('filament-panels::pages/auth/register.notifications.throttled.title', [
+                    'seconds' => $exception->secondsUntilAvailable,
+                    'minutes' => ceil($exception->secondsUntilAvailable / 60),
+                ]))
+                ->body(array_key_exists('body', __('filament-panels::pages/auth/register.notifications.throttled') ?: []) ? __('filament-panels::pages/auth/register.notifications.throttled.body', [
+                    'seconds' => $exception->secondsUntilAvailable,
+                    'minutes' => ceil($exception->secondsUntilAvailable / 60),
+                ]) : null)
+                ->danger()
+                ->send();
+
+            return null;
         }
 
-        public function register(): ?RegistrationResponse
-        {
-            try {
-                $this->rateLimit(2);
-            } catch (TooManyRequestsException $exception) {
-                Notification::make()
-                    ->title(__('filament-panels::pages/auth/register.notifications.throttled.title', [
-                        'seconds' => $exception->secondsUntilAvailable,
-                        'minutes' => ceil($exception->secondsUntilAvailable / 60),
-                    ]))
-                    ->body(array_key_exists('body', __('filament-panels::pages/auth/register.notifications.throttled') ?: []) ? __('filament-panels::pages/auth/register.notifications.throttled.body', [
-                        'seconds' => $exception->secondsUntilAvailable,
-                        'minutes' => ceil($exception->secondsUntilAvailable / 60),
-                    ]) : null)
-                    ->danger()
-                    ->send();
+        $data = $this->form->getState();
+        $user = $this->getUserModel()::create($data);
 
-                return null;
-            }
+        // do not delete rote_invites record, keep them as reference.
+        // System will not allow the invited user to register again with the same email address.
+        // $this->invite->delete();
 
+        $this->invite->is_confirmed = 1;
+        $this->invite->save();
 
-            $data = $this->form->getState();
-            $user = $this->getUserModel()::create($data);
+        // add role to user
+        $role = Role::find($this->invite->role_id);
+        $user->assignRole($role);
 
-            // do not delete rote_invites record, keep them as reference.
-            // System will not allow the invited user to register again with the same email address.
-            // $this->invite->delete();
+        app()->bind(
+            \Illuminate\Auth\Listeners\SendEmailVerificationNotification::class,
+        );
 
-            $this->invite->is_confirmed = 1;
-            $this->invite->save();
+        event(new Registered($user));
 
-            // add role to user
-            $role = Role::find($this->invite->role_id);
-            $user->assignRole($role);
+        Filament::auth()->login($user);
 
-            app()->bind(
-                \Illuminate\Auth\Listeners\SendEmailVerificationNotification::class,
-            );
+        session()->regenerate();
 
-            event(new Registered($user));
+        // redirect new user to app panel
+        return app(RegisterResponse::class);
+    }
 
-            Filament::auth()->login($user);
-
-            session()->regenerate();
-
-            // redirect new user to app panel
-            return app(RegisterResponse::class);
-        }
-
-        protected function getEmailFormComponent(): Component
-        {
-            return Forms\Components\TextInput::make('email')
-                ->label(__('filament-panels::pages/auth/register.form.email.label'))
-                ->email()
-                ->required()
-                ->maxLength(255)
-                ->unique($this->getUserModel())
-                ->readOnly();
-        }
+    protected function getEmailFormComponent(): Component
+    {
+        return Forms\Components\TextInput::make('email')
+            ->label(__('filament-panels::pages/auth/register.form.email.label'))
+            ->email()
+            ->required()
+            ->maxLength(255)
+            ->unique($this->getUserModel())
+            ->readOnly();
+    }
 }
