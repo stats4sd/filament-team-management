@@ -95,7 +95,7 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
 
     public function programs(): BelongsToMany
     {
-        return $this->belongsToMany(config('filament-team-management.models.program'));
+        return $this->belongsToMany(config('filament-team-management.models.program'), 'program_members', 'user_id', 'program_id');
     }
 
     public function belongsToTeam(TeamInterface $team): bool
