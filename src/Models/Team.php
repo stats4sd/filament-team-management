@@ -61,21 +61,21 @@ class Team extends Model implements TeamInterface
 
     public function admins(): BelongsToMany
     {
-        return $this->belongsToMany(config('filament-team-management.models.user'), 'team_members')
+        return $this->belongsToMany(config('filament-team-management.models.user'), 'team_members', 'team_id', 'user_id')
             ->withPivot('is_admin')
             ->wherePivot('is_admin', 1);
     }
 
     public function members(): BelongsToMany
     {
-        return $this->belongsToMany(config('filament-team-management.models.user'), 'team_members')
+        return $this->belongsToMany(config('filament-team-management.models.user'), 'team_members', 'team_id', 'user_id')
             ->withPivot('is_admin')
             ->wherePivot('is_admin', 0);
     }
 
     public function programs(): BelongsToMany
     {
-        return $this->belongsToMany(config('filament-team-management.models.program'));
+        return $this->belongsToMany(config('filament-team-management.models.program'), 'team_programs', 'team_id', 'program_id');
     }
 
     // add relationship to refer to team model itself, so that app panel > Teams resource can show the selected team for editing
