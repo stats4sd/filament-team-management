@@ -5,7 +5,6 @@ use Stats4sd\FilamentTeamManagement\Filament\App\Pages\Programregister;
 use Stats4sd\FilamentTeamManagement\Filament\App\Pages\Register;
 use Stats4sd\FilamentTeamManagement\Filament\App\Pages\Roleregister;
 
-
 Route::group([
     'middleware' => ['web'],
 ], function () {
