@@ -8,7 +8,7 @@ use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Stats4sd\FilamentTeamManagement\Models\Program;
+use Stats4sd\FilamentTeamManagement\Models\Interfaces\ProgramInterface;
 
 class UsersRelationManager extends RelationManager
 {
@@ -81,7 +81,7 @@ class UsersRelationManager extends RelationManager
             ]);
     }
 
-    public function handleInvitation(array $data, Program $program): void
+    public function handleInvitation(array $data, ProgramInterface $program): void
     {
         $program->sendInvites($data['users']);
     }

@@ -13,7 +13,6 @@ use Filament\Tables\Table;
 use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\TeamResource\Pages;
 use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\TeamResource\RelationManagers\InvitesRelationManager;
 use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\TeamResource\RelationManagers\UsersRelationManager;
-use Stats4sd\FilamentTeamManagement\Models\Team;
 
 // filament-odk-link package related code are commented as some applications may not require ODK functionalities.
 // Please uncomment those code if filament-odk-link package is required and added to main repo.
@@ -23,7 +22,10 @@ class TeamResource extends Resource
 {
     protected static ?string $navigationIcon = 'heroicon-o-building-office-2';
 
-    protected static ?string $model = Team::class;
+    public static function getModel(): string
+    {
+        return config('filament-team-management.models.team');
+    }
 
     public static function getNavigationGroup(): string
     {

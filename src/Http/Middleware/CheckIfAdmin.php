@@ -4,7 +4,6 @@ namespace Stats4sd\FilamentTeamManagement\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Stats4sd\FilamentTeamManagement\Models\User;
 use Symfony\Component\HttpFoundation\Response;
 
 class CheckIfAdmin
