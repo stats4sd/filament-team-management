@@ -11,6 +11,7 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\HtmlString;
+use Stats4sd\FilamentTeamManagement\Models\Interfaces\TeamInterface;
 
 class UsersRelationManager extends RelationManager
 {
@@ -96,7 +97,7 @@ class UsersRelationManager extends RelationManager
             ]);
     }
 
-    public function handleInvitation(array $data, Team $team): void
+    public function handleInvitation(array $data, TeamInterface $team): void
     {
         $team->sendInvites($data['users']);
     }
