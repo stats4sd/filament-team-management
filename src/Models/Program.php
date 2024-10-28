@@ -11,8 +11,9 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Spatie\Permission\Models\Role;
 use Stats4sd\FilamentTeamManagement\Mail\InviteProgramAdmin;
+use Stats4sd\FilamentTeamManagement\Models\Interfaces\ProgramInterface;
 
-class Program extends Model
+class Program extends Model implements ProgramInterface
 {
     protected $table = 'programs';
 
@@ -58,12 +59,12 @@ class Program extends Model
 
     public function users(): BelongsToMany
     {
-        return $this->belongsToMany(User::class)->withTimestamps();
+        return $this->belongsToMany(config('filament-team-management.models.user'))->withTimestamps();
     }
 
     public function teams(): BelongsToMany
     {
-        return $this->belongsToMany(Team::class)->withTimestamps();
+        return $this->belongsToMany(config('filament-team-management.models.team'))->withTimestamps();
     }
 
     // add relationship to refer to program model itself, so that program admin panel > Programs resource can show the selected program for editing

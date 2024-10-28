@@ -17,6 +17,11 @@ You can install the package via composer:
 composer require stats4sd/filament-team-management
 ```
 
+This package requires Laravel Filament and this package: https://filamentphp.com/plugins/tharinda-rodrigo-spatie-roles-permissions to be installed. Make sure you follow the installation instructions for those packages first:
+
+- https://filamentphp.com/plugins/tharinda-rodrigo-spatie-roles-permissions
+
+
 You can publish and run the migrations with:
 
 ```bash
@@ -76,4 +81,3 @@ Please review [our security policy](../../security/policy) on how to report secu
 ## License
 
 The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
-

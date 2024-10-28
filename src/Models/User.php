@@ -19,6 +19,8 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Spatie\Permission\Traits\HasRoles;
 use Stats4sd\FilamentTeamManagement\Mail\InviteUser;
+use Stats4sd\FilamentTeamManagement\Models\Interfaces\ProgramInterface;
+use Stats4sd\FilamentTeamManagement\Models\Interfaces\TeamInterface;
 
 class User extends Authenticatable implements FilamentUser, HasDefaultTenant, HasTenants
 {
@@ -88,20 +90,20 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
 
     public function teams(): BelongsToMany
     {
-        return $this->belongsToMany(Team::class, 'team_members')->withPivot('is_admin');
+        return $this->belongsToMany(config('filament-team-management.models.team'), 'team_members', 'user_id', 'team_id')->withPivot('is_admin');
     }
 
     public function programs(): BelongsToMany
     {
-        return $this->belongsToMany(Program::class);
+        return $this->belongsToMany(config('filament-team-management.models.program'));
     }
 
-    public function belongsToTeam(Team $team): bool
+    public function belongsToTeam(TeamInterface $team): bool
     {
         return $this->teams->contains($team);
     }
 
-    public function belongsToProgram(Program $program): bool
+    public function belongsToProgram(ProgramInterface $program): bool
     {
         return $this->programs->contains($program);
     }
@@ -124,7 +126,7 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
     public function canAccessTenant(Model $tenant): bool
     {
         // add different handling for different panel
-        if ($tenant instanceof (Team::class)) {
+        if ($tenant instanceof (config('filament-team-management.models.team'))) {
             // app panel
             // check permission
             if ($this->can('view all teams')) {
@@ -144,7 +146,7 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
 
             // user cannot access this team
             return false;
-        } elseif ($tenant instanceof (Program::class)) {
+        } elseif ($tenant instanceof (config('filament-team-management.models.program'))) {
             // program admin panel
             // check permission
             if ($this->can('view all programs')) {
@@ -167,7 +169,7 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
         if ($panel->isDefault()) {
             // app panel
             if ($this->can('view all teams')) {
-                return Team::all();
+                return config('filament-team-management.models.team')::all();
             } else {
                 // find all accessible Team models
                 $allAccessibleTeams = $this->getAllAccessibleTeams();
@@ -176,7 +178,7 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
             }
         } else {
             // program admin panel
-            return $this->can('view all programs') ? Program::all() : $this->programs;
+            return $this->can('view all programs') ? config('filament-team-management.models.program')::all() : $this->programs;
         }
     }
 
@@ -208,13 +210,13 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
     // The last team the user was on.
     public function latestTeam(): BelongsTo
     {
-        return $this->belongsTo(Team::class, 'latest_team_id');
+        return $this->belongsTo(config('filament-team-management.models.team'), 'latest_team_id');
     }
 
     // The last program the user was on.
     public function latestProgram(): BelongsTo
     {
-        return $this->belongsTo(Program::class, 'latest_program_id');
+        return $this->belongsTo(config('filament-team-management.models.program'), 'latest_program_id');
     }
 
     public function getDefaultTenant(Panel $panel): ?Model

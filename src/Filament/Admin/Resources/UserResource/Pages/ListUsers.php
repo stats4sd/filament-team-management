@@ -6,7 +6,6 @@ use Awcodes\Shout\Components\Shout;
 use Filament\Actions;
 use Filament\Forms;
 use Filament\Resources\Pages\ListRecords;
-use Spatie\Permission\Models\Role;
 use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\UserResource;
 
 class ListUsers extends ListRecords
@@ -29,11 +28,8 @@ class ListUsers extends ListRecords
                                 ->email()
                                 ->required(),
 
-                            // Only show "Super Admin" in role selection box.
-                            // This is to avoid admin invite program admin via role-invite.
-                            // Super admin should create a program then invite program admin for that program
                             Forms\Components\Select::make('role')
-                                ->options(Role::where('name', 'Super Admin')->pluck('name', 'id'))
+                                ->relationship('roles', 'name')
                                 ->required(),
                         ])
                         ->reorderable(false)
