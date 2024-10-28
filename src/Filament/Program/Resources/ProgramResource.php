@@ -13,7 +13,6 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Stats4sd\FilamentTeamManagement\Filament\Program\Resources\ProgramResource\Pages;
 use Stats4sd\FilamentTeamManagement\Filament\Program\Resources\ProgramResource\RelationManagers;
-use Stats4sd\FilamentTeamManagement\Models\Program;
 
 class ProgramResource extends Resource
 {
@@ -21,7 +20,10 @@ class ProgramResource extends Resource
 
     protected static ?string $navigationGroup = 'Settings';
 
-    protected static ?string $model = Program::class;
+    public static function getModel(): string
+    {
+        return config('filament-team-management.models.program');
+    }
 
     // when user click on sidebar item, it shows the view page of the selected program directly
     public static function getNavigationItems(): array

@@ -11,13 +11,15 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\ProgramResource\Pages;
 use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\ProgramResource\RelationManagers;
-use Stats4sd\FilamentTeamManagement\Models\Program;
 
 class ProgramResource extends Resource
 {
     protected static ?string $navigationIcon = 'heroicon-o-building-library';
 
-    protected static ?string $model = Program::class;
+    public static function getModel(): string
+    {
+        return config('filament-team-management.models.program');
+    }
 
     public static function shouldRegisterNavigation(): bool
     {

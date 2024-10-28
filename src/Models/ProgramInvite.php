@@ -34,12 +34,12 @@ class ProgramInvite extends Model
     // *********** RELATIONSHIPS ************ //
     public function inviter(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'inviter_id');
+        return $this->belongsTo(config('filament-team-management.models.user'), 'inviter_id');
     }
 
     public function program(): BelongsTo
     {
-        return $this->belongsTo(Program::class);
+        return $this->belongsTo(config('filament-team-management.models.program'));
     }
 
     public function confirm(): bool

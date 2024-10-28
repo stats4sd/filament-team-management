@@ -13,9 +13,7 @@ use Illuminate\Auth\Events\Registered;
 use Livewire\Attributes\Url;
 use Spatie\Permission\Models\Role;
 use Stats4sd\FilamentTeamManagement\Http\Responses\RegisterResponse;
-use Stats4sd\FilamentTeamManagement\Models\Program;
 use Stats4sd\FilamentTeamManagement\Models\ProgramInvite;
-use Stats4sd\FilamentTeamManagement\Models\User;
 
 class Programregister extends BaseRegister
 {

@@ -5,7 +5,7 @@ namespace Stats4sd\FilamentTeamManagement\Filament\App\Pages;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Pages\Tenancy\RegisterTenant;
-use Stats4sd\FilamentTeamManagement\Models\Program;
+use Illuminate\Database\Eloquent\Model;
 
 class RegisterProgram extends RegisterTenant
 {
@@ -25,9 +25,9 @@ class RegisterProgram extends RegisterTenant
             ]);
     }
 
-    protected function handleRegistration(array $data): Program
+    protected function handleRegistration(array $data): Model
     {
-        $program = Program::create($data);
+        $program = config('filament-team-management.models.program')::create($data);
 
         $program->users()->attach(auth()->user());
 

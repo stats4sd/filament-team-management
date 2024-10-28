@@ -8,13 +8,15 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\UserResource\Pages;
-use Stats4sd\FilamentTeamManagement\Models\User;
 
 class UserResource extends Resource
 {
     protected static ?string $navigationIcon = 'heroicon-o-users';
 
-    protected static ?string $model = User::class;
+    public static function getModel(): string
+    {
+        return config('filament-team-management.models.user');
+    }
 
     public static function getNavigationGroup(): string
     {
@@ -27,6 +29,8 @@ class UserResource extends Resource
 
     public static function form(Form $form): Form
     {
+        $teamClass = config('filament-team-management.models.team');
+
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
@@ -47,14 +51,16 @@ class UserResource extends Resource
                     ->password()
                     ->revealable(),
 
+                // TODO probably remove password editing here;
+
                 // invite to team (if role is team member)
 
-                // Note - The default setup is to have 'teams' as a belongsToMany for users. This is still the case in this platform (to avoid re-writing the structure), but in this case users will only ever belong to zero or one team. So this is not a 'multiple'.
+                // TODO: make multiple select
                 //
                 // (It's also because there seems to be a bug in Filament where select multiples don't work if the disabled() state is live updated...)
                 \Filament\Forms\Components\Select::make('team_id')
                     ->label('Which team should the user be a member of?')
-                    ->exists('teams', 'id')
+                    ->exists((new $teamClass)->getTable(), 'id')
                     ->relationship('teams', titleAttribute: 'name'),
 
                 // invite to role
