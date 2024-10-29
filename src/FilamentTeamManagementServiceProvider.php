@@ -8,7 +8,6 @@ use Filament\Support\Facades\FilamentAsset;
 use Filament\Support\Facades\FilamentIcon;
 use Illuminate\Filesystem\Filesystem;
 use Livewire\Features\SupportTesting\Testable;
-use Spatie\LaravelPackageTools\Commands\InstallCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 use Stats4sd\FilamentTeamManagement\Commands\InstallFilamentTeamManagement;
@@ -37,13 +36,10 @@ class FilamentTeamManagementServiceProvider extends PackageServiceProvider
         $package->hasTranslations();
         $package->hasViews(static::$viewNamespace);
 
-
         $package->hasRoute('team-management');
     }
 
-    public function packageRegistered(): void
-    {
-    }
+    public function packageRegistered(): void {}
 
     public function packageBooted(): void
     {
@@ -162,7 +158,7 @@ class FilamentTeamManagementServiceProvider extends PackageServiceProvider
         foreach ($migrations as $migrationFileName) {
 
             $filePath = $this->package->basePath("/../database/migrations/{$migrationFileName}.php");
-            if (!file_exists($filePath)) {
+            if (! file_exists($filePath)) {
                 // Support for the .stub file extension
                 $filePath .= '.stub';
             }
@@ -171,7 +167,7 @@ class FilamentTeamManagementServiceProvider extends PackageServiceProvider
                 $filePath => $this->generateMigrationName(
                     $migrationFileName,
                     $now->addSecond()
-                ),], "{$this->package->shortName()}-migrations-{$tag}");
+                ), ], "{$this->package->shortName()}-migrations-{$tag}");
 
             if ($this->package->runsMigrations) {
                 $this->loadMigrationsFrom($filePath);

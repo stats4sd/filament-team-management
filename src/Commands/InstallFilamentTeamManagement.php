@@ -19,10 +19,9 @@ class InstallFilamentTeamManagement extends Command
     {
         // confirm continue;
         $this->info('It is recommended to make a git commit before running this command. That way you can easily review the git diff to see what changes were made by the script.');
-        if(!$this->confirm('Do you want to continue?')) {
+        if (! $this->confirm('Do you want to continue?')) {
             return self::SUCCESS;
         }
-
 
         // Ask "do you want to use 'programs' (groups of teams)?
 
@@ -32,18 +31,17 @@ class InstallFilamentTeamManagement extends Command
         $this->updateEnv($usePrograms);
 
         $this->info('This package requires the Spatie Permissions package. If you have not already installed it and published the migrations, please do so now:');
-        if($this->confirm('Do you need the roles and permissions tables from the Spatie Permissions package?', true)) {
+        if ($this->confirm('Do you need the roles and permissions tables from the Spatie Permissions package?', true)) {
 
             $this->call('vendor:publish', [
                 '--provider' => "Spatie\Permission\PermissionServiceProvider",
             ]);
         }
 
-
         $this->info('publishing default migrations');
         $this->call('vendor:publish', [
             '--provider' => "Stats4sd\FilamentTeamManagement\FilamentTeamManagementServiceProvider",
-            '--tag' => "filament-team-management-migrations-default",
+            '--tag' => 'filament-team-management-migrations-default',
         ]);
 
         if ($usePrograms) {
@@ -51,7 +49,7 @@ class InstallFilamentTeamManagement extends Command
             $this->info('publishing program-related migrations');
             $this->call('vendor:publish', [
                 '--provider' => "Stats4sd\FilamentTeamManagement\FilamentTeamManagementServiceProvider",
-                '--tag' => "filament-team-management-migrations-program",
+                '--tag' => 'filament-team-management-migrations-program',
             ]);
 
         }
@@ -64,7 +62,6 @@ class InstallFilamentTeamManagement extends Command
             $this->updateDatabaseSeeder($usePrograms);
         }
 
-
         return self::SUCCESS;
     }
 
@@ -73,7 +70,7 @@ class InstallFilamentTeamManagement extends Command
         // find the DatabaseSeeder file and add the seeders
         $databaseSeederPath = base_path('database/seeders/DatabaseSeeder.php');
 
-        if (!file_exists($databaseSeederPath)) {
+        if (! file_exists($databaseSeederPath)) {
             $this->error('DatabaseSeeder.php file not found. Please add the following seeders to your seeder file manually:');
 
             $this->comment('Stats4sd\FilamentTeamManagement\Database\Seeders\DatabaseSeeder::class');
@@ -116,15 +113,16 @@ class InstallFilamentTeamManagement extends Command
 
             if (empty($braceStack)) {
                 $runMethodEndPos = $i;
+
                 break;
             }
         }
 
-        if (!isset($runMethodEndPos)) {
+        if (! isset($runMethodEndPos)) {
             $this->error('Could not find the end of the run() method in DatabaseSeeder.php. Please add the following seeders to your seeder file manually:');
             $this->comment('\Stats4sd\FilamentTeamManagement\Database\Seeders\DatabaseSeeder::class');
 
-            if($usePrograms) {
+            if ($usePrograms) {
                 $this->comment('\Stats4sd\FilamentTeamManagement\Database\Seeders\DatabaseProgramSeeder::class');
             }
 
@@ -132,7 +130,7 @@ class InstallFilamentTeamManagement extends Command
         }
 
         // add the seeders to the run() method
-        $databaseSeederContents = substr_replace($databaseSeederContents, PHP_EOL . PHP_EOL . '$this->call(\Stats4sd\FilamentTeamManagement\Database\Seeders\DatabaseSeeder::class);' . PHP_EOL , $runMethodEndPos, 0);
+        $databaseSeederContents = substr_replace($databaseSeederContents, PHP_EOL . PHP_EOL . '$this->call(\Stats4sd\FilamentTeamManagement\Database\Seeders\DatabaseSeeder::class);' . PHP_EOL, $runMethodEndPos, 0);
 
         if ($usePrograms) {
             $databaseSeederContents = substr_replace($databaseSeederContents, '$this->call(\Stats4sd\FilamentTeamManagement\Database\Seeders\DatabaseProgramSeeder::class);' . PHP_EOL, $runMethodEndPos, 0);
@@ -165,9 +163,8 @@ class InstallFilamentTeamManagement extends Command
             $variables['FILAMENT_TEAM_MANAGEMENT_PROGRAM_MODEL'] = "FILAMENT_TEAM_MANAGEMENT_PROGRAM_MODEL={$programClass}";
         }
 
-
         $variables = Arr::where($variables, function ($value, $key) use ($contents) {
-            return !Str::contains($contents, PHP_EOL . $key); // check if the key is already in the .env file
+            return ! Str::contains($contents, PHP_EOL . $key); // check if the key is already in the .env file
         });
 
         $variables = trim(implode(PHP_EOL, $variables));
