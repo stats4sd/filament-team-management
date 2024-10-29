@@ -1,2 +1,2 @@
-<x-filament::button size="xl" outlined>ADMIN PANEL
-</x-filament::button>
+<h2 class="font-xl text-center">ADMIN PANEL
+</h2>

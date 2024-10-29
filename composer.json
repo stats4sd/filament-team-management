@@ -42,7 +42,8 @@
     "autoload": {
         "psr-4": {
             "Stats4sd\\FilamentTeamManagement\\": "src/",
-            "Stats4sd\\FilamentTeamManagement\\Database\\Factories\\": "database/factories/"
+            "Stats4sd\\FilamentTeamManagement\\Database\\Factories\\": "database/factories/",
+            "Stats4sd\\FilamentTeamManagement\\Database\\Seeders\\": "database/seeders/"
         }
     },
     "autoload-dev": {

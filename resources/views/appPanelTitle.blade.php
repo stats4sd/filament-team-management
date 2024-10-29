@@ -1,2 +1,2 @@
-<x-filament::button size="xl" outlined>APP PANEL
-</x-filament::button>
+<h2 class="font-xl text-center">APP PANEL
+</h2>
