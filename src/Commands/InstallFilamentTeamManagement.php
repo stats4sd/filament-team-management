@@ -64,6 +64,8 @@ class InstallFilamentTeamManagement extends Command
             $this->updateDatabaseSeeder($usePrograms);
         }
 
+        $this->info('Installation complete!');
+        $this->info('Please make sure that your User model extends the FilamentTeamManagement User model.');
 
         return self::SUCCESS;
     }
