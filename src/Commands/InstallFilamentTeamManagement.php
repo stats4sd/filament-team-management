@@ -23,7 +23,6 @@ class InstallFilamentTeamManagement extends Command
             return self::SUCCESS;
         }
 
-
         // Ask "do you want to use 'programs' (groups of teams)?
 
         $usePrograms = $this->confirm('Do you want to use "programs" (groups of teams)?');
@@ -38,7 +37,6 @@ class InstallFilamentTeamManagement extends Command
                 '--provider' => "Spatie\Permission\PermissionServiceProvider",
             ]);
         }
-
 
         $this->info('publishing default migrations');
         $this->call('vendor:publish', [
@@ -75,7 +73,7 @@ class InstallFilamentTeamManagement extends Command
         // find the DatabaseSeeder file and add the seeders
         $databaseSeederPath = base_path('database/seeders/DatabaseSeeder.php');
 
-        if (!file_exists($databaseSeederPath)) {
+        if (! file_exists($databaseSeederPath)) {
             $this->error('DatabaseSeeder.php file not found. Please add the following seeders to your seeder file manually:');
 
             $this->comment('Stats4sd\FilamentTeamManagement\Database\Seeders\DatabaseSeeder::class');
