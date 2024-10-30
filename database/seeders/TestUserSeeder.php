@@ -8,6 +8,9 @@ use Spatie\Permission\Models\Role;
 
 class TestUserSeeder extends Seeder
 {
+    /**
+     * @throws \Exception
+     */
     public function run(): void
     {
         // create roles
@@ -27,30 +30,30 @@ class TestUserSeeder extends Seeder
         // create users
         $user = User::create([
             'name' => 'Test User',
-            'email' => 'test@example.com',
+            'email' => 'test-from-team@example.com',
             'password' => bcrypt('password'),
-            'latest_team_id' => 1,
-            'latest_program_id' => null,
         ]);
 
         $admin = User::create([
             'name' => 'Test Admin',
             'email' => 'admin@example.com',
             'password' => bcrypt('password'),
-            'latest_team_id' => 1,
-            'latest_program_id' => 1,
         ]);
 
         $programAdmin = User::create([
             'name' => 'Test Program Admin',
             'email' => 'program_admin@example.com',
             'password' => bcrypt('password'),
-            'latest_team_id' => 2,
-            'latest_program_id' => 1,
         ]);
 
         // assign role to users
-        $admin->assignRole('Super Admin');
-        $programAdmin->assignRole('Program Admin');
+
+        if (method_exists($user, 'assignRole')) {
+            $admin->assignRole('Super Admin');
+            $programAdmin->assignRole('Program Admin');
+        } else {
+            throw new \Exception('User model does not have assignRole method. Please make sure your User model uses the HasRoles trait. This can be achieved by extending the Stats4sd\FilamentTeamManagement\Models\User model');
+        }
+
     }
 }
