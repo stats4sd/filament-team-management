@@ -13,6 +13,7 @@ use Stats4sd\FilamentTeamManagement\Mail\InviteMember;
 use Stats4sd\FilamentTeamManagement\Models\Interfaces\TeamInterface;
 
 /**
+ * @property int $id
  * @property string $name
  * @property string $description
  */

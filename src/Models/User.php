@@ -22,6 +22,7 @@ use Stats4sd\FilamentTeamManagement\Models\Interfaces\ProgramInterface;
 use Stats4sd\FilamentTeamManagement\Models\Interfaces\TeamInterface;
 
 /**
+ * @property int $id
  * @property string $name
  * @property string $email
  * @property string $password

@@ -15,9 +15,7 @@ class DatabaseProgramSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            ProgramsTableSeeder::class,
-            ProgramTeamTableSeeder::class,
-            ProgramUserTableSeeder::class,
+            TestProgramSeeder::class,
         ]);
     }
 }
