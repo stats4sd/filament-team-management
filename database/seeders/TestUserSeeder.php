@@ -2,55 +2,44 @@
 
 namespace Stats4sd\FilamentTeamManagement\Database\Seeders;
 
-use App\Models\User;
 use Illuminate\Database\Seeder;
+use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 class TestUserSeeder extends Seeder
 {
+    /**
+     * @throws \Exception
+     */
     public function run(): void
     {
         // create roles
-        $superAdminRole = Role::create(['name' => 'Super Admin']);
-        $programAdminRole = Role::create(['name' => 'Program Admin']);
+        Role::create(['name' => 'Super Admin']);
 
         // create permissions
-        $permissions = [
-            ['name' => 'access admin panel'],
-            ['name' => 'access program admin panel'],
-            ['name' => 'view all prorgrams'],
-            ['name' => 'view all teams'],
-        ];
-
-        $superAdminRole->permissions()->createMany($permissions);
+        Permission::create(['name' => 'access admin panel']);
+        Permission::create(['name' => 'view all teams']);
 
         // create users
-        $user = User::create([
+        $user = config('filament-team-management.models.user')::create([
             'name' => 'Test User',
             'email' => 'test@example.com',
             'password' => bcrypt('password'),
-            'latest_team_id' => 1,
-            'latest_program_id' => null,
         ]);
 
-        $admin = User::create([
+        $admin = config('filament-team-management.models.user')::create([
             'name' => 'Test Admin',
             'email' => 'admin@example.com',
             'password' => bcrypt('password'),
-            'latest_team_id' => 1,
-            'latest_program_id' => 1,
-        ]);
-
-        $programAdmin = User::create([
-            'name' => 'Test Program Admin',
-            'email' => 'program_admin@example.com',
-            'password' => bcrypt('password'),
-            'latest_team_id' => 2,
-            'latest_program_id' => 1,
         ]);
 
         // assign role to users
-        $admin->assignRole('Super Admin');
-        $programAdmin->assignRole('Program Admin');
+
+        if (method_exists($user, 'assignRole')) {
+            $admin->assignRole('Super Admin');
+        } else {
+            throw new \Exception('User model does not have assignRole method. Please make sure your User model uses the HasRoles trait. This can be achieved by extending the Stats4sd\FilamentTeamManagement\Models\User model');
+        }
+
     }
 }

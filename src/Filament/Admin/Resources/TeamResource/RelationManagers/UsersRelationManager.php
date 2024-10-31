@@ -2,8 +2,6 @@
 
 namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\TeamResource\RelationManagers;
 
-use App\Models\Team;
-use App\Models\User;
 use Awcodes\Shout\Components\Shout;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -11,12 +9,14 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\HtmlString;
+use Stats4sd\FilamentTeamManagement\Models\Interfaces\TeamInterface;
+use Stats4sd\FilamentTeamManagement\Models\User;
 
 class UsersRelationManager extends RelationManager
 {
     protected static string $relationship = 'users';
 
-    // turn on Edit mode so that "Add Existing User to team" button will be showed when viewing team record
+    // turn on Edit mode so that "Add Existing User to team" button will be shown when viewing team record
     public function isReadOnly(): bool
     {
         return false;
@@ -96,7 +96,7 @@ class UsersRelationManager extends RelationManager
             ]);
     }
 
-    public function handleInvitation(array $data, Team $team): void
+    public function handleInvitation(array $data, TeamInterface $team): void
     {
         $team->sendInvites($data['users']);
     }

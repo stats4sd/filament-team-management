@@ -12,7 +12,7 @@ class TeamsRelationManager extends RelationManager
 {
     protected static string $relationship = 'teams';
 
-    // turn on Edit mode so that "Add Existing Team to program" button will be showed when viewing program record
+    // turn on Edit mode so that "Add Existing Team to program" button will be shown when viewing program record
     public function isReadOnly(): bool
     {
         return false;
@@ -26,9 +26,6 @@ class TeamsRelationManager extends RelationManager
                     ->schema([
                         Forms\Components\TextInput::make('name')
                             ->required()
-                            ->maxLength(255),
-                        Forms\Components\TextInput::make('website')
-                            ->url()
                             ->maxLength(255),
                         Forms\Components\Textarea::make('description'),
                     ]),
@@ -50,7 +47,7 @@ class TeamsRelationManager extends RelationManager
 
                 // Note: Here it is using filament-team-management Team model, which does not have xlsform relationship yet.
                 // xlsform relationship is added in main repo Team model because it uses HasXlsForms trait.
-                // I think we can comprimise to not to show number of xlsforms belongs to a team here.
+                // I think we can compromise not to show number of xlsforms belongs to a team here.
 
                 // Tables\Columns\TextColumn::make('xlsforms_count')
                 //     ->label('# Xlsforms')

@@ -6,21 +6,33 @@ use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
+use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Stats4sd\FilamentOdkLink\Filament\Resources\TeamResource\RelationManagers\XlsformsRelationManager;
 use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\TeamResource\Pages;
 use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\TeamResource\RelationManagers\InvitesRelationManager;
 use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\TeamResource\RelationManagers\UsersRelationManager;
-use Stats4sd\FilamentTeamManagement\Models\Team;
 
-class TeamResource extends \Stats4sd\FilamentOdkLink\Filament\Resources\TeamResource
+// filament-odk-link package related code are commented as some applications may not require ODK functionalities.
+// Please uncomment those code if filament-odk-link package is required and added to main repo.
+
+class TeamResource extends Resource
 {
     protected static ?string $navigationIcon = 'heroicon-o-building-office-2';
 
-    protected static ?string $navigationGroup = 'Programs, Teams and Users';
+    public static function getModel(): string
+    {
+        return config('filament-team-management.models.team');
+    }
 
-    protected static ?string $model = Team::class;
+    public static function getNavigationGroup(): string
+    {
+        if (config('filament-team-management.use_programs')) {
+            return 'Programs, Teams and Users';
+        } else {
+            return 'Teams and Users';
+        }
+    }
 
     public static function form(Form $form): Form
     {
@@ -46,7 +58,8 @@ class TeamResource extends \Stats4sd\FilamentOdkLink\Filament\Resources\TeamReso
                 Tables\Columns\TextColumn::make('programs.name')
                     ->searchable()
                     ->badge()
-                    ->color('success'),
+                    ->color('success')
+                    ->visible(config('filament-team-management.use_programs')),
                 Tables\Columns\TextColumn::make('users_count')
                     ->label('# Users')
                     ->counts('users')
@@ -55,10 +68,10 @@ class TeamResource extends \Stats4sd\FilamentOdkLink\Filament\Resources\TeamReso
                     ->label('# Invites')
                     ->counts('invites')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('xlsforms_count')
-                    ->label('# Xlsforms')
-                    ->counts('xlsforms')
-                    ->sortable(),
+                // Tables\Columns\TextColumn::make('xlsforms_count')
+                //     ->label('# Xlsforms')
+                //     ->counts('xlsforms')
+                //     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->sortable(),
             ]);
@@ -79,7 +92,7 @@ class TeamResource extends \Stats4sd\FilamentOdkLink\Filament\Resources\TeamReso
         return [
             UsersRelationManager::class,
             InvitesRelationManager::class,
-            XlsformsRelationManager::class,
+            // XlsformsRelationManager::class,
         ];
     }
 

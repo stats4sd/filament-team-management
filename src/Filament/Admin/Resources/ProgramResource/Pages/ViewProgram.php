@@ -6,7 +6,9 @@ use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 use Illuminate\Contracts\Support\Htmlable;
 use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\ProgramResource;
+use Stats4sd\FilamentTeamManagement\Models\Program;
 
+/** @method Program getRecord() */
 class ViewProgram extends ViewRecord
 {
     protected static string $resource = ProgramResource::class;

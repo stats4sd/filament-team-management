@@ -2,15 +2,15 @@
 
 namespace Stats4sd\FilamentTeamManagement;
 
+use Carbon\Carbon;
 use Filament\Support\Assets\Asset;
 use Filament\Support\Facades\FilamentAsset;
 use Filament\Support\Facades\FilamentIcon;
 use Illuminate\Filesystem\Filesystem;
 use Livewire\Features\SupportTesting\Testable;
-use Spatie\LaravelPackageTools\Commands\InstallCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
-use Stats4sd\FilamentTeamManagement\Commands\FilamentTeamManagementCommand;
+use Stats4sd\FilamentTeamManagement\Commands\InstallFilamentTeamManagement;
 use Stats4sd\FilamentTeamManagement\Testing\TestsFilamentTeamManagement;
 
 class FilamentTeamManagementServiceProvider extends PackageServiceProvider
@@ -27,39 +27,30 @@ class FilamentTeamManagementServiceProvider extends PackageServiceProvider
          * More info: https://github.com/spatie/laravel-package-tools
          */
         $package->name(static::$name)
-            ->hasCommands($this->getCommands())
-            ->hasInstallCommand(function (InstallCommand $command) {
-                $command
-                    ->publishConfigFile()
-                    ->publishMigrations()
-                    ->askToRunMigrations();
-            });
+            ->hasCommands($this->getCommands());
 
-        $configFileName = $package->shortName();
+        $package->hasConfigFile();
 
-        if (file_exists($package->basePath("/../config/{$configFileName}.php"))) {
-            $package->hasConfigFile();
-        }
-
-        if (file_exists($package->basePath('/../database/migrations'))) {
-            $package->hasMigrations($this->getMigrations());
-        }
-
-        if (file_exists($package->basePath('/../resources/lang'))) {
-            $package->hasTranslations();
-        }
-
-        if (file_exists($package->basePath('/../resources/views'))) {
-            $package->hasViews(static::$viewNamespace);
-        }
+        $package->hasTranslations();
+        $package->hasViews(static::$viewNamespace);
 
         $package->hasRoute('team-management');
     }
 
     public function packageRegistered(): void {}
 
+    /**
+     * @throws \ReflectionException
+     */
     public function packageBooted(): void
     {
+        // handle migrations is a custom way (to split between regular and program migrations)
+        $defaultMigrations = $this->getDefaultMigrations();
+        $programMigrations = $this->getProgramMigrations();
+
+        $this->handleMigrations($defaultMigrations, 'default');
+        $this->handleMigrations($programMigrations, 'program');
+
         // Asset Registration
         FilamentAsset::register(
             $this->getAssets(),
@@ -107,7 +98,7 @@ class FilamentTeamManagementServiceProvider extends PackageServiceProvider
     protected function getCommands(): array
     {
         return [
-            FilamentTeamManagementCommand::class,
+            InstallFilamentTeamManagement::class,
         ];
     }
 
@@ -138,18 +129,50 @@ class FilamentTeamManagementServiceProvider extends PackageServiceProvider
     /**
      * @return array<string>
      */
-    protected function getMigrations(): array
+    protected function getDefaultMigrations(): array
     {
         return [
             '1_create_teams_table',
             '2_create_team_members_table',
             '3_create_team_invites_table',
             '4_create_role_invites_table',
+            '9_add_column_to_users_table',
+        ];
+    }
+
+    protected function getProgramMigrations(): array
+    {
+        return [
             '5_create_programs_table',
             '6_create_program_user_table',
             '7_create_program_team_table',
             '8_create_program_invites_table',
-            '9_add_column_to_users_table',
+            '10_add_program_column_to_users_table',
         ];
+    }
+
+    protected function handleMigrations(array $migrations, string $tag): void
+    {
+
+        $now = Carbon::now();
+
+        foreach ($migrations as $migrationFileName) {
+
+            $filePath = $this->package->basePath("/../database/migrations/{$migrationFileName}.php");
+            if (! file_exists($filePath)) {
+                // Support for the .stub file extension
+                $filePath .= '.stub';
+            }
+
+            $this->publishes([
+                $filePath => $this->generateMigrationName(
+                    $migrationFileName,
+                    $now->addSecond()
+                ), ], "{$this->package->shortName()}-migrations-{$tag}");
+
+            if ($this->package->runsMigrations) {
+                $this->loadMigrationsFrom($filePath);
+            }
+        }
     }
 }

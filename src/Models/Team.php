@@ -10,9 +10,14 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Stats4sd\FilamentTeamManagement\Mail\InviteMember;
+use Stats4sd\FilamentTeamManagement\Models\Interfaces\TeamInterface;
 
-// class Team extends \Stats4sd\FilamentOdkLink\Models\TeamManagement\Team
-class Team extends Model
+/**
+ * @property int $id
+ * @property string $name
+ * @property string $description
+ */
+class Team extends Model implements TeamInterface
 {
     protected $table = 'teams';
 
@@ -50,32 +55,32 @@ class Team extends Model
 
     public function invites(): HasMany
     {
-        return $this->hasMany(TeamInvite::class);
+        return $this->hasMany(TeamInvite::class, foreignKey: 'team_id', localKey: 'id');
     }
 
     public function users(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'team_members')
+        return $this->belongsToMany(config('filament-team-management.models.user'), 'team_members', 'team_id', 'user_id')
             ->withPivot('is_admin');
     }
 
     public function admins(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'team_members')
+        return $this->belongsToMany(config('filament-team-management.models.user'), 'team_members', 'team_id', 'user_id')
             ->withPivot('is_admin')
             ->wherePivot('is_admin', 1);
     }
 
     public function members(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'team_members')
+        return $this->belongsToMany(config('filament-team-management.models.user'), 'team_members', 'team_id', 'user_id')
             ->withPivot('is_admin')
             ->wherePivot('is_admin', 0);
     }
 
     public function programs(): BelongsToMany
     {
-        return $this->belongsToMany(Program::class);
+        return $this->belongsToMany(config('filament-team-management.models.program'), 'team_programs', 'team_id', 'program_id');
     }
 
     // add relationship to refer to team model itself, so that app panel > Teams resource can show the selected team for editing

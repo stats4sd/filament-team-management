@@ -2,10 +2,18 @@
 
 namespace Stats4sd\FilamentTeamManagement\Models;
 
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property string $email
+ * @property int $inviter_id
+ * @property int $program_id
+ * @property int $role_id
+ * @property string $token
+ * @property bool $is_confirmed
+ * @property Program $program
+ */
 class ProgramInvite extends Model
 {
     protected $table = 'program_invites';
@@ -34,17 +42,17 @@ class ProgramInvite extends Model
     // *********** RELATIONSHIPS ************ //
     public function inviter(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'inviter_id');
+        return $this->belongsTo(config('filament-team-management.models.user'), 'inviter_id');
     }
 
     public function program(): BelongsTo
     {
-        return $this->belongsTo(Program::class);
+        return $this->belongsTo(config('filament-team-management.models.program'));
     }
 
     public function confirm(): bool
     {
-        $this->is_confirmed = 1;
+        $this->is_confirmed = true;
         $this->save();
 
         return $this->is_confirmed;

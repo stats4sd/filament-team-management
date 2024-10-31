@@ -2,11 +2,17 @@
 
 namespace Stats4sd\FilamentTeamManagement\Models;
 
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\Permission\Models\Role;
 
+/**
+ * @property string $email
+ * @property int $inviter_id
+ * @property int $role_id
+ * @property string $token
+ * @property bool $is_confirmed
+ */
 class RoleInvite extends Model
 {
     protected $table = 'role_invites';
@@ -34,7 +40,7 @@ class RoleInvite extends Model
     // *********** RELATIONSHIPS ************ //
     public function inviter(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'inviter_id');
+        return $this->belongsTo(config('filament-team-management.models.user'), 'inviter_id');
     }
 
     public function role(): BelongsTo
@@ -44,7 +50,7 @@ class RoleInvite extends Model
 
     public function confirm(): bool
     {
-        $this->is_confirmed = 1;
+        $this->is_confirmed = true;
         $this->save();
 
         return $this->is_confirmed;

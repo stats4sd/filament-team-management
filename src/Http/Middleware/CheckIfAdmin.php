@@ -4,7 +4,6 @@ namespace Stats4sd\FilamentTeamManagement\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Stats4sd\FilamentTeamManagement\Models\User;
 use Symfony\Component\HttpFoundation\Response;
 
 class CheckIfAdmin
@@ -12,7 +11,7 @@ class CheckIfAdmin
     /**
      * Handle an incoming request.
      *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * @param  Closure(Request): (Response)  $next
      */
     public function handle(Request $request, Closure $next): Response
     {
