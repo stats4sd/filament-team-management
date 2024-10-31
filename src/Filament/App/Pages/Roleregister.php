@@ -10,6 +10,7 @@ use Filament\Http\Responses\Auth\Contracts\RegistrationResponse;
 use Filament\Notifications\Notification;
 use Filament\Pages\Auth\Register as BaseRegister;
 use Illuminate\Auth\Events\Registered;
+use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Livewire\Attributes\Url;
 use Spatie\Permission\Models\Role;
 use Stats4sd\FilamentTeamManagement\Http\Responses\RegisterResponse;
@@ -18,7 +19,7 @@ use Stats4sd\FilamentTeamManagement\Models\RoleInvite;
 class Roleregister extends BaseRegister
 {
     #[Url]
-    public $token = '';
+    public string $token = '';
 
     public ?RoleInvite $invite = null;
 
@@ -68,7 +69,7 @@ class Roleregister extends BaseRegister
         $user->assignRole($role);
 
         app()->bind(
-            \Illuminate\Auth\Listeners\SendEmailVerificationNotification::class,
+            SendEmailVerificationNotification::class,
         );
 
         event(new Registered($user));

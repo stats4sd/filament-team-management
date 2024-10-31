@@ -23,7 +23,7 @@ class InstallFilamentTeamManagement extends Command
             return self::SUCCESS;
         }
 
-        // Ask "do you want to use 'programs' (groups of teams)?
+        // Ask do you want to use 'programs' (groups of teams)?
 
         $usePrograms = $this->confirm('Do you want to use "programs" (groups of teams)?');
 

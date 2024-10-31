@@ -10,6 +10,7 @@ use Filament\Http\Responses\Auth\Contracts\RegistrationResponse;
 use Filament\Notifications\Notification;
 use Filament\Pages\Auth\Register as BaseRegister;
 use Illuminate\Auth\Events\Registered;
+use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Livewire\Attributes\Url;
 use Spatie\Permission\Models\Role;
 use Stats4sd\FilamentTeamManagement\Http\Responses\RegisterResponse;
@@ -18,7 +19,7 @@ use Stats4sd\FilamentTeamManagement\Models\ProgramInvite;
 class Programregister extends BaseRegister
 {
     #[Url]
-    public $token = '';
+    public string $token = '';
 
     public ?ProgramInvite $invite = null;
 
@@ -56,7 +57,7 @@ class Programregister extends BaseRegister
         $data = $this->form->getState();
         $user = $this->getUserModel()::create($data);
 
-        // set user's latest program id, to avoid asking user to register a new prorgram in program admin panel
+        // set user's latest program id, to avoid asking user to register a new program in program admin panel
         $user->latest_program_id = $this->invite->program_id;
         $user->save();
 
@@ -75,7 +76,7 @@ class Programregister extends BaseRegister
         $this->invite->program->users()->attach($user);
 
         app()->bind(
-            \Illuminate\Auth\Listeners\SendEmailVerificationNotification::class,
+            SendEmailVerificationNotification::class,
         );
 
         event(new Registered($user));

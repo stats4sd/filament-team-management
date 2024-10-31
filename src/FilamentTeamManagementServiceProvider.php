@@ -29,8 +29,6 @@ class FilamentTeamManagementServiceProvider extends PackageServiceProvider
         $package->name(static::$name)
             ->hasCommands($this->getCommands());
 
-        $configFileName = $package->shortName();
-
         $package->hasConfigFile();
 
         $package->hasTranslations();
@@ -41,6 +39,9 @@ class FilamentTeamManagementServiceProvider extends PackageServiceProvider
 
     public function packageRegistered(): void {}
 
+    /**
+     * @throws \ReflectionException
+     */
     public function packageBooted(): void
     {
         // handle migrations is a custom way (to split between regular and program migrations)

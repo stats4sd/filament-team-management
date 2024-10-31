@@ -2,7 +2,6 @@
 
 namespace Stats4sd\FilamentTeamManagement\Models;
 
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -44,7 +43,7 @@ class TeamInvite extends Model
 
     public function confirm(): bool
     {
-        $this->is_confirmed = 1;
+        $this->is_confirmed = true;
         $this->save();
 
         return $this->is_confirmed;

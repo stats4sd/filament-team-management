@@ -2,7 +2,9 @@
 
 namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources;
 
-use Filament\Forms;
+use Filament\Forms\Components\CheckboxList;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -33,17 +35,17 @@ class UserResource extends Resource
 
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name')
+                TextInput::make('name')
                     ->required()
                     ->maxLength(255),
 
-                \Filament\Forms\Components\TextInput::make('email')
+                TextInput::make('email')
                     ->label('Email')
                     ->placeholder('Email')
                     ->email()
                     ->required(),
 
-                \Filament\Forms\Components\TextInput::make('password')
+                TextInput::make('password')
                     ->label('Password')
                     ->placeholder('Password')
                     // password field is compulsory when creating a new user record, it is optional when editing an existing user record
@@ -58,13 +60,13 @@ class UserResource extends Resource
                 // TODO: make multiple select
                 //
                 // (It's also because there seems to be a bug in Filament where select multiples don't work if the disabled() state is live updated...)
-                \Filament\Forms\Components\Select::make('team_id')
+                Select::make('team_id')
                     ->label('Which team should the user be a member of?')
                     ->exists((new $teamClass)->getTable(), 'id')
                     ->relationship('teams', titleAttribute: 'name'),
 
                 // invite to role
-                \Filament\Forms\Components\CheckboxList::make('roles')
+                CheckboxList::make('roles')
                     ->relationship('roles', titleAttribute: 'name')
                     ->label('Select the user role(s) to assign')
                     ->exists('roles', 'id')
