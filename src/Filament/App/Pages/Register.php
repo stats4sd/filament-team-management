@@ -10,6 +10,7 @@ use Filament\Http\Responses\Auth\Contracts\RegistrationResponse;
 use Filament\Notifications\Notification;
 use Filament\Pages\Auth\Register as BaseRegister;
 use Illuminate\Auth\Events\Registered;
+use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Livewire\Attributes\Url;
 use Stats4sd\FilamentTeamManagement\Http\Responses\RegisterResponse;
 use Stats4sd\FilamentTeamManagement\Models\TeamInvite;
@@ -17,7 +18,7 @@ use Stats4sd\FilamentTeamManagement\Models\TeamInvite;
 class Register extends BaseRegister
 {
     #[Url]
-    public $token = '';
+    public string $token = '';
 
     public ?TeamInvite $invite = null;
 
@@ -64,7 +65,7 @@ class Register extends BaseRegister
         $this->invite->team->members()->attach($user);
 
         app()->bind(
-            \Illuminate\Auth\Listeners\SendEmailVerificationNotification::class,
+            SendEmailVerificationNotification::class,
         );
 
         event(new Registered($user));

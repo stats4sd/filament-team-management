@@ -14,7 +14,7 @@ class UsersRelationManager extends RelationManager
 {
     protected static string $relationship = 'users';
 
-    // turn on Edit mode so that "Add Existing User to program" button will be showed when viewing program record
+    // turn on Edit mode so that "Add Existing User to program" button will be shown when viewing program record
     public function isReadOnly(): bool
     {
         return false;

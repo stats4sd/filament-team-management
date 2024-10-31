@@ -14,7 +14,7 @@ class EditTeam extends EditRecord
     {
         return [
             Actions\DeleteAction::make()
-                ->modalDescription('WARNING: Please do not delete when there is actual survey data collected, as deletion is unreversable. Are you sure you would like to do this?'),
+                ->modalDescription('WARNING: Please do not delete when there is actual survey data collected, as deletion is irreversible. Are you sure you would like to do this?'),
         ];
     }
 }
