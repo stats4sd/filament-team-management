@@ -2,7 +2,6 @@
 
 namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources;
 
-use Filament\Forms;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
