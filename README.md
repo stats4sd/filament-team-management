@@ -24,6 +24,8 @@ php artisan filament-team-management:install
 
 The script will ask you if you want to use the concept of "programs" in your app. Based on your response, it will publish the appropriate migration files and update your .env file with the appropriate variables. It will also offer to add some example Database Seeders to your main `database/seeders/DatabaseSeeder.php` file. 
 
+For a full guide on how to set this package up with a brand new Laravel installation, see [SETUP.md](SETUP.md)
+
 
 ## Features
 
