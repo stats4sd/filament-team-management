@@ -4,7 +4,6 @@ namespace Stats4sd\FilamentTeamManagement\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Stats4sd\FilamentTeamManagement\Models\Interfaces\ProgramInterface;
 
 /**
  * @property string $email
