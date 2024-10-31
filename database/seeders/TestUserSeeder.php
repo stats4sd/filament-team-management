@@ -33,7 +33,6 @@ class TestUserSeeder extends Seeder
             'password' => bcrypt('password'),
         ]);
 
-
         // assign role to users
 
         if (method_exists($user, 'assignRole')) {
