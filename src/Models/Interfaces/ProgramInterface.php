@@ -6,6 +6,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
+/**
+ * @property string $name
+ * @property string $description
+ */
 interface ProgramInterface
 {
     /**

@@ -5,11 +5,15 @@ namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\ProgramResour
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Database\Eloquent\Model;
 use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\ProgramResource;
+use Stats4sd\FilamentTeamManagement\Models\Program;
 
+/** @method Program getRecord() */
 class ViewProgram extends ViewRecord
 {
     protected static string $resource = ProgramResource::class;
+
 
     public function getTitle(): string | Htmlable
     {

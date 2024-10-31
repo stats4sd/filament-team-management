@@ -12,6 +12,10 @@ use Illuminate\Support\Str;
 use Stats4sd\FilamentTeamManagement\Mail\InviteMember;
 use Stats4sd\FilamentTeamManagement\Models\Interfaces\TeamInterface;
 
+/**
+ * @property string $name
+ * @property string $description
+ */
 class Team extends Model implements TeamInterface
 {
     protected $table = 'teams';

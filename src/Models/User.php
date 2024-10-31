@@ -21,6 +21,12 @@ use Stats4sd\FilamentTeamManagement\Mail\InviteUser;
 use Stats4sd\FilamentTeamManagement\Models\Interfaces\ProgramInterface;
 use Stats4sd\FilamentTeamManagement\Models\Interfaces\TeamInterface;
 
+/**
+ * @property string $name
+ * @property string $email
+ * @property string $password
+ * @property string $remember_token
+ */
 class User extends Authenticatable implements FilamentUser, HasDefaultTenant, HasTenants
 {
     use HasRoles;
@@ -64,6 +70,7 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
                 continue;
             }
 
+            /** @var RoleInvite $invite */
             $invite = $this->invites()->create([
                 'email' => $item['email'],
                 'role_id' => $item['role'],
@@ -184,7 +191,7 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
     {
         $allAccessibleTeams = collect();
 
-        // find all teams belong to all programs of user
+        /** @var Program $program */
         foreach ($this->programs as $program) {
             foreach ($program->teams as $team) {
                 $allAccessibleTeams->push($team);

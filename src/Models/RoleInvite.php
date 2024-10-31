@@ -6,6 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\Permission\Models\Role;
 
+/**
+ * @property string $email
+ * @property int $inviter_id
+ * @property int $role_id
+ * @property string $token
+ * @property bool $is_confirmed
+ */
 class RoleInvite extends Model
 {
     protected $table = 'role_invites';

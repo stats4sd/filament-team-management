@@ -4,7 +4,17 @@ namespace Stats4sd\FilamentTeamManagement\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Stats4sd\FilamentTeamManagement\Models\Interfaces\ProgramInterface;
 
+/**
+ * @property string $email
+ * @property int $inviter_id
+ * @property int $program_id
+ * @property int $role_id
+ * @property string $token
+ * @property bool $is_confirmed
+ * @property Program $program
+ */
 class ProgramInvite extends Model
 {
     protected $table = 'program_invites';

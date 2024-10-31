@@ -6,7 +6,9 @@ use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 use Illuminate\Contracts\Support\Htmlable;
 use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\TeamResource;
+use Stats4sd\FilamentTeamManagement\Models\Team;
 
+/** @method Team getRecord() */
 class ViewTeam extends ViewRecord
 {
     protected static string $resource = TeamResource::class;

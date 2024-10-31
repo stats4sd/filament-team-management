@@ -11,6 +11,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\ProgramResource\Pages;
 use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\ProgramResource\RelationManagers;
+use Stats4sd\FilamentTeamManagement\Models\Program;
 
 class ProgramResource extends Resource
 {

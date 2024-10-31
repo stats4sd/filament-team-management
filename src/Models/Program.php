@@ -13,6 +13,11 @@ use Spatie\Permission\Models\Role;
 use Stats4sd\FilamentTeamManagement\Mail\InviteProgramAdmin;
 use Stats4sd\FilamentTeamManagement\Models\Interfaces\ProgramInterface;
 
+/**
+ * @property string $name
+ * @property string $description
+ * @property string $note
+ */
 class Program extends Model implements ProgramInterface
 {
     protected $table = 'programs';

@@ -5,6 +5,14 @@ namespace Stats4sd\FilamentTeamManagement\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property string $email
+ * @property int $inviter_id
+ * @property string $token
+ * @property bool $is_confirmed
+ * @property User $inviter
+ * @property Team $team
+ */
 class TeamInvite extends Model
 {
     protected $table = 'team_invites';

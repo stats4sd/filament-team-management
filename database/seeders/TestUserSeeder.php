@@ -2,7 +2,6 @@
 
 namespace Stats4sd\FilamentTeamManagement\Database\Seeders;
 
-use App\Models\User;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
 
@@ -28,19 +27,19 @@ class TestUserSeeder extends Seeder
         $superAdminRole->permissions()->createMany($permissions);
 
         // create users
-        $user = User::create([
+        $user = config('filament-team-management.models.user')::create([
             'name' => 'Test User',
             'email' => 'test-from-team@example.com',
             'password' => bcrypt('password'),
         ]);
 
-        $admin = User::create([
+        $admin = config('filament-team-management.models.user')::create([
             'name' => 'Test Admin',
             'email' => 'admin@example.com',
             'password' => bcrypt('password'),
         ]);
 
-        $programAdmin = User::create([
+        $programAdmin = config('filament-team-management.models.user')::create([
             'name' => 'Test Program Admin',
             'email' => 'program_admin@example.com',
             'password' => bcrypt('password'),
