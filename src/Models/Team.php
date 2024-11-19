@@ -80,7 +80,7 @@ class Team extends Model implements TeamInterface
 
     public function programs(): BelongsToMany
     {
-        return $this->belongsToMany(config('filament-team-management.models.program'), 'team_programs', 'team_id', 'program_id');
+        return $this->belongsToMany(config('filament-team-management.models.program'), 'program_team', 'team_id', 'program_id');
     }
 
     // add relationship to refer to team model itself, so that app panel > Teams resource can show the selected team for editing
