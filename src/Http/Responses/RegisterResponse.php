@@ -5,8 +5,8 @@ namespace Stats4sd\FilamentTeamManagement\Http\Responses;
 use Filament\Facades\Filament;
 use Filament\Http\Responses\Auth\Contracts\RegistrationResponse;
 use Illuminate\Http\RedirectResponse;
+use Livewire\Features\SupportRedirects\Redirector;
 use Symfony\Component\HttpFoundation\Response;
-use \Livewire\Features\SupportRedirects\Redirector;
 
 class RegisterResponse implements RegistrationResponse
 {
