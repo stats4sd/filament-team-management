@@ -2,6 +2,10 @@
 
 All notable changes to `filament-team-management` will be documented in this file.
 
+## 1.03 - 2024-11-21
+
+Adds support for when a user is redirected immediately after registration by the app itself.
+
 ## 1.02 - Another, similar bug fix - 2024-11-19
 
 Fixes another pivot table name clash.
