@@ -16,7 +16,6 @@ use Stats4sd\FilamentTeamManagement\Filament\App\Resources\TeamResource\Relation
 
 class TeamResource extends Resource
 {
-
     protected static bool $shouldRegisterNavigation = false;
 
     public static function getModel(): string

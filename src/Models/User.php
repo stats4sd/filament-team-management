@@ -237,6 +237,6 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
             $latestTenant = $this->latestProgram;
         }
 
-        return $latestTenant ??  $this->getTenants(Filament::getCurrentPanel())->first();
+        return $latestTenant ?? $this->getTenants(Filament::getCurrentPanel())->first();
     }
 }
