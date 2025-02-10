@@ -61,7 +61,7 @@ class UserResource extends Resource
                 //
                 // (It's also because there seems to be a bug in Filament where select multiples don't work if the disabled() state is live updated...)
                 Select::make(config('filament-team-management.names.team') . '_id')
-                    ->label('Which '.config('filament-team-management.names.team') .'(s) should the user be a member of?')
+                    ->label('Which ' . config('filament-team-management.names.team') . '(s) should the user be a member of?')
                     ->exists((new $teamClass)->getTable(), 'id')
                     ->multiple()
                     ->relationship('teams', titleAttribute: 'name'),

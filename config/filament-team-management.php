@@ -22,5 +22,5 @@ return [
 
     'tables' => [
         'team_members' => env('FILAMENT_TEAM_MANAGEMENT_TEAM_MEMBER_TABLE_NAME', 'team_members'),
-    ]
+    ],
 ];
