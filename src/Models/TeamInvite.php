@@ -47,7 +47,9 @@ class TeamInvite extends Model
 
     public function team(): BelongsTo
     {
-        return $this->belongsTo(config('filament-team-management.models.team'), 'team_id');
+        return $this->belongsTo(
+            config('filament-team-management.models.team'),
+            config('filament-team-management.names.team') . '_id');
     }
 
     // ************ METHODS ************ //

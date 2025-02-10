@@ -60,9 +60,10 @@ class UserResource extends Resource
                 // TODO: make multiple select
                 //
                 // (It's also because there seems to be a bug in Filament where select multiples don't work if the disabled() state is live updated...)
-                Select::make('team_id')
-                    ->label('Which team should the user be a member of?')
+                Select::make(config('filament-team-management.names.team') . '_id')
+                    ->label('Which '.config('filament-team-management.names.team') .'(s) should the user be a member of?')
                     ->exists((new $teamClass)->getTable(), 'id')
+                    ->multiple()
                     ->relationship('teams', titleAttribute: 'name'),
 
                 // invite to role
@@ -87,7 +88,7 @@ class UserResource extends Resource
                     ->badge()
                     ->color('success')
                     ->visible(config('filament-team-management.use_programs')),
-                Tables\Columns\TextColumn::make('teams.name')
+                Tables\Columns\TextColumn::make(config('filament-team-management.names.team') . '.name')
                     ->searchable()
                     ->badge()
                     ->color('success'),

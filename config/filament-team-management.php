@@ -13,4 +13,14 @@ return [
         'team' => env('FILAMENT_TEAM_MANAGEMENT_TEAM_MODEL', Team::class),
         'program' => env('FILAMENT_TEAM_MANAGEMENT_PROGRAM_MODEL', Program::class),
     ],
+
+    'names' => [
+        'team' => \Illuminate\Support\Str::of(env('FILAMENT_TEAM_MANAGEMENT_TEAM_MODEL', Team::class))
+            ->afterLast('\\')
+            ->lower()->toString(),
+    ],
+
+    'tables' => [
+        'team_members' => env('FILAMENT_TEAM_MANAGEMENT_TEAM_MEMBER_TABLE_NAME', 'team_members'),
+    ]
 ];
