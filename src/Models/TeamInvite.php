@@ -15,7 +15,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class TeamInvite extends Model
 {
-    protected $table = 'team_invites';
+    public function getTable()
+    {
+        return Team::getModelNameLower() . '_invites';
+    }
 
     protected $fillable = [
         'email',

@@ -16,9 +16,8 @@ use Stats4sd\FilamentTeamManagement\Filament\App\Resources\TeamResource\Relation
 
 class TeamResource extends Resource
 {
-    protected static ?string $navigationIcon = 'heroicon-o-building-office-2';
 
-    protected static ?string $navigationGroup = 'Settings';
+    protected static bool $shouldRegisterNavigation = false;
 
     public static function getModel(): string
     {
