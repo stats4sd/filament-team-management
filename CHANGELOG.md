@@ -2,6 +2,10 @@
 
 All notable changes to `filament-team-management` will be documented in this file.
 
+## Hotfix for apps with different Team + User Models - 2025-03-03
+
+This fixes a bug caused by the `canAccessTenant` returning the wrong namespaced team.
+
 ## 1.04 - Remove Unused App Panel Dashboard - 2024-12-17
 
 To give app  devs more freedom on what sort of navigation / dashboard pages they want.
