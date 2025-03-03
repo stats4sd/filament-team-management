@@ -131,6 +131,7 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
     // Admin users can access all teams
     public function canAccessTenant(Model $tenant): bool
     {
+        
         // add different handling for different panel
         if ($tenant instanceof (config('filament-team-management.models.team'))) {
             // app panel
@@ -144,9 +145,11 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
                 return true;
             }
 
+
             $allAccessibleTeams = $this->getAllAccessibleTeams();
 
-            if ($allAccessibleTeams->contains($tenant)) {
+
+            if ($allAccessibleTeams->pluck('id')->contains($tenant->id)) {
                 return true;
             }
 
@@ -171,7 +174,7 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
         return false;
     }
 
-    public function getTenants(Panel $panel): array | Collection
+    public function getTenants(Panel $panel): array|Collection
     {
         // add different handling for different panel
         if ($panel->isDefault()) {
@@ -190,25 +193,11 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
 
     public function getAllAccessibleTeams(): Collection
     {
-        $allAccessibleTeams = collect();
+        return $this->programs->pluck('teams')
+            ->flatten()
+            ->merge($this->teams)
+            ->unique('id');
 
-        /** @var Program $program */
-        foreach ($this->programs as $program) {
-            foreach ($program->teams as $team) {
-                $allAccessibleTeams->push($team);
-            }
-        }
-
-        // find all teams belong to user
-        foreach ($this->teams as $team) {
-            $allAccessibleTeams->push($team);
-        }
-
-        // return $allAccessibleTeams;
-
-        // when return $allAccessibleTeams directly, the collection does not contain the tenant. Not sure the root cause.
-        // to make it work, get Team models in the same way temporary
-        return Team::whereIn('id', $allAccessibleTeams->pluck('id'))->get();
     }
 
     // The last team the user was on.
