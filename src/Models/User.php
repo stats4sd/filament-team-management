@@ -131,7 +131,7 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
     // Admin users can access all teams
     public function canAccessTenant(Model $tenant): bool
     {
-        
+
         // add different handling for different panel
         if ($tenant instanceof (config('filament-team-management.models.team'))) {
             // app panel
@@ -145,9 +145,7 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
                 return true;
             }
 
-
             $allAccessibleTeams = $this->getAllAccessibleTeams();
-
 
             if ($allAccessibleTeams->pluck('id')->contains($tenant->id)) {
                 return true;
@@ -174,7 +172,7 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
         return false;
     }
 
-    public function getTenants(Panel $panel): array|Collection
+    public function getTenants(Panel $panel): array | Collection
     {
         // add different handling for different panel
         if ($panel->isDefault()) {
