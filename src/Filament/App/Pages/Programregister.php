@@ -103,6 +103,6 @@ class Programregister extends BaseRegister
     protected function getPasswordFormComponent(): Component
     {
         return parent::getPasswordFormComponent()
-           ->rule('min:10', 'Password must be at least 10 characters long.');
+            ->rule('min:10', 'Password must be at least 10 characters long.');
     }
 }
