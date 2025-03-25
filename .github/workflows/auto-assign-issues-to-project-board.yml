@@ -1,0 +1,15 @@
+name: Auto Assign Issues to Internal IT Planning Board
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  add-to-project:
+    name: Add issue to project
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/add-to-project@v0.4.0
+        with:
+          project-url: https://github.com/orgs/stats4sd/projects/10
+          github-token: ${{ secrets.PROJECT_ACCESS_TOKEN }}
