@@ -2,6 +2,10 @@
 
 All notable changes to `filament-team-management` will be documented in this file.
 
+## Updates Password Requirements - 2025-03-25
+
+The password requirements are now 'min:10', to match ODK Central requirements.
+
 ## Hotfix for apps with different Team + User Models - 2025-03-03
 
 This fixes a bug caused by the `canAccessTenant` returning the wrong namespaced team.
