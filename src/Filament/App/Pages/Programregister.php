@@ -99,4 +99,10 @@ class Programregister extends BaseRegister
             ->unique($this->getUserModel())
             ->readOnly();
     }
+
+    protected function getPasswordFormComponent(): Component
+    {
+        return parent::getPasswordFormComponent()
+           ->rule('min:10', 'Password must be at least 10 characters long.');
+    }
 }
