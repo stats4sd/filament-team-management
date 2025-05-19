@@ -9,7 +9,5 @@ class RegisteredWithData
 {
     use SerializesModels;
 
-    public function __construct(public Authenticatable $user, public array $data)
-    {
-    }
+    public function __construct(public Authenticatable $user, public array $data) {}
 }

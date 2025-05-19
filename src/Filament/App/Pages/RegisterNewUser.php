@@ -82,7 +82,7 @@ class RegisterNewUser extends BaseRegister
             $this->invite->team->members()->attach($user);
         }
 
-        if($this->invite->program) {
+        if ($this->invite->program) {
             $this->invite->program->members()->attach($user);
         }
 
@@ -116,7 +116,7 @@ class RegisterNewUser extends BaseRegister
     protected function getPasswordFormComponent(): Component
     {
         return parent::getPasswordFormComponent()
-            ->dehydrateStateUsing(fn($state) => $state) // override default hashing so we have the option of passing the plain password to register on ODK Central
+            ->dehydrateStateUsing(fn ($state) => $state) // override default hashing so we have the option of passing the plain password to register on ODK Central
             ->rule('min:10', 'Password must be at least 10 characters long.');
     }
 }

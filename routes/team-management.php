@@ -1,9 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Stats4sd\FilamentTeamManagement\Filament\App\Pages\Programregister;
 use Stats4sd\FilamentTeamManagement\Filament\App\Pages\RegisterNewUser;
-use Stats4sd\FilamentTeamManagement\Filament\App\Pages\Roleregister;
 
 Route::group([
     'middleware' => ['web'],

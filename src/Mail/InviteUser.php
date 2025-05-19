@@ -20,9 +20,7 @@ class InviteUser extends Mailable
      *
      * @return void
      */
-    public function __construct(public Invite $invite)
-    {
-    }
+    public function __construct(public Invite $invite) {}
 
     /**
      * Get the message envelope.
