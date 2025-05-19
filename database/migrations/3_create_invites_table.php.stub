@@ -11,12 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('program_invites', function (Blueprint $table) {
+        Schema::create('invites', function (Blueprint $table) {
             $table->id();
             $table->string('email');
-            $table->foreignId('program_id')->constrained()->onDelete('cascade');
-            $table->foreignId('role_id')->constrained()->onDelete('cascade');
-            $table->foreignId('inviter_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('team_id')->nullable()->constrained()->onDelete('cascade');
+            $table->foreignId('role_id')->nullable()->constrained()->onDelete('cascade');
+            $table->foreignId('program_id')->nullable()->constrained()->onDelete('cascade');
+            $table->foreignId('inviter_id');
             $table->string('token');
             $table->tinyInteger('is_confirmed')->default(0);
             $table->timestamps();
@@ -28,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('program_invites');
+        Schema::dropIfExists('team_invites');
     }
 };

@@ -71,7 +71,7 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
                 continue;
             }
 
-            /** @var RoleInvite $invite */
+            /** @var Invite $invite */
             $invite = $this->invites()->create([
                 'email' => $item['email'],
                 'role_id' => $item['role'],
@@ -91,7 +91,7 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
 
     public function invites(): HasMany
     {
-        return $this->hasMany(RoleInvite::class, 'inviter_id');
+        return $this->hasMany(Invite::class, 'inviter_id');
     }
 
     public function teams(): BelongsToMany

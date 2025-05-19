@@ -11,22 +11,25 @@ use Filament\Notifications\Notification;
 use Filament\Pages\Auth\Register as BaseRegister;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
+use Illuminate\Support\Facades\Hash;
 use Livewire\Attributes\Url;
+use Spatie\Permission\Models\Role;
+use Stats4sd\FilamentTeamManagement\Events\RegisteredWithData;
 use Stats4sd\FilamentTeamManagement\Http\Responses\RegisterResponse;
-use Stats4sd\FilamentTeamManagement\Models\TeamInvite;
+use Stats4sd\FilamentTeamManagement\Models\Invite;
 
-class Register extends BaseRegister
+class RegisterNewUser extends BaseRegister
 {
     #[Url]
     public string $token = '';
 
-    public ?TeamInvite $invite = null;
+    public ?Invite $invite = null;
 
     public ?array $data = [];
 
     public function mount(): void
     {
-        $this->invite = TeamInvite::where('token', $this->token)->firstOrFail();
+        $this->invite = Invite::where('token', $this->token)->firstOrFail();
 
         $this->form->fill([
             'email' => $this->invite->email,
@@ -54,21 +57,42 @@ class Register extends BaseRegister
         }
 
         $data = $this->form->getState();
-        $user = $this->getUserModel()::create($data);
+
+        $data['original_password'] = $data['password'];
+        $data['password'] = Hash::make($data['password']);
+
+        $user = $this->getUserModel()::create(
+            collect($data)
+                ->except('original_password')
+                ->toArray()
+        );
 
         // Question: If we do not delete team_invites record, can it be used for registration again?
         // $this->invite->delete();
         $this->invite->is_confirmed = 1;
         $this->invite->save();
 
-        // add the newly created user to the dedicated team
-        $this->invite->team->members()->attach($user);
+        // If the invite was linked to a role, team or program, link the user to those entries:
+        if ($this->invite->role) {
+            $role = Role::find($this->invite->role_id);
+            $user->assignRole($role);
+        }
+
+        if ($this->invite->team) {
+            $this->invite->team->members()->attach($user);
+        }
+
+        if($this->invite->program) {
+            $this->invite->program->members()->attach($user);
+        }
 
         app()->bind(
             SendEmailVerificationNotification::class,
         );
 
+        // pass in the registered form data to the event for extensibility
         event(new Registered($user));
+        event(new RegisteredWithData($user, $data));
 
         Filament::auth()->login($user);
 
@@ -92,6 +116,7 @@ class Register extends BaseRegister
     protected function getPasswordFormComponent(): Component
     {
         return parent::getPasswordFormComponent()
+            ->dehydrateStateUsing(fn($state) => $state) // override default hashing so we have the option of passing the plain password to register on ODK Central
             ->rule('min:10', 'Password must be at least 10 characters long.');
     }
 }
