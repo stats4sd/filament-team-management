@@ -43,3 +43,16 @@ This will:
 1. Make sure your App\Models\User model extends the Stats4SD\FilamentTeamManagement\Models\User model
 2. If you want a custom Team and Program model, create them and extend the Stats4SD\FilamentTeamManagement\Models\Team and Stats4SD\FilamentTeamManagement\Models\Program models respectively.
    - Remember to update the .env variables to point to your custom models
+
+### 4. Make sure you require the needed pages into your Filament Panel
+
+To enable the custom registration pages, you need to explicitly register them into your panel - otherwise you will get a "Class not found" error when trying to load the registration page. 
+
+In your AppPanelProvider (or which-ever panel you use for logins):
+
+```php
+$panel
+...
+->discoverPages(in: app_path('../vendor/stats4sd/filament-team-management/src/Filament/App/Pages'), for: 'Stats4sd\\FilamentTeamManagement\\Filament\\App\\Pages')
+
+```

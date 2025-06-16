@@ -58,13 +58,9 @@ $panel
 
 ### Invitations
 
-This package includes the needed setup to let your users invite other users via email. There are 3 different types of invite:
+This package includes the needed setup to let your users invite other users via email. You can invite a new user to join a specific team, a specific program, or with an assigned site-wide role.  
 
-  - `RoleInvite`: The provided UserResource lets you invite users to join the platform with a specific role
-  - `Invite`: The provided TeamResource lets you invite users to join a specific team on the platform.
-  - `ProgramInvite`: If you use programs, the provided ProgramResource lets you invite users to join a specific program.
- 
-To make the registration work, you **must** add the pages in the namespace `Stats4sd\\FilamentTeamManagement\\App\\Pages` to one of your Panels. Otherwise the registration pages will not be correctly registered in the app. 
+To make the registration work, you **must** add the pages in the namespace `Stats4sd\\FilamentTeamManagement\\App\\Pages` to one of your Panels. Otherwise the registration page will not be correctly registered in the app. 
 
 For example: 
 

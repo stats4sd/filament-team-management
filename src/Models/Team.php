@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
-use Stats4sd\FilamentTeamManagement\Mail\InviteMember;
+use Stats4sd\FilamentTeamManagement\Mail\InviteUser;
 use Stats4sd\FilamentTeamManagement\Models\Interfaces\TeamInterface;
 
 /**
@@ -42,7 +42,7 @@ class Team extends Model implements TeamInterface
                 'token' => Str::random(24),
             ]);
 
-            Mail::to($invite->email)->send(new InviteMember($invite));
+            Mail::to($invite->email)->send(new InviteUser($invite));
 
             // show notification after sending invitation email to user
             Notification::make()
@@ -55,7 +55,7 @@ class Team extends Model implements TeamInterface
 
     public function invites(): HasMany
     {
-        return $this->hasMany(TeamInvite::class, foreignKey: 'team_id', localKey: 'id');
+        return $this->hasMany(Invite::class, foreignKey: 'team_id', localKey: 'id');
     }
 
     public function users(): BelongsToMany

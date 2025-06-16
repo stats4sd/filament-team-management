@@ -8,24 +8,19 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\URL;
-use Stats4sd\FilamentTeamManagement\Models\RoleInvite;
+use Stats4sd\FilamentTeamManagement\Models\Invite;
 
 class InviteUser extends Mailable
 {
     use Queueable;
     use SerializesModels;
 
-    public RoleInvite $invite;
-
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct(RoleInvite $invite)
-    {
-        $this->invite = $invite;
-    }
+    public function __construct(public Invite $invite) {}
 
     /**
      * Get the message envelope.
@@ -34,7 +29,7 @@ class InviteUser extends Mailable
     {
         return new Envelope(
             from: config('mail.from.address'),
-            subject: config('app.name') . ': Invitation To Be a ' . $this->invite->role->name,
+            subject: config('app.name') . ': Invitation to register',
         );
     }
 
@@ -44,10 +39,10 @@ class InviteUser extends Mailable
     public function content(): Content
     {
         return new Content(
-            markdown: 'filament-team-management::emails.role_invite',
+            markdown: 'filament-team-management::emails.invite',
             with: [
                 'acceptUrl' => URL::signedRoute(
-                    'filament.app.roleregister',
+                    'filament.app.register-invite',
                     [
                         'token' => $this->invite->token,
                     ],

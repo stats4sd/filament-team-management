@@ -59,7 +59,7 @@ class Program extends Model implements ProgramInterface
 
     public function invites(): HasMany
     {
-        return $this->hasMany(ProgramInvite::class);
+        return $this->hasMany(Invite::class);
     }
 
     public function users(): BelongsToMany
