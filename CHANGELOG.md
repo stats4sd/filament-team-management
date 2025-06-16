@@ -2,6 +2,10 @@
 
 All notable changes to `filament-team-management` will be documented in this file.
 
+## v2.1 - The quick bug release - 2025-06-16
+
+Fixes bugs found in model references and registering new users.
+
 ## v2.0 - Harmonised Invites - 2025-06-16
 
 ### Breaking Changes
