@@ -12,6 +12,9 @@ use Spatie\Permission\Models\Role;
  * @property int $role_id
  * @property string $token
  * @property bool $is_confirmed
+ * @property ?Team $team
+ * @property ?Role $role
+ * @property ?Program $program
  */
 class Invite extends Model
 {
@@ -31,10 +34,10 @@ class Invite extends Model
         return $this->belongsTo(config('filament-team-management.models.user'), 'inviter_id');
     }
 
-    /** @return BelongsTo<Role, $this> */
+    /** @return BelongsTo<Model, $this> */
     public function role(): BelongsTo
     {
-        return $this->belongsTo(Role::class);
+        return $this->belongsTo(config('filament-team-management.models.role'), 'role_id');
     }
 
     /** @return BelongsTo<Model, $this> */
