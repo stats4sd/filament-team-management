@@ -69,7 +69,9 @@ class Program extends Model implements ProgramInterface
 
     public function teams(): BelongsToMany
     {
-        return $this->belongsToMany(config('filament-team-management.models.team'))->withTimestamps();
+        return $this->belongsToMany(
+            config('filament-team-management.models.team'),
+        )->withTimestamps();
     }
 
     // add relationship to refer to program model itself, so that program admin panel > Programs resource can show the selected program for editing
