@@ -2,6 +2,7 @@
 
 namespace Stats4sd\FilamentTeamManagement\Models;
 
+use Filament\Facades\Filament;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasDefaultTenant;
 use Filament\Models\Contracts\HasTenants;
@@ -175,7 +176,7 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
     public function getTenants(Panel $panel): array | Collection
     {
         // add different handling for different panel
-        if ($panel->isDefault()) {
+        if ($panel->getTenantModel() === config('filament-team-management.models.team')) {
             // app panel
             if ($this->can('view all teams')) {
                 return config('filament-team-management.models.team')::all();
@@ -212,13 +213,19 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
 
     public function getDefaultTenant(Panel $panel): ?Model
     {
+        $latestTenant = null;
+
         // add different handling for different tenant
-        if ($panel->isDefault()) {
+        if ($panel->getTenantModel() === config('filament-team-management.models.team')) {
             // app panel
-            return $this->latestTeam;
-        } else {
-            // program admin panel
-            return $this->latestProgram;
+            $latestTenant = $this->latestTeam;
         }
+
+        if($panel->getTenantModel() === config('filament-team-management.models.program')) {
+            // program admin panel
+            $latestTenant = $this->latestProgram;
+        }
+
+        return $latestTenant ?? $this->getTenants(Filament::getCurrentPanel())->first();
     }
 }
