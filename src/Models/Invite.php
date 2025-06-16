@@ -49,7 +49,7 @@ class Invite extends Model
     /** @return BelongsTo<Model, $this> */
     public function team(): BelongsTo
     {
-        return $this->belongsTo(config('filament-team-management.models.team'), Team::getModelNameLower().'_id');
+        return $this->belongsTo(config('filament-team-management.models.team'), Team::getModelNameLower() . '_id');
     }
 
     public function confirm(): bool

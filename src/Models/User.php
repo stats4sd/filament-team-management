@@ -221,7 +221,7 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
             $latestTenant = $this->latestTeam;
         }
 
-        if($panel->getTenantModel() === config('filament-team-management.models.program')) {
+        if ($panel->getTenantModel() === config('filament-team-management.models.program')) {
             // program admin panel
             $latestTenant = $this->latestProgram;
         }
