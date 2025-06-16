@@ -7,7 +7,10 @@ use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\RoleResource\Pages;
 
 class RoleResource extends \Althinect\FilamentSpatieRolesPermissions\Resources\RoleResource
 {
-    protected static ?string $model = Role::class;
+    public static function getModel(): string
+    {
+        return config('filament-team-management.models.role');
+    }
 
     public static function getPages(): array
     {

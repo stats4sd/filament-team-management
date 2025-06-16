@@ -147,7 +147,7 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
 
             $allAccessibleTeams = $this->getAllAccessibleTeams();
 
-            if ($allAccessibleTeams->pluck('id')->contains($tenant->id)) {
+            if ($allAccessibleTeams->pluck('id')->contains($tenant->getKey())) {
                 return true;
             }
 

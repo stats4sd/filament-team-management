@@ -67,23 +67,27 @@ class RegisterNewUser extends BaseRegister
                 ->toArray()
         );
 
-        // Question: If we do not delete team_invites record, can it be used for registration again?
-        // $this->invite->delete();
-        $this->invite->is_confirmed = 1;
-        $this->invite->save();
+        if ($this->invite instanceof Invite) {
 
-        // If the invite was linked to a role, team or program, link the user to those entries:
-        if ($this->invite->role) {
-            $role = Role::find($this->invite->role_id);
-            $user->assignRole($role);
-        }
+            // Question: If we do not delete team_invites record, can it be used for registration again?
+            // $this->invite->delete();
+            $this->invite->is_confirmed = true;
+            $this->invite->save();
 
-        if ($this->invite->team) {
-            $this->invite->team->members()->attach($user);
-        }
+            // If the invite was linked to a role, team or program, link the user to those entries:
+            if ($this->invite->role) {
+                $role = config('filament-team-management.models.role')::find($this->invite->role_id);
+                $user->assignRole($role);
+            }
 
-        if ($this->invite->program) {
-            $this->invite->program->members()->attach($user);
+            if ($this->invite->team) {
+                $this->invite->team->members()->attach($user);
+            }
+
+            if ($this->invite->program) {
+                $this->invite->program->users()->attach($user);
+            }
+
         }
 
         app()->bind(
@@ -115,7 +119,10 @@ class RegisterNewUser extends BaseRegister
 
     protected function getPasswordFormComponent(): Component
     {
-        return parent::getPasswordFormComponent()
+        /** @var Forms\Components\Field $field */
+        $field = parent::getPasswordFormComponent();
+
+        return $field
             ->dehydrateStateUsing(fn ($state) => $state) // override default hashing so we have the option of passing the plain password to register on ODK Central
             ->rule('min:10', 'Password must be at least 10 characters long.');
     }

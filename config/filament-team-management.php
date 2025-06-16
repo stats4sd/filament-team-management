@@ -12,5 +12,6 @@ return [
         'user' => env('FILAMENT_TEAM_MANAGEMENT_USER_MODEL', User::class),
         'team' => env('FILAMENT_TEAM_MANAGEMENT_TEAM_MODEL', Team::class),
         'program' => env('FILAMENT_TEAM_MANAGEMENT_PROGRAM_MODEL', Program::class),
+        'role' => env('FILAMENT_TEAM_MANAGEMENT_ROLE_MODEL', \Spatie\Permission\Models\Role::class),
     ],
 ];

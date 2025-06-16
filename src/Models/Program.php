@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Spatie\Permission\Models\Role;
 use Stats4sd\FilamentTeamManagement\Mail\InviteProgramAdmin;
+use Stats4sd\FilamentTeamManagement\Mail\InviteUser;
 use Stats4sd\FilamentTeamManagement\Models\Interfaces\ProgramInterface;
 
 /**
@@ -46,7 +47,7 @@ class Program extends Model implements ProgramInterface
                 'token' => Str::random(24),
             ]);
 
-            Mail::to($invite->email)->send(new InviteProgramAdmin($invite));
+            Mail::to($invite->email)->send(new InviteUser($invite));
 
             // show notification after sending invitation email to user
             Notification::make()
