@@ -2,6 +2,22 @@
 
 All notable changes to `filament-team-management` will be documented in this file.
 
+## v2.0 - Harmonised Invites - 2025-06-16
+
+### Breaking Changes
+
+This update will require updates to apps using this package.
+
+1. Update Database
+   For apps without a live implementation, where a full db refresh is possible, remove the team_invites, role_invites and program_invites migrations and swap with the new invites database migration.
+   For apps with a live implementation, where a full db refresh is not possible, then:
+
+- add the new invites database migration.
+- optionally, remove the old database tables. If keeping the old invites is important, then they could be transferred to the invites table first.
+
+2. Overrides
+   If the app doesn't override the default Register pages, routes or Invite classes, then nothing else is needed. If the app does, then there are probably updates needed. See the code changes to see what needs updating.
+
 ## Updates Password Requirements - 2025-03-25
 
 The password requirements are now 'min:10', to match ODK Central requirements.
