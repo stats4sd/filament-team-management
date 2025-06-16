@@ -4,7 +4,6 @@ namespace Stats4sd\FilamentTeamManagement\Models;
 
 use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -49,7 +48,7 @@ class Team extends Model implements TeamInterface
             Notification::make()
                 ->success()
                 ->title('Invitation Sent')
-                ->body('An email invitation has been successfully sent to '.$email)
+                ->body('An email invitation has been successfully sent to ' . $email)
                 ->send();
         }
     }
@@ -63,10 +62,12 @@ class Team extends Model implements TeamInterface
     /** @return BelongsToMany<Model, $this> */
     public function users(): BelongsToMany
     {
-        return $this->belongsToMany(config('filament-team-management.models.user'),
-            static::getModelNameLower().'_members',
-            static::getModelNameLower().'_id',
-            'user_id')
+        return $this->belongsToMany(
+            config('filament-team-management.models.user'),
+            static::getModelNameLower() . '_members',
+            static::getModelNameLower() . '_id',
+            'user_id'
+        )
             ->withPivot('is_admin');
     }
 
@@ -75,9 +76,10 @@ class Team extends Model implements TeamInterface
     {
         return $this->belongsToMany(
             config('filament-team-management.models.user'),
-            static::getModelNameLower().'_members',
-            static::getModelNameLower().'_id',
-            'user_id')
+            static::getModelNameLower() . '_members',
+            static::getModelNameLower() . '_id',
+            'user_id'
+        )
             ->withPivot('is_admin')
             ->wherePivot('is_admin', 1);
     }
@@ -87,9 +89,10 @@ class Team extends Model implements TeamInterface
     {
         return $this->belongsToMany(
             config('filament-team-management.models.user'),
-            static::getModelNameLower().'_members',
-            static::getModelNameLower().'_id',
-            'user_id')
+            static::getModelNameLower() . '_members',
+            static::getModelNameLower() . '_id',
+            'user_id'
+        )
             ->withPivot('is_admin')
             ->wherePivot('is_admin', 0);
     }
@@ -99,9 +102,10 @@ class Team extends Model implements TeamInterface
     {
         return $this->belongsToMany(
             config('filament-team-management.models.program'),
-            'program_'.static::getModelNameLower(),
-            static::getModelNameLower().'_id',
-            'program_id');
+            'program_' . static::getModelNameLower(),
+            static::getModelNameLower() . '_id',
+            'program_id'
+        );
     }
 
     // add relationship to refer to team model itself, so that app panel > Teams resource can show the selected team for editing
