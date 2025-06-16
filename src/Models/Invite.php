@@ -4,50 +4,50 @@ namespace Stats4sd\FilamentTeamManagement\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Spatie\Permission\Models\Role;
 
 /**
  * @property string $email
  * @property int $inviter_id
+ * @property int $role_id
  * @property string $token
  * @property bool $is_confirmed
- * @property User $inviter
- * @property Team $team
  */
-class TeamInvite extends Model
+class Invite extends Model
 {
-    protected $table = 'team_invites';
+    protected $table = 'invites';
 
-    protected $fillable = [
-        'email',
-        'inviter_id',
-        'token',
-    ];
+    protected $guarded = ['id'];
 
     protected $casts = [
         'is_confirmed' => 'boolean',
     ];
 
-    // do not use global scope, to show all invitation emails sent
-    //
-    // protected static function booted(): void
-    // {
-    //     static::addGlobalScope('unconfirmed', static function (Builder $builder) {
-    //         $builder->where('is_confirmed', false);
-    //     });
-    // }
-
     // *********** RELATIONSHIPS ************ //
+
+    /** @return BelongsTo<Model, $this> */
     public function inviter(): BelongsTo
     {
         return $this->belongsTo(config('filament-team-management.models.user'), 'inviter_id');
     }
 
+    /** @return BelongsTo<Role, $this> */
+    public function role(): BelongsTo
+    {
+        return $this->belongsTo(Role::class);
+    }
+
+    /** @return BelongsTo<Model, $this> */
+    public function program(): BelongsTo
+    {
+        return $this->belongsTo(config('filament-team-management.models.program'), 'program_id');
+    }
+
+    /** @return BelongsTo<Model, $this> */
     public function team(): BelongsTo
     {
         return $this->belongsTo(config('filament-team-management.models.team'), 'team_id');
     }
-
-    // ************ METHODS ************ //
 
     public function confirm(): bool
     {
