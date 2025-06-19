@@ -69,10 +69,10 @@ class TeamResource extends Resource
                     ->label('# Invites')
                     ->counts('invites')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('xlsforms_count')
-                    ->label('# Xlsforms')
-                    ->counts('xlsforms')
-                    ->sortable(),
+                // Tables\Columns\TextColumn::make('xlsforms_count')
+                //     ->label('# Xlsforms')
+                //     ->counts('xlsforms')
+                //     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->sortable(),
             ]);
