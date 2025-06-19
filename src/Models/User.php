@@ -97,12 +97,22 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
 
     public function teams(): BelongsToMany
     {
-        return $this->belongsToMany(config('filament-team-management.models.team'), 'team_members', 'user_id', 'team_id')->withPivot('is_admin');
+        return $this->belongsToMany(
+            config('filament-team-management.models.team'),
+            config('filament-team-management.table_names.team_members'),
+            config('filament-team-management.column_names.user_id'),
+            config('filament-team-management.column_names.team_id'),
+        )->withPivot('is_admin');
     }
 
     public function programs(): BelongsToMany
     {
-        return $this->belongsToMany(config('filament-team-management.models.program'), 'program_user', 'user_id', 'program_id');
+        return $this->belongsToMany(
+            config('filament-team-management.models.program'),
+            config('filament-team-management.table_names.program_user'),
+            config('filament-team-management.column_names.user_id'),
+            config('filament-team-management.column_names.program_id'),
+        );
     }
 
     public function belongsToTeam(TeamInterface $team): bool
@@ -196,7 +206,6 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
             ->flatten()
             ->merge($this->teams)
             ->unique('id');
-
     }
 
     // The last team the user was on.

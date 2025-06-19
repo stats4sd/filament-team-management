@@ -56,7 +56,7 @@ class Team extends Model implements TeamInterface
     /** @return HasMany<Invite, $this> */
     public function invites(): HasMany
     {
-        return $this->hasMany(Invite::class, foreignKey: 'team_id', localKey: 'id');
+        return $this->hasMany(Invite::class, foreignKey: config('filament-team-management.column_name.team_id'), localKey: 'id');
     }
 
     /** @return BelongsToMany<Model, $this> */
