@@ -3,16 +3,16 @@
 namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources;
 
 use Filament\Forms;
-use Filament\Tables;
 use Filament\Forms\Form;
-use Filament\Tables\Table;
-use Illuminate\Support\Str;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
-use Filament\Infolists\Components\TextEntry;
+use Filament\Tables;
+use Filament\Tables\Table;
+use Illuminate\Support\Str;
 use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\TeamResource\Pages;
-use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\TeamResource\RelationManagers\UsersRelationManager;
 use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\TeamResource\RelationManagers\InvitesRelationManager;
+use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\TeamResource\RelationManagers\UsersRelationManager;
 
 // filament-odk-link package related code are commented as some applications may not require ODK functionalities.
 // Please uncomment those code if filament-odk-link package is required and added to main repo.
