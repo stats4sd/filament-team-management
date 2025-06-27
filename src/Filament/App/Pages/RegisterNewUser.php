@@ -124,6 +124,7 @@ class RegisterNewUser extends BaseRegister
 
         return $field
             ->dehydrateStateUsing(fn ($state) => $state) // override default hashing so we have the option of passing the plain password to register on ODK Central
+            ->helperText('Your password must be at least 10 characters long')
             ->rule('min:10', 'Password must be at least 10 characters long.');
     }
 }
