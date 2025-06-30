@@ -7,10 +7,18 @@ use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class TeamsRelationManager extends RelationManager
 {
     protected static string $relationship = 'teams';
+
+    // customise relation manager title
+    public static function getTitle(Model $ownerRecord, string $pageClass): string
+    {
+        return Str::ucfirst(Str::plural(config('filament-team-management.names.team')));
+    }
 
     // turn on Edit mode so that "Add Existing Team to program" button will be shown when viewing program record
     public function isReadOnly(): bool
@@ -22,7 +30,7 @@ class TeamsRelationManager extends RelationManager
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('Team Details')
+                Forms\Components\Section::make(Str::ucfirst(config('filament-team-management.names.team')) . ' Details')
                     ->schema([
                         Forms\Components\TextInput::make('name')
                             ->required()
@@ -67,18 +75,19 @@ class TeamsRelationManager extends RelationManager
             ->headerActions([
                 Tables\Actions\CreateAction::make(),
                 Tables\Actions\AttachAction::make()
-                    ->label('Add Existing Team to program'),
+                    ->label('Add Existing ' . Str::ucfirst(config('filament-team-management.names.team')) . ' to program'),
             ])
             ->actions([
-                Tables\Actions\DetachAction::make()->label('Remove Team')
-                    ->modalSubmitActionLabel('Remove Team')
-                    ->modalHeading('Remove Team from Program'),
+                Tables\Actions\DetachAction::make()
+                    ->label('Remove ' . Str::ucfirst(config('filament-team-management.names.team')))
+                    ->modalSubmitActionLabel('Remove ' . Str::ucfirst(config('filament-team-management.names.team')))
+                    ->modalHeading('Remove ' . Str::ucfirst(config('filament-team-management.names.team')) . ' from Program'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DetachBulkAction::make()->label('Remove selected')
-                        ->modalSubmitActionLabel('Remove Selected Teams')
-                        ->modalHeading('Remove Selected Teams from Program'),
+                        ->modalSubmitActionLabel('Remove Selected ' . Str::ucfirst(Str::plural(config('filament-team-management.names.team'))))
+                        ->modalHeading('Remove Selected ' . Str::ucfirst(Str::plural(config('filament-team-management.names.team'))) . ' from Program'),
                 ]),
             ]);
     }

@@ -43,13 +43,19 @@ class Invite extends Model
     /** @return BelongsTo<Model, $this> */
     public function program(): BelongsTo
     {
-        return $this->belongsTo(config('filament-team-management.models.program'), 'program_id');
+        return $this->belongsTo(
+            config('filament-team-management.models.program'),
+            foreignKey: config('filament-team-management.models.program')::getModelNameLower() . '_id'
+        );
     }
 
     /** @return BelongsTo<Model, $this> */
     public function team(): BelongsTo
     {
-        return $this->belongsTo(config('filament-team-management.models.team'), Team::getModelNameLower() . '_id');
+        return $this->belongsTo(
+            config('filament-team-management.models.team'),
+            foreignKey: config('filament-team-management.models.team')::getModelNameLower() . '_id'
+        );
     }
 
     public function confirm(): bool

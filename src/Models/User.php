@@ -21,6 +21,7 @@ use Spatie\Permission\Traits\HasRoles;
 use Stats4sd\FilamentTeamManagement\Mail\InviteUser;
 use Stats4sd\FilamentTeamManagement\Models\Interfaces\ProgramInterface;
 use Stats4sd\FilamentTeamManagement\Models\Interfaces\TeamInterface;
+use Stats4sd\FilamentTeamManagement\Models\Traits\HasModelNameLowerString;
 
 /**
  * @property int $id
@@ -31,6 +32,7 @@ use Stats4sd\FilamentTeamManagement\Models\Interfaces\TeamInterface;
  */
 class User extends Authenticatable implements FilamentUser, HasDefaultTenant, HasTenants
 {
+    use HasModelNameLowerString;
     use HasRoles;
     use Notifiable;
 
@@ -97,12 +99,22 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
 
     public function teams(): BelongsToMany
     {
-        return $this->belongsToMany(config('filament-team-management.models.team'), 'team_members', 'user_id', 'team_id')->withPivot('is_admin');
+        return $this->belongsToMany(
+            config('filament-team-management.models.team'),
+            config('filament-team-management.models.team')::getModelNameLower() . '_members',
+            config('filament-team-management.models.user')::getModelNameLower() . '_id',
+            config('filament-team-management.models.team')::getModelNameLower() . '_id',
+        )->withPivot('is_admin');
     }
 
     public function programs(): BelongsToMany
     {
-        return $this->belongsToMany(config('filament-team-management.models.program'), 'program_user', 'user_id', 'program_id');
+        return $this->belongsToMany(
+            config('filament-team-management.models.program'),
+            config('filament-team-management.models.program')::getModelNameLower() . '_' . config('filament-team-management.models.user')::getModelNameLower(),
+            config('filament-team-management.models.user')::getModelNameLower() . '_id',
+            config('filament-team-management.models.program')::getModelNameLower() . '_id',
+        );
     }
 
     public function belongsToTeam(TeamInterface $team): bool
@@ -196,19 +208,24 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
             ->flatten()
             ->merge($this->teams)
             ->unique('id');
-
     }
 
     // The last team the user was on.
     public function latestTeam(): BelongsTo
     {
-        return $this->belongsTo(config('filament-team-management.models.team'), 'latest_team_id');
+        return $this->belongsTo(
+            config('filament-team-management.models.team'),
+            foreignKey: 'latest_' . config('filament-team-management.models.team')::getModelNameLower() . '_id'
+        );
     }
 
     // The last program the user was on.
     public function latestProgram(): BelongsTo
     {
-        return $this->belongsTo(config('filament-team-management.models.program'), 'latest_program_id');
+        return $this->belongsTo(
+            config('filament-team-management.models.program'),
+            foreignKey: 'latest_' . config('filament-team-management.models.program')::getModelNameLower() . '_id'
+        );
     }
 
     public function getDefaultTenant(Panel $panel): ?Model

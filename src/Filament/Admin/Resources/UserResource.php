@@ -9,6 +9,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\Str;
 use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\UserResource\Pages;
 
 class UserResource extends Resource
@@ -23,9 +24,9 @@ class UserResource extends Resource
     public static function getNavigationGroup(): string
     {
         if (config('filament-team-management.use_programs')) {
-            return 'Programs, Teams and Users';
+            return 'Programs, ' . Str::ucfirst(Str::plural(config('filament-team-management.names.team'))) . ' and Users';
         } else {
-            return 'Teams and Users';
+            return Str::ucfirst(Str::plural(config('filament-team-management.names.team'))) . ' and Users';
         }
     }
 
@@ -61,7 +62,7 @@ class UserResource extends Resource
                 //
                 // (It's also because there seems to be a bug in Filament where select multiples don't work if the disabled() state is live updated...)
                 Select::make('team_id')
-                    ->label('Which team should the user be a member of?')
+                    ->label('Which ' . config('filament-team-management.names.team') . ' should the user be a member of?')
                     ->exists((new $teamClass)->getTable(), 'id')
                     ->relationship('teams', titleAttribute: 'name'),
 
@@ -88,6 +89,7 @@ class UserResource extends Resource
                     ->color('success')
                     ->visible(config('filament-team-management.use_programs')),
                 Tables\Columns\TextColumn::make('teams.name')
+                    ->label(Str::ucfirst(Str::plural(config('filament-team-management.names.team'))))
                     ->searchable()
                     ->badge()
                     ->color('success'),

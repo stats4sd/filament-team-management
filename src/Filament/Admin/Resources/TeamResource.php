@@ -9,6 +9,7 @@ use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\Str;
 use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\TeamResource\Pages;
 use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\TeamResource\RelationManagers\InvitesRelationManager;
 use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\TeamResource\RelationManagers\UsersRelationManager;
@@ -28,9 +29,9 @@ class TeamResource extends Resource
     public static function getNavigationGroup(): string
     {
         if (config('filament-team-management.use_programs')) {
-            return 'Programs, Teams and Users';
+            return 'Programs, ' . Str::ucfirst(Str::plural(config('filament-team-management.names.team'))) . ' and Users';
         } else {
-            return 'Teams and Users';
+            return Str::ucfirst(Str::plural(config('filament-team-management.names.team'))) . ' and Users';
         }
     }
 
@@ -38,7 +39,7 @@ class TeamResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('Team Details')
+                Forms\Components\Section::make(Str::ucfirst(config('filament-team-management.names.team')) . ' Details')
                     ->schema([
                         Forms\Components\TextInput::make('name')
                             ->required()

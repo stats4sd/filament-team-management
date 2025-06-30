@@ -9,6 +9,7 @@ use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\Str;
 use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\ProgramResource\Pages;
 use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\ProgramResource\RelationManagers;
 
@@ -29,9 +30,9 @@ class ProgramResource extends Resource
     public static function getNavigationGroup(): string
     {
         if (config('filament-team-management.use_programs')) {
-            return 'Programs, Teams and Users';
+            return 'Programs, ' . Str::ucfirst(Str::plural(config('filament-team-management.names.team'))) . ' and Users';
         } else {
-            return 'Teams and Users';
+            return Str::ucfirst(Str::plural(config('filament-team-management.names.team'))) . ' and Users';
         }
     }
 
@@ -64,7 +65,7 @@ class ProgramResource extends Resource
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('teams_count')
-                    ->label('# Teams')
+                    ->label('# ' . Str::ucfirst(Str::plural(config('filament-team-management.names.team'))))
                     ->counts('teams')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('users_count')

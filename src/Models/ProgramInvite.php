@@ -47,7 +47,10 @@ class ProgramInvite extends Model
 
     public function program(): BelongsTo
     {
-        return $this->belongsTo(config('filament-team-management.models.program'));
+        return $this->belongsTo(
+            config('filament-team-management.models.program'),
+            foreignKey: config('filament-team-management.models.program')::getModelNameLower() . '_id'
+        );
     }
 
     public function confirm(): bool
