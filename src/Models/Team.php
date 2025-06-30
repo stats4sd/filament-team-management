@@ -51,7 +51,7 @@ class Team extends Model implements TeamInterface
             Notification::make()
                 ->success()
                 ->title('Invitation Sent')
-                ->body('An email invitation has been successfully sent to '.$email)
+                ->body('An email invitation has been successfully sent to ' . $email)
                 ->send();
         }
     }
@@ -62,7 +62,8 @@ class Team extends Model implements TeamInterface
         return $this->hasMany(
             Invite::class,
             foreignKey: static::getModelNameLower() . '_id',
-            localKey: 'id');
+            localKey: 'id'
+        );
     }
 
     /** @return BelongsToMany<Model, $this> */
@@ -70,9 +71,9 @@ class Team extends Model implements TeamInterface
     {
         return $this->belongsToMany(
             related: config('filament-team-management.models.user'),
-            table: static::getModelNameLower().'_members',
-            foreignPivotKey: static::getModelNameLower().'_id',
-            relatedPivotKey: config('filament-team-management.models.user')::getModelNameLower().'_id'
+            table: static::getModelNameLower() . '_members',
+            foreignPivotKey: static::getModelNameLower() . '_id',
+            relatedPivotKey: config('filament-team-management.models.user')::getModelNameLower() . '_id'
         )
             ->withPivot('is_admin');
     }
@@ -82,9 +83,9 @@ class Team extends Model implements TeamInterface
     {
         return $this->belongsToMany(
             config('filament-team-management.models.user'),
-            static::getModelNameLower().'_members',
-            static::getModelNameLower().'_id',
-            config('filament-team-management.models.user')::getModelNameLower().'_id'
+            static::getModelNameLower() . '_members',
+            static::getModelNameLower() . '_id',
+            config('filament-team-management.models.user')::getModelNameLower() . '_id'
         )
             ->withPivot('is_admin')
             ->wherePivot('is_admin', 1);
@@ -95,9 +96,9 @@ class Team extends Model implements TeamInterface
     {
         return $this->belongsToMany(
             config('filament-team-management.models.user'),
-            static::getModelNameLower().'_members',
-            static::getModelNameLower().'_id',
-            config('filament-team-management.models.user')::getModelNameLower().'_id'
+            static::getModelNameLower() . '_members',
+            static::getModelNameLower() . '_id',
+            config('filament-team-management.models.user')::getModelNameLower() . '_id'
         )
             ->withPivot('is_admin')
             ->wherePivot('is_admin', 0);
@@ -108,9 +109,9 @@ class Team extends Model implements TeamInterface
     {
         return $this->belongsToMany(
             config('filament-team-management.models.program'),
-            config('filament-team-management.models.program')::getModelNameLower().'_'.static::getModelNameLower(),
-            static::getModelNameLower().'_id',
-            config('filament-team-management.models.program')::getModelNameLower().'_id'
+            config('filament-team-management.models.program')::getModelNameLower() . '_' . static::getModelNameLower(),
+            static::getModelNameLower() . '_id',
+            config('filament-team-management.models.program')::getModelNameLower() . '_id'
         );
     }
 

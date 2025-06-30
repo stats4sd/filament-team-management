@@ -87,7 +87,7 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
             Notification::make()
                 ->success()
                 ->title('Invitation Sent')
-                ->body('An email invitation has been successfully sent to '.$item['email'])
+                ->body('An email invitation has been successfully sent to ' . $item['email'])
                 ->send();
         }
     }
@@ -101,9 +101,9 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
     {
         return $this->belongsToMany(
             config('filament-team-management.models.team'),
-            config('filament-team-management.models.team')::getModelNameLower().'_members',
-            config('filament-team-management.models.user')::getModelNameLower().'_id',
-            config('filament-team-management.models.team')::getModelNameLower().'_id',
+            config('filament-team-management.models.team')::getModelNameLower() . '_members',
+            config('filament-team-management.models.user')::getModelNameLower() . '_id',
+            config('filament-team-management.models.team')::getModelNameLower() . '_id',
         )->withPivot('is_admin');
     }
 
@@ -111,9 +111,9 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
     {
         return $this->belongsToMany(
             config('filament-team-management.models.program'),
-            config('filament-team-management.models.program')::getModelNameLower().'_'.config('filament-team-management.models.user')::getModelNameLower(),
-            config('filament-team-management.models.user')::getModelNameLower().'_id',
-            config('filament-team-management.models.program')::getModelNameLower().'_id',
+            config('filament-team-management.models.program')::getModelNameLower() . '_' . config('filament-team-management.models.user')::getModelNameLower(),
+            config('filament-team-management.models.user')::getModelNameLower() . '_id',
+            config('filament-team-management.models.program')::getModelNameLower() . '_id',
         );
     }
 
@@ -185,7 +185,7 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
         return false;
     }
 
-    public function getTenants(Panel $panel): array|Collection
+    public function getTenants(Panel $panel): array | Collection
     {
         // add different handling for different panel
         if ($panel->getTenantModel() === config('filament-team-management.models.team')) {
@@ -215,7 +215,7 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
     {
         return $this->belongsTo(
             config('filament-team-management.models.team'),
-            foreignKey: 'latest_'.config('filament-team-management.models.team')::getModelNameLower().'_id'
+            foreignKey: 'latest_' . config('filament-team-management.models.team')::getModelNameLower() . '_id'
         );
     }
 
@@ -224,7 +224,7 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
     {
         return $this->belongsTo(
             config('filament-team-management.models.program'),
-            foreignKey: 'latest_'.config('filament-team-management.models.program')::getModelNameLower().'_id'
+            foreignKey: 'latest_' . config('filament-team-management.models.program')::getModelNameLower() . '_id'
         );
     }
 

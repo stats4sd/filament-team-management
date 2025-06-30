@@ -45,7 +45,8 @@ class Invite extends Model
     {
         return $this->belongsTo(
             config('filament-team-management.models.program'),
-            foreignKey: config('filament-team-management.models.program')::getModelNameLower().'_id');
+            foreignKey: config('filament-team-management.models.program')::getModelNameLower() . '_id'
+        );
     }
 
     /** @return BelongsTo<Model, $this> */
@@ -53,7 +54,8 @@ class Invite extends Model
     {
         return $this->belongsTo(
             config('filament-team-management.models.team'),
-            foreignKey: config('filament-team-management.models.team')::getModelNameLower().'_id');
+            foreignKey: config('filament-team-management.models.team')::getModelNameLower() . '_id'
+        );
     }
 
     public function confirm(): bool

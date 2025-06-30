@@ -56,7 +56,7 @@ class Program extends Model implements ProgramInterface
             Notification::make()
                 ->success()
                 ->title('Invitation Sent')
-                ->body('An email invitation has been successfully sent to '.$email)
+                ->body('An email invitation has been successfully sent to ' . $email)
                 ->send();
         }
     }
@@ -70,10 +70,9 @@ class Program extends Model implements ProgramInterface
     {
         return $this->belongsToMany(
             related: config('filament-team-management.models.user'),
-            table: static::getModelNameLower().'_'.config('filament-team-management.models.user')::getModelNameLower(),
-            foreignPivotKey: static::getModelNameLower().'_id',
-            relatedPivotKey: config('filament-team-management.models.user')::getModelNameLower().'_id'
-
+            table: static::getModelNameLower() . '_' . config('filament-team-management.models.user')::getModelNameLower(),
+            foreignPivotKey: static::getModelNameLower() . '_id',
+            relatedPivotKey: config('filament-team-management.models.user')::getModelNameLower() . '_id'
         )->withTimestamps();
     }
 
@@ -81,9 +80,9 @@ class Program extends Model implements ProgramInterface
     {
         return $this->belongsToMany(
             related: config('filament-team-management.models.team'),
-            table: static::getModelNameLower().'_'.config('filament-team-management.models.team')::getModelNameLower(),
-            foreignPivotKey: static::getModelNameLower().'_id',
-            relatedPivotKey: config('filament-team-management.models.team')::getModelNameLower().'_id'
+            table: static::getModelNameLower() . '_' . config('filament-team-management.models.team')::getModelNameLower(),
+            foreignPivotKey: static::getModelNameLower() . '_id',
+            relatedPivotKey: config('filament-team-management.models.team')::getModelNameLower() . '_id'
         )->withTimestamps();
     }
 

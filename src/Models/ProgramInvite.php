@@ -49,7 +49,7 @@ class ProgramInvite extends Model
     {
         return $this->belongsTo(
             config('filament-team-management.models.program'),
-            foreignKey: config('filament-team-management.models.program')::getModelNameLower().'_id'
+            foreignKey: config('filament-team-management.models.program')::getModelNameLower() . '_id'
         );
     }
 
