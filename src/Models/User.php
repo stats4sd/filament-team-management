@@ -97,7 +97,14 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
 
     public function teams(): BelongsToMany
     {
-        return $this->belongsToMany(config('filament-team-management.models.team'), 'team_members', 'user_id', 'team_id')->withPivot('is_admin');
+        $teamModelNameLower = config('filament-team-management.models.team')::getModelNameLower();
+
+        return $this->belongsToMany(
+            config('filament-team-management.models.team'),
+            $teamModelNameLower . '_members',
+            'user_id',
+            $teamModelNameLower . '_id'
+        )->withPivot('is_admin');
     }
 
     public function programs(): BelongsToMany
@@ -196,7 +203,6 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
             ->flatten()
             ->merge($this->teams)
             ->unique('id');
-
     }
 
     // The last team the user was on.
