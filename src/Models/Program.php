@@ -12,6 +12,7 @@ use Illuminate\Support\Str;
 use Spatie\Permission\Models\Role;
 use Stats4sd\FilamentTeamManagement\Mail\InviteUser;
 use Stats4sd\FilamentTeamManagement\Models\Interfaces\ProgramInterface;
+use Stats4sd\FilamentTeamManagement\Models\Traits\HasModelNameLowerString;
 
 /**
  * @property string $name
@@ -20,6 +21,8 @@ use Stats4sd\FilamentTeamManagement\Models\Interfaces\ProgramInterface;
  */
 class Program extends Model implements ProgramInterface
 {
+    use HasModelNameLowerString;
+
     protected $table = 'programs';
 
     protected $guarded = ['id'];
@@ -39,6 +42,7 @@ class Program extends Model implements ProgramInterface
                 continue;
             }
 
+            /** @var Invite $invite */
             $invite = $this->invites()->create([
                 'email' => $email,
                 'inviter_id' => auth()->id(),
@@ -52,7 +56,7 @@ class Program extends Model implements ProgramInterface
             Notification::make()
                 ->success()
                 ->title('Invitation Sent')
-                ->body('An email invitation has been successfully sent to ' . $email)
+                ->body('An email invitation has been successfully sent to '.$email)
                 ->send();
         }
     }
@@ -64,13 +68,22 @@ class Program extends Model implements ProgramInterface
 
     public function users(): BelongsToMany
     {
-        return $this->belongsToMany(config('filament-team-management.models.user'))->withTimestamps();
+        return $this->belongsToMany(
+            related: config('filament-team-management.models.user'),
+            table: static::getModelNameLower().'_'.config('filament-team-management.models.user')::getModelNameLower(),
+            foreignPivotKey: static::getModelNameLower().'_id',
+            relatedPivotKey: config('filament-team-management.models.user')::getModelNameLower().'_id'
+
+        )->withTimestamps();
     }
 
     public function teams(): BelongsToMany
     {
         return $this->belongsToMany(
-            config('filament-team-management.models.team'),
+            related: config('filament-team-management.models.team'),
+            table: static::getModelNameLower().'_'.config('filament-team-management.models.team')::getModelNameLower(),
+            foreignPivotKey: static::getModelNameLower().'_id',
+            relatedPivotKey: config('filament-team-management.models.team')::getModelNameLower().'_id'
         )->withTimestamps();
     }
 

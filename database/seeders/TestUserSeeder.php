@@ -15,6 +15,7 @@ class TestUserSeeder extends Seeder
     {
         // create roles
         Role::create(['name' => 'Super Admin']);
+        Role::create(['name' => 'Program Admin']);
 
         // create permissions
         Permission::create(['name' => 'access admin panel']);
