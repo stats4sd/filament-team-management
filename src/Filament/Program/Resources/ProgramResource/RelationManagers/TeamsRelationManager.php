@@ -3,14 +3,32 @@
 namespace Stats4sd\FilamentTeamManagement\Filament\Program\Resources\ProgramResource\RelationManagers;
 
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Model;
+use Filament\Resources\RelationManagers\RelationManager;
 
 class TeamsRelationManager extends RelationManager
 {
     protected static string $relationship = 'teams';
+
+    public static function getTitle(Model $ownerRecord, string $pageClass): string
+    {
+        return TeamsRelationManager::getModelNamePlural();
+    }
+
+    public static function getModelName(): string
+    {
+        return Str::ucfirst(config('filament-team-management.names.team'));
+    }
+
+    public static function getModelNamePlural(): string
+    {
+        // return Str::ucfirst(Str::plural(config('filament-team-management.names.team')));
+        return Str::plural(TeamsRelationManager::getModelName());
+    }
 
     // turn on Edit mode so that "Add Existing Team to program" button will be shown when viewing program record
     public function isReadOnly(): bool
@@ -67,18 +85,18 @@ class TeamsRelationManager extends RelationManager
             ->headerActions([
                 Tables\Actions\CreateAction::make(),
                 Tables\Actions\AttachAction::make()
-                    ->label('Add Existing Team to program'),
+                    ->label('Add Existing ' . TeamsRelationManager::getModelName() . ' to program'),
             ])
             ->actions([
-                Tables\Actions\DetachAction::make()->label('Remove Team')
-                    ->modalSubmitActionLabel('Remove Team')
-                    ->modalHeading('Remove Team from Program'),
+                Tables\Actions\DetachAction::make()->label('Remove ' . TeamsRelationManager::getModelName())
+                    ->modalSubmitActionLabel('Remove ' . TeamsRelationManager::getModelName())
+                    ->modalHeading('Remove ' . TeamsRelationManager::getModelName() . ' from Program'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DetachBulkAction::make()->label('Remove selected')
-                        ->modalSubmitActionLabel('Remove Selected Teams')
-                        ->modalHeading('Remove Selected Teams from Program'),
+                        ->modalSubmitActionLabel('Remove Selected ' . TeamsRelationManager::getModelNamePlural())
+                        ->modalHeading('Remove Selected ' . TeamsRelationManager::getModelNamePlural() . ' from Program'),
                 ]),
             ]);
     }
