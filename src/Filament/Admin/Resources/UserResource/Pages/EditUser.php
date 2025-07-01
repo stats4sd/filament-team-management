@@ -20,7 +20,11 @@ class EditUser extends EditRecord
     protected function mutateFormDataBeforeSave(array $data): array
     {
         // encrypt password before saving it to database
-        $data['password'] = bcrypt('password');
+        if ($data['password']) {
+            $data['password'] = bcrypt('password');
+        } else {
+            unset($data['password']);
+        }
 
         // unset team_id, as it's not a field on the user model.
         // The relationship is handled because the field has the ->relationship() method.
