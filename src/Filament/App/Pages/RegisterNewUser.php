@@ -31,9 +31,17 @@ class RegisterNewUser extends BaseRegister
     {
         $this->invite = Invite::where('token', $this->token)->firstOrFail();
 
+        if (Filament::auth()->check()) {
+            redirect()->intended(Filament::getUrl());
+        }
+
+        $this->callHook('beforeFill');
+
         $this->form->fill([
             'email' => $this->invite->email,
         ]);
+
+        $this->callHook('afterFill');
     }
 
     public function register(): ?RegistrationResponse
