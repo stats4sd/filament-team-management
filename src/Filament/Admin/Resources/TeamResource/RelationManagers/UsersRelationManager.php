@@ -22,7 +22,7 @@ class UsersRelationManager extends RelationManager
     {
         $team = $this->getOwnerRecord();
 
-        if(auth()->user()->can('update', $team)) {
+        if (auth()->user()->can('update', $team)) {
             return false;
         }
 
@@ -68,11 +68,11 @@ class UsersRelationManager extends RelationManager
             ])
             ->headerActions([
                 Tables\Actions\Action::make('invite users')
-                    ->visible(!$this->isReadOnly())
+                    ->visible(! $this->isReadOnly())
                     ->form([
                         Shout::make('info')
                             ->type('info')
-                            ->content('Add the email address(es) of the user(s) you would like to invite to this ' . config('filament-team-management.names.team') . '. An invitation will be sent to each address.')
+                            ->content('Add the email address(es) of the user(s) you would like to invite to this '.config('filament-team-management.names.team').'. An invitation will be sent to each address.')
                             ->columnSpanFull(),
                         Forms\Components\Repeater::make('users')
                             ->label('Email Addresses to Invite')
@@ -86,7 +86,7 @@ class UsersRelationManager extends RelationManager
                     ])
                     ->action(fn (array $data, RelationManager $livewire) => $this->handleInvitation($data, $livewire->getOwnerRecord())),
                 Tables\Actions\AttachAction::make()
-                    ->label('Add Existing User to ' . config('filament-team-management.names.team')),
+                    ->label('Add Existing User to '.config('filament-team-management.names.team')),
             ])
             ->actions([
                 // hide "Edit User Role" button as team admin is not being used in this application
@@ -95,13 +95,13 @@ class UsersRelationManager extends RelationManager
 
                 Tables\Actions\DetachAction::make()->label('Remove User')
                     ->modalSubmitActionLabel('Remove User')
-                    ->modalHeading('Remove User from ' . Str::ucfirst(config('filament-team-management.names.team'))),
+                    ->modalHeading('Remove User from '.Str::ucfirst(config('filament-team-management.names.team'))),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DetachBulkAction::make()->label('Remove selected')
                         ->modalSubmitActionLabel('Remove Selected Users')
-                        ->modalHeading('Remove Selected Users from ' . Str::ucfirst(config('filament-team-management.names.team'))),
+                        ->modalHeading('Remove Selected Users from '.Str::ucfirst(config('filament-team-management.names.team'))),
                 ]),
             ]);
     }
