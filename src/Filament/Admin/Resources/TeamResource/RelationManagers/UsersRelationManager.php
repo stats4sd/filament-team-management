@@ -22,7 +22,7 @@ class UsersRelationManager extends RelationManager
     {
         $team = $this->getOwnerRecord();
 
-        if(auth()->user()->can('edit', $team)) {
+        if(auth()->user()->can('update', $team)) {
             return false;
         }
 
@@ -68,6 +68,7 @@ class UsersRelationManager extends RelationManager
             ])
             ->headerActions([
                 Tables\Actions\Action::make('invite users')
+                    ->visible(!$this->isReadOnly())
                     ->form([
                         Shout::make('info')
                             ->type('info')
