@@ -22,7 +22,7 @@ class UsersRelationManager extends RelationManager
     {
         $team = $this->getOwnerRecord();
 
-        if(auth()->user()->can('edit', $team)) {
+        if (auth()->user()->can('edit', $team)) {
             return false;
         }
 
