@@ -20,7 +20,13 @@ class UsersRelationManager extends RelationManager
     // turn on Edit mode so that "Add Existing User to team" button will be shown when viewing team record
     public function isReadOnly(): bool
     {
-        return false;
+        $team = $this->getOwnerRecord();
+
+        if (auth()->user()->can('update', $team)) {
+            return false;
+        }
+
+        return true;
     }
 
     public function form(Form $form): Form
@@ -62,6 +68,7 @@ class UsersRelationManager extends RelationManager
             ])
             ->headerActions([
                 Tables\Actions\Action::make('invite users')
+                    ->visible(! $this->isReadOnly())
                     ->form([
                         Shout::make('info')
                             ->type('info')
