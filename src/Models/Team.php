@@ -33,26 +33,73 @@ class Team extends Model implements TeamInterface
      */
     public function sendInvites(array $emails): void
     {
+        logger('Team.sendInvites()...');
+
         foreach ($emails as $email) {
+            logger('email: ' . $email);
+
             // if email is empty, skip to next email
             if ($email == null || $email == '') {
                 continue;
             }
 
-            $invite = $this->invites()->create([
-                'email' => $email,
-                'inviter_id' => auth()->id(),
-                'token' => Str::random(24),
-            ]);
+            // check if email address belong to any registered user
+            $user = User::where('email', $email)->first();
 
-            Mail::to($invite->email)->send(new InviteUser($invite));
+            // email address does not belong to any registered user
+            if (!$user) {
+                logger('Email address does not belong to any registered user');
 
-            // show notification after sending invitation email to user
-            Notification::make()
-                ->success()
-                ->title('Invitation Sent')
-                ->body('An email invitation has been successfully sent to ' . $email)
-                ->send();
+                $invite = $this->invites()->create([
+                    'email' => $email,
+                    'inviter_id' => auth()->id(),
+                    'token' => Str::random(24),
+                ]);
+
+                Mail::to($invite->email)->send(new InviteUser($invite));
+
+                // show notification after sending invitation email to user
+                Notification::make()
+                    ->success()
+                    ->title('Invitation Sent')
+                    ->body('An email invitation has been successfully sent to ' . $email)
+                    ->send();
+
+            // email address belongs to a registered user
+            } else {
+                logger('Email address belongs to a registered user');
+
+                // add user to team if user does not belong to this team yet
+                if ($this->users->contains($user)) {
+                    logger('User belongs to this team already');
+
+                    // show notification 
+                    Notification::make()
+                        ->success()
+                        ->title('User added')
+                        ->body('User ' . $email . ' belongs to this team already')
+                        ->send();
+
+                } else {
+                    logger('User does not belong to this team, add user to this team');
+
+                    // show notification 
+                    Notification::make()
+                        ->success()
+                        ->title('User added')
+                        ->body('User ' . $email . ' has been added to this team')
+                        ->send();
+
+                    $this->members()->attach($user);
+
+                    // TODO: send email notification to inform user that he/she has been added to a team
+
+                    // TODO: show notification after sending email notification to user
+
+                }
+
+            }
+
         }
     }
 
