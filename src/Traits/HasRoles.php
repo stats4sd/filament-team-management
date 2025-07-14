@@ -2,16 +2,16 @@
 
 namespace Stats4sd\FilamentTeamManagement\Traits;
 
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Contracts\Role;
-use Illuminate\Database\Eloquent\Builder;
 use Spatie\Permission\Events\RoleAttached;
 use Spatie\Permission\Events\RoleDetached;
 use Spatie\Permission\PermissionRegistrar;
-use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Traits\HasPermissions;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 trait HasRoles
 {
@@ -101,7 +101,7 @@ trait HasRoles
 
         $teamsKey = app(PermissionRegistrar::class)->teamsKey;
         $relation->withPivot($teamsKey);
-        $teamField = config('permission.table_names.roles').'.'.$teamsKey;
+        $teamField = config('permission.table_names.roles') . '.' . $teamsKey;
 
         return $relation->wherePivot($teamsKey, getPermissionsTeamId())
             ->where(fn ($q) => $q->whereNull($teamField)->orWhere($teamField, getPermissionsTeamId()));
@@ -138,8 +138,10 @@ trait HasRoles
 
         $key = (new ($this->getRoleClass())())->getKeyName();
 
-        return $query->{! $without ? 'whereHas' : 'whereDoesntHave'}('roles', fn (Builder $subQuery) => $subQuery
-            ->whereIn(config('permission.table_names.roles').".$key", \array_column($roles, $key))
+        return $query->{! $without ? 'whereHas' : 'whereDoesntHave'}(
+            'roles',
+            fn (Builder $subQuery) => $subQuery
+                ->whereIn(config('permission.table_names.roles') . ".$key", \array_column($roles, $key))
         );
     }
 
@@ -369,7 +371,7 @@ trait HasRoles
     public function hasAllRoles($roles, ?string $guard = null): bool
     {
         logger('HasRoles.hasAllRoles()...');
-        
+
         $this->loadMissing('roles');
 
         if ($roles instanceof \BackedEnum) {
@@ -434,7 +436,8 @@ trait HasRoles
             $roles = [$roles->name];
         }
 
-        $roles = collect()->make($roles)->map(fn ($role) => $role instanceof Role ? $role->name : $role
+        $roles = collect()->make($roles)->map(
+            fn ($role) => $role instanceof Role ? $role->name : $role
         );
 
         return $this->roles->count() == $roles->count() && $this->hasAllRoles($roles, $guard);

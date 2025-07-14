@@ -17,14 +17,12 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
-
 // use Spatie\Permission\Traits\HasRoles;
-use Stats4sd\FilamentTeamManagement\Traits\HasRoles;
-
 use Stats4sd\FilamentTeamManagement\Mail\InviteUser;
 use Stats4sd\FilamentTeamManagement\Models\Interfaces\ProgramInterface;
 use Stats4sd\FilamentTeamManagement\Models\Interfaces\TeamInterface;
 use Stats4sd\FilamentTeamManagement\Models\Traits\HasModelNameLowerString;
+use Stats4sd\FilamentTeamManagement\Traits\HasRoles;
 
 /**
  * @property int $id
@@ -80,8 +78,6 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
         });
 
     }
-
-
 
     /**
      * Generate an invitation to be a role for each of the provided email addresses
