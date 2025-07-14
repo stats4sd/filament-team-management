@@ -17,7 +17,10 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
-use Spatie\Permission\Traits\HasRoles;
+
+// use Spatie\Permission\Traits\HasRoles;
+use Stats4sd\FilamentTeamManagement\Traits\HasRoles;
+
 use Stats4sd\FilamentTeamManagement\Mail\InviteUser;
 use Stats4sd\FilamentTeamManagement\Models\Interfaces\ProgramInterface;
 use Stats4sd\FilamentTeamManagement\Models\Interfaces\TeamInterface;
@@ -62,6 +65,23 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
     }
 
     // ****** TEAM MANAGEMENT STUFF ******
+
+    public static function boot()
+    {
+        parent::boot();
+
+        logger('User.boot()...');
+
+        static::updated(function ($item) {
+            logger('User.updated()...');
+
+            // User model event "updated" will be triggered only when any users table column is updated.
+            // It will not be triggered when a new role added to a user.
+        });
+
+    }
+
+
 
     /**
      * Generate an invitation to be a role for each of the provided email addresses
