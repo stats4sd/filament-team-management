@@ -48,7 +48,7 @@ class Team extends Model implements TeamInterface
             $user = User::where('email', $email)->first();
 
             // email address does not belong to any registered user
-            if (!$user) {
+            if (! $user) {
                 logger('Email address does not belong to any registered user');
 
                 $invite = $this->invites()->create([
@@ -66,7 +66,7 @@ class Team extends Model implements TeamInterface
                     ->body('An email invitation has been successfully sent to ' . $email)
                     ->send();
 
-            // email address belongs to a registered user
+                // email address belongs to a registered user
             } else {
                 logger('Email address belongs to a registered user');
 
@@ -74,7 +74,7 @@ class Team extends Model implements TeamInterface
                 if ($this->users->contains($user)) {
                     logger('User belongs to this team already');
 
-                    // show notification 
+                    // show notification
                     Notification::make()
                         ->success()
                         ->title('User already in this team')
