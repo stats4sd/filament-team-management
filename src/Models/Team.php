@@ -34,10 +34,7 @@ class Team extends Model implements TeamInterface
      */
     public function sendInvites(array $emails): void
     {
-        logger('Team.sendInvites()...');
-
         foreach ($emails as $email) {
-            logger('email: ' . $email);
 
             // if email is empty, skip to next email
             if ($email == null || $email == '') {
@@ -49,8 +46,6 @@ class Team extends Model implements TeamInterface
 
             // email address does not belong to any registered user
             if (! $user) {
-                logger('Email address does not belong to any registered user');
-
                 $invite = $this->invites()->create([
                     'email' => $email,
                     'inviter_id' => auth()->id(),
@@ -66,24 +61,17 @@ class Team extends Model implements TeamInterface
                     ->body('An email invitation has been successfully sent to ' . $email)
                     ->send();
 
-                // email address belongs to a registered user
+            // email address belongs to a registered user
             } else {
-                logger('Email address belongs to a registered user');
-
                 // add user to team if user does not belong to this team yet
                 if ($this->users->contains($user)) {
-                    logger('User belongs to this team already');
-
                     // show notification
                     Notification::make()
                         ->success()
                         ->title('User already in this team')
                         ->body('User ' . $email . ' belongs to this team already')
                         ->send();
-
                 } else {
-                    logger('User does not belong to this team, add user to this team');
-
                     // add invites model for future tracing
                     $invite = $this->invites()->create([
                         'email' => $email,
@@ -103,7 +91,6 @@ class Team extends Model implements TeamInterface
                         ->body('User ' . $email . ' has been added to this ' . config('filament-team-management.models.team')::getModelNameLower())
                         ->send();
 
-
                     // send email notification to inform user that he/she has been added to a team
                     Mail::to($invite->email)->send(new AddUserToTeam($invite));
 
@@ -113,7 +100,6 @@ class Team extends Model implements TeamInterface
                         ->title('Email Notification Sent')
                         ->body('An email notification has been successfully sent to ' . $email)
                         ->send();
-
                 }
 
             }
