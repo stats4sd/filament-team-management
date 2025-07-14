@@ -68,8 +68,8 @@ class Team extends Model implements TeamInterface
                     // show notification
                     Notification::make()
                         ->success()
-                        ->title('User already in this team')
-                        ->body('User ' . $email . ' belongs to this team already')
+                        ->title('User already in this ' . config('filament-team-management.models.team')::getModelNameLower())
+                        ->body('User ' . $email . ' belongs to this ' . config('filament-team-management.models.team')::getModelNameLower() . ' already')
                         ->send();
                 } else {
                     // add invites model for future tracing
