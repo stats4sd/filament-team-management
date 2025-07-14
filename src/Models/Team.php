@@ -61,7 +61,7 @@ class Team extends Model implements TeamInterface
                     ->body('An email invitation has been successfully sent to ' . $email)
                     ->send();
 
-            // email address belongs to a registered user
+                // email address belongs to a registered user
             } else {
                 // add user to team if user does not belong to this team yet
                 if ($this->users->contains($user)) {
