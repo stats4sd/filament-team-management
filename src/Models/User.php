@@ -2,26 +2,26 @@
 
 namespace Stats4sd\FilamentTeamManagement\Models;
 
-use Filament\Panel;
-use Illuminate\Support\Str;
 use Filament\Facades\Filament;
-use Illuminate\Support\Collection;
-use Spatie\Permission\Models\Role;
-use Illuminate\Support\Facades\Mail;
-use Spatie\Permission\Traits\HasRoles;
-use Illuminate\Database\Eloquent\Model;
-use Filament\Notifications\Notification;
-use Illuminate\Notifications\Notifiable;
-use Filament\Models\Contracts\HasTenants;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasDefaultTenant;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Stats4sd\FilamentTeamManagement\Mail\InviteUser;
+use Filament\Models\Contracts\HasTenants;
+use Filament\Notifications\Notification;
+use Filament\Panel;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Stats4sd\FilamentTeamManagement\Models\Interfaces\TeamInterface;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Traits\HasRoles;
+use Stats4sd\FilamentTeamManagement\Mail\InviteUser;
 use Stats4sd\FilamentTeamManagement\Models\Interfaces\ProgramInterface;
+use Stats4sd\FilamentTeamManagement\Models\Interfaces\TeamInterface;
 use Stats4sd\FilamentTeamManagement\Models\Traits\HasModelNameLowerString;
 
 /**

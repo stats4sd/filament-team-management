@@ -2,10 +2,10 @@
 
 namespace Stats4sd\FilamentTeamManagement\Models;
 
-use Spatie\Permission\Models\Role;
-use Illuminate\Support\Facades\Mail;
 use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Support\Facades\Mail;
+use Spatie\Permission\Models\Role;
 use Stats4sd\FilamentTeamManagement\Mail\AddRoleToUser;
 
 class ModelHasRole extends Pivot
@@ -34,7 +34,9 @@ class ModelHasRole extends Pivot
 
             $role = Role::find($item->role_id);
 
+
             // Question: 
+            //
             // Should we send email notificaiton to user when a new role is attached, regardless if there is email invite sent to user before?
             //
             // When we invite an unregistered user in admin panel > Users resource > Invite users button, it allows to select one role only.
