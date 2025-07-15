@@ -34,17 +34,6 @@ class ModelHasRole extends Pivot
 
             $role = Role::find($item->role_id);
 
-            // check if there is invites record for this user and this role
-            // if invites record found, email invite should have been sent before, no need to send email notification
-            // if no invites record found, send email notification to user (this role should be added by Super Admin in admin panel > Users resource > edit page)
-            $invite = Invite::where('email', $user->email)->where('role_id', $item->role_id)->first();
-
-            // if ($invite != null) {
-            //     logger('invites record found, email invite should have been sent before, no need to send email notification');
-            // } else {
-            //     logger('no invites record found, send email notification to user (this role should be added by Super Admin in admin panel > Users resource > edit page)');
-            // }
-
             // Question: 
             // Should we send email notificaiton to user when a new role is attached, regardless if there is email invite sent to user before?
             //
@@ -86,7 +75,6 @@ class ModelHasRole extends Pivot
                 ->title('Email Notification Sent')
                 ->body('An email notification has been successfully sent to ' . $email)
                 ->send();
-
         });
 
     }

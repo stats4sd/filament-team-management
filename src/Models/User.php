@@ -75,21 +75,45 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
                 continue;
             }
 
-            /** @var Invite $invite */
-            $invite = $this->invites()->create([
-                'email' => $item['email'],
-                'role_id' => $item['role'],
-                'token' => Str::random(24),
-            ]);
+            // check if email address belong to any registered user
+            $user = User::where('email', $item['email'])->first();
 
-            Mail::to($invite->email)->send(new InviteUser($invite));
+            // email address does not belong to any registered user
+            if (! $user) {
+                /** @var Invite $invite */
+                $invite = $this->invites()->create([
+                    'email' => $item['email'],
+                    'role_id' => $item['role'],
+                    'token' => Str::random(24),
+                ]);
 
-            // show notification after sending invitation email to user
-            Notification::make()
-                ->success()
-                ->title('Invitation Sent')
-                ->body('An email invitation has been successfully sent to ' . $item['email'])
-                ->send();
+                Mail::to($invite->email)->send(new InviteUser($invite));
+
+                // show notification after sending invitation email to user
+                Notification::make()
+                    ->success()
+                    ->title('Invitation Sent')
+                    ->body('An email invitation has been successfully sent to ' . $item['email'])
+                    ->send();
+
+            } else {
+                // add role to user if user does not have this role yet
+                $role = Role::find($item['role']);
+
+                if ($user->roles->contains($role)) {
+                    // show notification
+                    Notification::make()
+                        ->success()
+                        ->title('User already has this role')
+                        ->body('User ' . $item['email'] . ' has ' . $role->name . ' role already')
+                        ->send();
+                } else {
+                    // add role to user
+                    // notification, email will be handled by ModelHasRole model event "created"
+                    $user->roles()->attach($role);
+                }
+            }
+
         }
     }
 
