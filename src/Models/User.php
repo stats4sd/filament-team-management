@@ -18,8 +18,8 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
-// use Spatie\Permission\Traits\HasRoles;
-use Stats4sd\FilamentTeamManagement\Traits\HasRoles;
+use Spatie\Permission\Traits\HasRoles;
+// use Stats4sd\FilamentTeamManagement\Traits\HasRoles;
 
 use Stats4sd\FilamentTeamManagement\Mail\InviteUser;
 use Stats4sd\FilamentTeamManagement\Models\Interfaces\ProgramInterface;
