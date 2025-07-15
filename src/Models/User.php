@@ -17,10 +17,7 @@ use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasDefaultTenant;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Stats4sd\FilamentTeamManagement\Mail\InviteUser;
-
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-// use Stats4sd\FilamentTeamManagement\Traits\HasRoles;
-
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Stats4sd\FilamentTeamManagement\Models\Interfaces\TeamInterface;
