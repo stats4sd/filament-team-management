@@ -34,8 +34,12 @@ use Stats4sd\FilamentTeamManagement\Models\Traits\HasModelNameLowerString;
 class User extends Authenticatable implements FilamentUser, HasDefaultTenant, HasTenants
 {
     use HasModelNameLowerString;
-    use HasRoles;
     use Notifiable;
+
+    // alias trait method roles() as spatieRoles()
+    use HasRoles {
+        roles as spatieRoles;
+    }
 
     protected $guarded = ['id'];
 
@@ -120,7 +124,7 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
     // define roles relationship to use custom class ModelHasRole, to capture model event when creating new model_has_roles record
     public function roles(): BelongsToMany
     {
-        return $this->belongsToMany(Role::class, 'model_has_roles', 'model_id')->using(ModelHasRole::class);
+        return $this->spatieRoles()->using(ModelHasRole::class);
     }
 
     public function invites(): HasMany
