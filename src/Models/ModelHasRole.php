@@ -2,11 +2,11 @@
 
 namespace Stats4sd\FilamentTeamManagement\Models;
 
-use Spatie\Permission\Models\Role;
-use Illuminate\Support\Facades\Mail;
 use Filament\Notifications\Notification;
-use Stats4sd\FilamentTeamManagement\Mail\UpdateUser;
 use Illuminate\Database\Eloquent\Relations\MorphPivot;
+use Illuminate\Support\Facades\Mail;
+use Spatie\Permission\Models\Role;
+use Stats4sd\FilamentTeamManagement\Mail\UpdateUser;
 
 class ModelHasRole extends MorphPivot
 {
