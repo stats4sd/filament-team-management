@@ -34,12 +34,12 @@ use Stats4sd\FilamentTeamManagement\Models\Traits\HasModelNameLowerString;
 class User extends Authenticatable implements FilamentUser, HasDefaultTenant, HasTenants
 {
     use HasModelNameLowerString;
-    use Notifiable;
-
     // alias trait method roles() as spatieRoles()
     use HasRoles {
         roles as spatieRoles;
     }
+
+    use Notifiable;
 
     protected $guarded = ['id'];
 
