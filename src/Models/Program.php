@@ -2,16 +2,16 @@
 
 namespace Stats4sd\FilamentTeamManagement\Models;
 
-use Filament\Notifications\Notification;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Spatie\Permission\Models\Role;
-use Stats4sd\FilamentTeamManagement\Mail\AddUserToProgram;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Database\Eloquent\Model;
+use Filament\Notifications\Notification;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Stats4sd\FilamentTeamManagement\Mail\InviteUser;
+use Stats4sd\FilamentTeamManagement\Mail\UpdateUser;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Stats4sd\FilamentTeamManagement\Models\Interfaces\ProgramInterface;
 use Stats4sd\FilamentTeamManagement\Models\Traits\HasModelNameLowerString;
 
@@ -97,7 +97,7 @@ class Program extends Model implements ProgramInterface
                         ->send();
 
                     // send email notification to inform user that he/she has been added to a program
-                    Mail::to($invite->email)->send(new AddUserToProgram($invite));
+                    Mail::to($invite->email)->send(new UpdateUser($invite));
 
                     // show notification after sending email notification to user
                     Notification::make()

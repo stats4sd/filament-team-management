@@ -7,9 +7,10 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\URL;
 use Stats4sd\FilamentTeamManagement\Models\Invite;
 
-class AddRoleToUser extends Mailable
+class UpdateUser extends Mailable
 {
     use Queueable;
     use SerializesModels;
@@ -28,7 +29,7 @@ class AddRoleToUser extends Mailable
     {
         return new Envelope(
             from: config('mail.from.address'),
-            subject: config('app.name') . ': Invitation to join a role',
+            subject: config('app.name') . ': Update to user account',
         );
     }
 
@@ -38,7 +39,7 @@ class AddRoleToUser extends Mailable
     public function content(): Content
     {
         return new Content(
-            markdown: 'filament-team-management::emails.add_role_to_user',
+            markdown: 'filament-team-management::emails.update',
         );
     }
 }

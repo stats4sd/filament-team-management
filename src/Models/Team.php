@@ -2,15 +2,15 @@
 
 namespace Stats4sd\FilamentTeamManagement\Models;
 
-use Filament\Notifications\Notification;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
-use Stats4sd\FilamentTeamManagement\Mail\AddUserToTeam;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Database\Eloquent\Model;
+use Filament\Notifications\Notification;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Stats4sd\FilamentTeamManagement\Mail\InviteUser;
+use Stats4sd\FilamentTeamManagement\Mail\UpdateUser;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Stats4sd\FilamentTeamManagement\Models\Interfaces\TeamInterface;
 use Stats4sd\FilamentTeamManagement\Models\Traits\HasModelNameLowerString;
 
@@ -92,7 +92,7 @@ class Team extends Model implements TeamInterface
                         ->send();
 
                     // send email notification to inform user that he/she has been added to a team
-                    Mail::to($invite->email)->send(new AddUserToTeam($invite));
+                    Mail::to($invite->email)->send(new UpdateUser($invite));
 
                     // show notification after sending email notification to user
                     Notification::make()

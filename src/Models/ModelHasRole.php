@@ -2,11 +2,11 @@
 
 namespace Stats4sd\FilamentTeamManagement\Models;
 
-use Filament\Notifications\Notification;
-use Illuminate\Database\Eloquent\Relations\MorphPivot;
-use Illuminate\Support\Facades\Mail;
 use Spatie\Permission\Models\Role;
-use Stats4sd\FilamentTeamManagement\Mail\AddRoleToUser;
+use Illuminate\Support\Facades\Mail;
+use Filament\Notifications\Notification;
+use Stats4sd\FilamentTeamManagement\Mail\UpdateUser;
+use Illuminate\Database\Eloquent\Relations\MorphPivot;
 
 class ModelHasRole extends MorphPivot
 {
@@ -28,34 +28,37 @@ class ModelHasRole extends MorphPivot
 
             $role = Role::find($item->role_id);
 
-            // create invite model for future tracing
-            $invite = Invite::create([
-                'email' => $email,
-                'inviter_id' => auth()->id(),
-                'role_id' => $item->role_id,
-                'token' => 'na',
-                'is_confirmed' => true,
-            ]);
+            // it is new user registration if auth()->id() is null, otherwise it is Super Admin adding role to an existing user
+            if (auth()->id() != null) {
+                // create invite model for future tracing
+                $invite = Invite::create([
+                    'email' => $email,
+                    'inviter_id' => auth()->id(),
+                    'role_id' => $item->role_id,
+                    'token' => 'na',
+                    'is_confirmed' => true,
+                ]);
 
-            // save invite model
-            $invite->save();
+                // save invite model
+                $invite->save();
 
-            // show notification
-            Notification::make()
-                ->success()
-                ->title('Role Assigned to user')
-                ->body('User ' . $email . ' has been assigned role ' . $role->name)
-                ->send();
+                // show notification
+                Notification::make()
+                    ->success()
+                    ->title('Role Assigned to user')
+                    ->body('User ' . $email . ' has been assigned role ' . $role->name)
+                    ->send();
 
-            // send email notification to inform user that he/she has been assigned a role
-            Mail::to($invite->email)->send(new AddRoleToUser($invite));
+                // send email notification to inform user that he/she has been assigned a role
+                Mail::to($invite->email)->send(new UpdateUser($invite));
 
-            // show notification after sending email notification to user
-            Notification::make()
-                ->success()
-                ->title('Email Notification Sent')
-                ->body('An email notification has been successfully sent to ' . $email)
-                ->send();
+                // show notification after sending email notification to user
+                Notification::make()
+                    ->success()
+                    ->title('Email Notification Sent')
+                    ->body('An email notification has been successfully sent to ' . $email)
+                    ->send();
+            }
         });
 
     }
