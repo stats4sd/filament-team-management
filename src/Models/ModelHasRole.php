@@ -34,8 +34,7 @@ class ModelHasRole extends Pivot
 
             $role = Role::find($item->role_id);
 
-
-            // Question: 
+            // Question:
             //
             // Should we send email notificaiton to user when a new role is attached, regardless if there is email invite sent to user before?
             //
