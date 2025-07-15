@@ -32,5 +32,4 @@ class ModelHasRole extends Model
         });
 
     }
-
 }

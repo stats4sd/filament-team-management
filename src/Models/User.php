@@ -81,8 +81,6 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
 
     }
 
-
-
     /**
      * Generate an invitation to be a role for each of the provided email addresses
      */
