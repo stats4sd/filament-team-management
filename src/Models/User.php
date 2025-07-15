@@ -2,28 +2,29 @@
 
 namespace Stats4sd\FilamentTeamManagement\Models;
 
+use Filament\Panel;
+use Illuminate\Support\Str;
 use Filament\Facades\Filament;
+use Illuminate\Support\Collection;
+use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Mail;
+use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Database\Eloquent\Model;
+use Filament\Notifications\Notification;
+use Illuminate\Notifications\Notifiable;
+use Filament\Models\Contracts\HasTenants;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasDefaultTenant;
-use Filament\Models\Contracts\HasTenants;
-use Filament\Notifications\Notification;
-use Filament\Panel;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Str;
+use Stats4sd\FilamentTeamManagement\Mail\InviteUser;
 
-use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 // use Stats4sd\FilamentTeamManagement\Traits\HasRoles;
 
-use Stats4sd\FilamentTeamManagement\Mail\InviteUser;
-use Stats4sd\FilamentTeamManagement\Models\Interfaces\ProgramInterface;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Stats4sd\FilamentTeamManagement\Models\Interfaces\TeamInterface;
+use Stats4sd\FilamentTeamManagement\Models\Interfaces\ProgramInterface;
 use Stats4sd\FilamentTeamManagement\Models\Traits\HasModelNameLowerString;
 
 /**
@@ -66,21 +67,6 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
 
     // ****** TEAM MANAGEMENT STUFF ******
 
-    public static function boot()
-    {
-        parent::boot();
-
-        logger('User.boot()...');
-
-        static::updated(function ($item) {
-            logger('User.updated()...');
-
-            // User model event "updated" will be triggered only when any users table column is updated.
-            // It will not be triggered when a new role added to a user.
-        });
-
-    }
-
     /**
      * Generate an invitation to be a role for each of the provided email addresses
      */
@@ -108,6 +94,12 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
                 ->body('An email invitation has been successfully sent to ' . $item['email'])
                 ->send();
         }
+    }
+
+    // define roles relationship to use custom class ModelHasRole, to capture model event when creating new model_has_roles record
+    public function roles(): BelongsToMany
+    {
+        return $this->belongsToMany(Role::class, 'model_has_roles', 'model_id')->using(ModelHasRole::class);
     }
 
     public function invites(): HasMany
