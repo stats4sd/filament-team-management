@@ -17,7 +17,6 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
-
 use Spatie\Permission\Traits\HasRoles;
 // use Stats4sd\FilamentTeamManagement\Traits\HasRoles;
 
