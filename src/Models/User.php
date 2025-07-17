@@ -17,6 +17,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use Spatie\Permission\Models\Role;
 use Spatie\Permission\Traits\HasRoles;
 use Stats4sd\FilamentTeamManagement\Mail\InviteUser;
 use Stats4sd\FilamentTeamManagement\Models\Interfaces\ProgramInterface;
@@ -33,7 +34,11 @@ use Stats4sd\FilamentTeamManagement\Models\Traits\HasModelNameLowerString;
 class User extends Authenticatable implements FilamentUser, HasDefaultTenant, HasTenants
 {
     use HasModelNameLowerString;
-    use HasRoles;
+
+    // alias trait method roles() as spatieRoles()
+    use HasRoles {
+        roles as spatieRoles;
+    }
     use Notifiable;
 
     protected $guarded = ['id'];
@@ -74,22 +79,52 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
                 continue;
             }
 
-            /** @var Invite $invite */
-            $invite = $this->invites()->create([
-                'email' => $item['email'],
-                'role_id' => $item['role'],
-                'token' => Str::random(24),
-            ]);
+            // check if email address belong to any registered user
+            $user = User::where('email', $item['email'])->first();
 
-            Mail::to($invite->email)->send(new InviteUser($invite));
+            // email address does not belong to any registered user
+            if (! $user) {
+                /** @var Invite $invite */
+                $invite = $this->invites()->create([
+                    'email' => $item['email'],
+                    'role_id' => $item['role'],
+                    'token' => Str::random(24),
+                ]);
 
-            // show notification after sending invitation email to user
-            Notification::make()
-                ->success()
-                ->title('Invitation Sent')
-                ->body('An email invitation has been successfully sent to ' . $item['email'])
-                ->send();
+                Mail::to($invite->email)->send(new InviteUser($invite));
+
+                // show notification after sending invitation email to user
+                Notification::make()
+                    ->success()
+                    ->title('Invitation Sent')
+                    ->body('An email invitation has been successfully sent to ' . $item['email'])
+                    ->send();
+
+            } else {
+                // add role to user if user does not have this role yet
+                $role = Role::find($item['role']);
+
+                if ($user->roles->contains($role)) {
+                    // show notification
+                    Notification::make()
+                        ->success()
+                        ->title('User already has this role')
+                        ->body('User ' . $item['email'] . ' has ' . $role->name . ' role already')
+                        ->send();
+                } else {
+                    // add role to user
+                    // notification, email will be handled by ModelHasRole model event "created"
+                    $user->roles()->attach($role);
+                }
+            }
+
         }
+    }
+
+    // define roles relationship to use custom class ModelHasRole, to capture model event when creating new model_has_roles record
+    public function roles(): BelongsToMany
+    {
+        return $this->spatieRoles()->using(ModelHasRole::class);
     }
 
     public function invites(): HasMany

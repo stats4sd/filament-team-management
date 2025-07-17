@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Stats4sd\FilamentTeamManagement\Mail\InviteUser;
+use Stats4sd\FilamentTeamManagement\Mail\UpdateUser;
 use Stats4sd\FilamentTeamManagement\Models\Interfaces\TeamInterface;
 use Stats4sd\FilamentTeamManagement\Models\Traits\HasModelNameLowerString;
 
@@ -34,25 +35,75 @@ class Team extends Model implements TeamInterface
     public function sendInvites(array $emails): void
     {
         foreach ($emails as $email) {
+
             // if email is empty, skip to next email
             if ($email == null || $email == '') {
                 continue;
             }
 
-            $invite = $this->invites()->create([
-                'email' => $email,
-                'inviter_id' => auth()->id(),
-                'token' => Str::random(24),
-            ]);
+            // check if email address belong to any registered user
+            $user = User::where('email', $email)->first();
 
-            Mail::to($invite->email)->send(new InviteUser($invite));
+            // email address does not belong to any registered user
+            if (! $user) {
+                $invite = $this->invites()->create([
+                    'email' => $email,
+                    'inviter_id' => auth()->id(),
+                    'token' => Str::random(24),
+                ]);
 
-            // show notification after sending invitation email to user
-            Notification::make()
-                ->success()
-                ->title('Invitation Sent')
-                ->body('An email invitation has been successfully sent to ' . $email)
-                ->send();
+                Mail::to($invite->email)->send(new InviteUser($invite));
+
+                // show notification after sending invitation email to user
+                Notification::make()
+                    ->success()
+                    ->title('Invitation Sent')
+                    ->body('An email invitation has been successfully sent to ' . $email)
+                    ->send();
+
+                // email address belongs to a registered user
+            } else {
+                // add user to team if user does not belong to this team yet
+                if ($this->users->contains($user)) {
+                    // show notification
+                    Notification::make()
+                        ->success()
+                        ->title('User already in this ' . config('filament-team-management.models.team')::getModelNameLower())
+                        ->body('User ' . $email . ' belongs to this ' . config('filament-team-management.models.team')::getModelNameLower() . ' already')
+                        ->send();
+                } else {
+                    // add invites model for future tracing
+                    $invite = $this->invites()->create([
+                        'email' => $email,
+                        'inviter_id' => auth()->id(),
+                        config('filament-team-management.models.team')::getModelNameLower() . '_id' => $this->id,
+                        'token' => 'na',
+                        'is_confirmed' => true,
+                    ]);
+
+                    // add user to this team
+                    $this->members()->attach($user);
+
+                    // show notification
+                    Notification::make()
+                        ->success()
+                        ->title('User added')
+                        ->body('User ' . $email . ' has been added to this ' . config('filament-team-management.models.team')::getModelNameLower())
+                        ->send();
+
+                    // send email notification to inform user that he/she has been added to a team
+                    Mail::to($invite->email)->send(new UpdateUser($invite));
+
+                    // show notification after sending email notification to user
+                    Notification::make()
+                        ->success()
+                        ->title('Email Notification Sent')
+                        ->body('An email notification has been successfully sent to ' . $email)
+                        ->send();
+                }
+
+            }
+
         }
     }
 
