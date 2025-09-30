@@ -3,17 +3,16 @@
 namespace Stats4sd\FilamentTeamManagement\Filament\App\Pages;
 
 use DanHarrin\LivewireRateLimiting\Exceptions\TooManyRequestsException;
+use Filament\Auth\Http\Responses\Contracts\RegistrationResponse;
+use Filament\Auth\Pages\Register as BaseRegister;
 use Filament\Facades\Filament;
 use Filament\Forms;
-use Filament\Forms\Components\Component;
-use Filament\Http\Responses\Auth\Contracts\RegistrationResponse;
 use Filament\Notifications\Notification;
-use Filament\Pages\Auth\Register as BaseRegister;
+use Filament\Schemas\Components\Component;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Support\Facades\Hash;
 use Livewire\Attributes\Url;
-use Spatie\Permission\Models\Role;
 use Stats4sd\FilamentTeamManagement\Events\RegisteredWithData;
 use Stats4sd\FilamentTeamManagement\Http\Responses\RegisterResponse;
 use Stats4sd\FilamentTeamManagement\Models\Invite;
