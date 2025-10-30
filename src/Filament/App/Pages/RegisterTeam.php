@@ -24,7 +24,7 @@ class RegisterTeam extends RegisterTenant
         return $form
             ->schema([
                 TextInput::make('name')
-                    ->label('Enter a name for the team')
+                    ->label('Enter a name for the team 123')
                     ->required(),
             ]);
     }
