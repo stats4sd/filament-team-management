@@ -18,10 +18,14 @@ class RegisterTeam extends RegisterTenant
 
     public function form(Form $form): Form
     {
+        // Question: why the changes does not take effect...?
+        ray('RegisterTeam.form()...');
+
         return $form
             ->schema([
                 TextInput::make('name')
-                    ->label('Enter a name for the team'),
+                    ->label('Enter a name for the team')
+                    ->required(),
             ]);
     }
 
