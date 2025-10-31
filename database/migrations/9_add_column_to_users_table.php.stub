@@ -11,8 +11,13 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
+            // Always add the latest_team_id column
             $table->foreignId('latest_team_id')->nullable()->constrained('teams')->onDelete('set null');
-            $table->foreignId('latest_program_id')->nullable()->constrained('programs')->onDelete('set null');
+
+            // Only add the latest_program_id column if the app is using programs
+            if (config('filament-team-management.use_programs')) {
+                $table->foreignId('latest_program_id')->nullable()->constrained('programs')->onDelete('set null');
+            }
         });
     }
 
@@ -22,7 +27,13 @@ return new class extends Migration {
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            //
+            $table->dropForeign(['latest_team_id']);
+            $table->dropColumn('latest_team_id');
+
+            if (config('filament-team-management.use_programs')) {
+                $table->dropForeign(['latest_program_id']);
+                $table->dropColumn('latest_program_id');
+            }
         });
     }
 };

@@ -134,8 +134,7 @@ class FilamentTeamManagementServiceProvider extends PackageServiceProvider
         return [
             '1_create_teams_table',
             '2_create_team_members_table',
-            '3_create_team_invites_table',
-            '4_create_role_invites_table',
+            '3_create_invites_table',
             '9_add_column_to_users_table',
         ];
     }
@@ -146,8 +145,6 @@ class FilamentTeamManagementServiceProvider extends PackageServiceProvider
             '5_create_programs_table',
             '6_create_program_user_table',
             '7_create_program_team_table',
-            '8_create_program_invites_table',
-            '10_add_program_column_to_users_table',
         ];
     }
 
