@@ -13,7 +13,7 @@ class ViewTeam extends ViewRecord
 {
     protected static string $resource = \Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Teams\TeamResource::class;
 
-    public function getTitle(): string|Htmlable
+    public function getTitle(): string | Htmlable
     {
         return $this->getRecord()->name;
     }
