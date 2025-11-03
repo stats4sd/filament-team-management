@@ -5,7 +5,7 @@ namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\ProgramResour
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 use Illuminate\Contracts\Support\Htmlable;
-use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\ProgramResource;
+use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Programs\ProgramResource;
 use Stats4sd\FilamentTeamManagement\Models\Program;
 
 /** @method Program getRecord() */
@@ -13,7 +13,7 @@ class ViewProgram extends ViewRecord
 {
     protected static string $resource = ProgramResource::class;
 
-    public function getTitle(): string | Htmlable
+    public function getTitle(): string|Htmlable
     {
         return $this->getRecord()->name;
     }
@@ -23,7 +23,7 @@ class ViewProgram extends ViewRecord
         return [
             Actions\EditAction::make(),
             Actions\DeleteAction::make()
-                ->modalDescription('WARNING: Please do not delete when there is actual survey data collected, as deletion is unreversable. Are you sure you would like to do this?'),
+                ->modalDescription('WARNING: This will permanently delete this program and all associated teams and data. This action cannot be undone.'),
         ];
     }
 }

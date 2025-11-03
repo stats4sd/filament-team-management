@@ -38,7 +38,7 @@ The intention is that this package is used for apps where you have 2 different F
 
 - An "Admin" panel, for administrators to manage users and teams.
 - An "App" panel, which uses multitenancy with teams as the tennant.
-
+_
 You can also optionally use 'programs', which are groups of teams. In this case, you may have a 3rd panel:
 
 - A "Program" panel, for program managers to manage the users and teams within their own program.
@@ -48,7 +48,8 @@ The Resources in this package are intended for one of these 3 panels, shown by t
 ```php
 $panel
   ## add all resources in a namespace at once
-  ->discoverResources(in: app_path('../vendor/stats4sd/filament-team-management/src/Filament/Admin/Resources'), for: 'Stats4sd\\FilamentTeamManagement\\Admin\\Resources)
+  ->discoverResources(in: app_path('../vendor/stats4sd/filament-team-management/src/Filament/Admin/Resources'), for: 'Stats4sd\\FilamentTeamManagement\\Admin\\Resources');
+  
   ## OR... add resources individually
   ->resources([
     Stats4sd\\FilamentTeamManagement\\Admin\\Resources\\TeamResource,

@@ -3,9 +3,15 @@
 namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\ProgramResource\RelationManagers;
 
 use Awcodes\Shout\Components\Shout;
+use Filament\Actions\Action;
+use Filament\Actions\AttachAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DetachAction;
+use Filament\Actions\DetachBulkAction;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Stats4sd\FilamentTeamManagement\Models\Interfaces\ProgramInterface;
@@ -20,9 +26,9 @@ class UsersRelationManager extends RelationManager
         return false;
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Forms\Components\TextInput::make('name')
                     ->required()
@@ -47,7 +53,7 @@ class UsersRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                Tables\Actions\Action::make('invite users')
+                Action::make('invite users')
                     ->form([
                         Shout::make('info')
                             ->type('info')
@@ -64,17 +70,17 @@ class UsersRelationManager extends RelationManager
                             ->addActionLabel('Add Another Email Address'),
                     ])
                     ->action(fn (array $data, RelationManager $livewire) => $this->handleInvitation($data, $livewire->getOwnerRecord())),
-                Tables\Actions\AttachAction::make()
+                AttachAction::make()
                     ->label('Add Existing User to program'),
             ])
-            ->actions([
-                Tables\Actions\DetachAction::make()->label('Remove User')
+            ->recordActions([
+                DetachAction::make()->label('Remove User')
                     ->modalSubmitActionLabel('Remove User')
                     ->modalHeading('Remove User from Program'),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DetachBulkAction::make()->label('Remove selected')
+            ->groupedBulkActions([
+                BulkActionGroup::make([
+                    DetachBulkAction::make()->label('Remove selected')
                         ->modalSubmitActionLabel('Remove Selected Users')
                         ->modalHeading('Remove Selected Users from Program'),
                 ]),
