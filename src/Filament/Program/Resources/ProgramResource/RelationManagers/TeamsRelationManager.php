@@ -84,18 +84,18 @@ class TeamsRelationManager extends RelationManager
             ->headerActions([
                 Tables\Actions\CreateAction::make(),
                 Tables\Actions\AttachAction::make()
-                    ->label('Add Existing ' . TeamsRelationManager::getModelName() . ' to program'),
+                    ->label('Add Existing '.TeamsRelationManager::getModelName().' to program'),
             ])
             ->actions([
-                Tables\Actions\DetachAction::make()->label('Remove ' . TeamsRelationManager::getModelName())
-                    ->modalSubmitActionLabel('Remove ' . TeamsRelationManager::getModelName())
-                    ->modalHeading('Remove ' . TeamsRelationManager::getModelName() . ' from Program'),
+                Tables\Actions\DetachAction::make()->label('Remove '.TeamsRelationManager::getModelName())
+                    ->modalSubmitActionLabel('Remove '.TeamsRelationManager::getModelName())
+                    ->modalHeading('Remove '.TeamsRelationManager::getModelName().' from Program'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DetachBulkAction::make()->label('Remove selected')
-                        ->modalSubmitActionLabel('Remove Selected ' . TeamsRelationManager::getModelNamePlural())
-                        ->modalHeading('Remove Selected ' . TeamsRelationManager::getModelNamePlural() . ' from Program'),
+                        ->modalSubmitActionLabel('Remove Selected '.TeamsRelationManager::getModelNamePlural())
+                        ->modalHeading('Remove Selected '.TeamsRelationManager::getModelNamePlural().' from Program'),
                 ]),
             ]);
     }

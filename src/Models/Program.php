@@ -63,7 +63,7 @@ class Program extends Model implements ProgramInterface
                 Notification::make()
                     ->success()
                     ->title('Invitation Sent')
-                    ->body('An email invitation has been successfully sent to ' . $email)
+                    ->body('An email invitation has been successfully sent to '.$email)
                     ->send();
 
                 // email address belongs to a registered user
@@ -74,7 +74,7 @@ class Program extends Model implements ProgramInterface
                     Notification::make()
                         ->success()
                         ->title('User already in this program')
-                        ->body('User ' . $email . ' belongs to this program already')
+                        ->body('User '.$email.' belongs to this program already')
                         ->send();
                 } else {
                     // add invites model for future tracing
@@ -93,7 +93,7 @@ class Program extends Model implements ProgramInterface
                     Notification::make()
                         ->success()
                         ->title('User added')
-                        ->body('User ' . $email . ' has been added to this program')
+                        ->body('User '.$email.' has been added to this program')
                         ->send();
 
                     // send email notification to inform user that he/she has been added to a program
@@ -103,7 +103,7 @@ class Program extends Model implements ProgramInterface
                     Notification::make()
                         ->success()
                         ->title('Email Notification Sent')
-                        ->body('An email notification has been successfully sent to ' . $email)
+                        ->body('An email notification has been successfully sent to '.$email)
                         ->send();
                 }
 
@@ -121,9 +121,9 @@ class Program extends Model implements ProgramInterface
     {
         return $this->belongsToMany(
             related: config('filament-team-management.models.user'),
-            table: static::getModelNameLower() . '_' . config('filament-team-management.models.user')::getModelNameLower(),
-            foreignPivotKey: static::getModelNameLower() . '_id',
-            relatedPivotKey: config('filament-team-management.models.user')::getModelNameLower() . '_id'
+            table: static::getModelNameLower().'_'.config('filament-team-management.models.user')::getModelNameLower(),
+            foreignPivotKey: static::getModelNameLower().'_id',
+            relatedPivotKey: config('filament-team-management.models.user')::getModelNameLower().'_id'
         )->withTimestamps();
     }
 
@@ -131,9 +131,9 @@ class Program extends Model implements ProgramInterface
     {
         return $this->belongsToMany(
             related: config('filament-team-management.models.team'),
-            table: static::getModelNameLower() . '_' . config('filament-team-management.models.team')::getModelNameLower(),
-            foreignPivotKey: static::getModelNameLower() . '_id',
-            relatedPivotKey: config('filament-team-management.models.team')::getModelNameLower() . '_id'
+            table: static::getModelNameLower().'_'.config('filament-team-management.models.team')::getModelNameLower(),
+            foreignPivotKey: static::getModelNameLower().'_id',
+            relatedPivotKey: config('filament-team-management.models.team')::getModelNameLower().'_id'
         )->withTimestamps();
     }
 

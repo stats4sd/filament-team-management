@@ -1,14 +1,9 @@
 <?php
 
-namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources;
+namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Users;
 
-use Filament\Forms\Components\CheckboxList;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
 use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\UserResource\Pages;
@@ -27,9 +22,9 @@ class UserResource extends Resource
     public static function getNavigationGroup(): string
     {
         if (config('filament-team-management.use_programs')) {
-            return 'Programs, ' . Str::ucfirst(Str::plural(config('filament-team-management.names.team'))) . ' and Users';
+            return 'Programs, '.Str::ucfirst(Str::plural(config('filament-team-management.names.team'))).' and Users';
         } else {
-            return Str::ucfirst(Str::plural(config('filament-team-management.names.team'))) . ' and Users';
+            return Str::ucfirst(Str::plural(config('filament-team-management.names.team'))).' and Users';
         }
     }
 

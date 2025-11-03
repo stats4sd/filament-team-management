@@ -28,7 +28,7 @@ class UpdateUser extends Mailable
     {
         return new Envelope(
             from: config('mail.from.address'),
-            subject: config('app.name') . ': Update to user account',
+            subject: config('app.name').': Update to user account',
         );
     }
 

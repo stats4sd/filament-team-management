@@ -13,7 +13,7 @@ class ViewProgram extends ViewRecord
 {
     protected static string $resource = ProgramResource::class;
 
-    public function getTitle(): string | Htmlable
+    public function getTitle(): string|Htmlable
     {
         return $this->getRecord()->name;
     }

@@ -3,13 +3,9 @@
 namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Users\Schemas;
 
 use Filament\Forms\Components\CheckboxList;
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use Illuminate\Support\Str;
 
 class UserForm
 {
@@ -41,7 +37,7 @@ class UserForm
                 //
                 // (It's also because there seems to be a bug in Filament where select multiples don't work if the disabled() state is live updated...)
                 Select::make('team_id')
-                    ->label('Which ' . config('filament-team-management.names.team') . ' should the user be a member of?')
+                    ->label('Which '.config('filament-team-management.names.team').' should the user be a member of?')
                     ->exists((new $teamClass)->getTable(), 'id')
                     ->relationship('teams', titleAttribute: 'name'),
 

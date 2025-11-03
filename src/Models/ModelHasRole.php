@@ -46,7 +46,7 @@ class ModelHasRole extends MorphPivot
                 Notification::make()
                     ->success()
                     ->title('Role Assigned to user')
-                    ->body('User ' . $email . ' has been assigned role ' . $role->name)
+                    ->body('User '.$email.' has been assigned role '.$role->name)
                     ->send();
 
                 // send email notification to inform user that he/she has been assigned a role
@@ -56,7 +56,7 @@ class ModelHasRole extends MorphPivot
                 Notification::make()
                     ->success()
                     ->title('Email Notification Sent')
-                    ->body('An email notification has been successfully sent to ' . $email)
+                    ->body('An email notification has been successfully sent to '.$email)
                     ->send();
             }
         });
