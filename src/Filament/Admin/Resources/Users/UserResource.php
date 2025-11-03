@@ -14,7 +14,7 @@ class UserResource extends Resource
 {
     use HasTeamManagementNavigationGroup;
 
-    protected static string|null|\BackedEnum $navigationIcon = 'heroicon-o-users';
+    protected static string | null | \BackedEnum $navigationIcon = 'heroicon-o-users';
 
     public static function getModel(): string
     {

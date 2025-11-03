@@ -5,7 +5,6 @@ namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Teams;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
-use Illuminate\Support\Str;
 use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Teams\RelationManagers\InvitesRelationManager;
 use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Teams\RelationManagers\UsersRelationManager;
 use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Teams\Schemas\TeamForm;
@@ -18,10 +17,9 @@ use Stats4sd\FilamentTeamManagement\Filament\Traits\HasTeamManagementNavigationG
 
 class TeamResource extends Resource
 {
-
     use HasTeamManagementNavigationGroup;
 
-    protected static string|null|\BackedEnum $navigationIcon = 'heroicon-o-building-office-2';
+    protected static string | null | \BackedEnum $navigationIcon = 'heroicon-o-building-office-2';
 
     public static function getModel(): string
     {

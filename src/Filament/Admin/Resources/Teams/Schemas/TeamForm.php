@@ -4,9 +4,7 @@ namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Teams\Schemas
 
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use Illuminate\Support\Str;
 
 class TeamForm
 {

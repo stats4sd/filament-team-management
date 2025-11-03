@@ -28,6 +28,7 @@ class Program extends Model implements ProgramInterface
     {
         return config('filament-team-management.table_names.programs');
     }
+
     protected $guarded = ['id'];
 
     // ****** TEAM MANAGEMENT STUFF ******
@@ -65,7 +66,7 @@ class Program extends Model implements ProgramInterface
                 Notification::make()
                     ->success()
                     ->title('Invitation Sent')
-                    ->body('An email invitation has been successfully sent to '.$email)
+                    ->body('An email invitation has been successfully sent to ' . $email)
                     ->send();
 
                 // email address belongs to a registered user
@@ -76,7 +77,7 @@ class Program extends Model implements ProgramInterface
                     Notification::make()
                         ->success()
                         ->title('User already in this program')
-                        ->body('User '.$email.' belongs to this program already')
+                        ->body('User ' . $email . ' belongs to this program already')
                         ->send();
                 } else {
                     // add invites model for future tracing
@@ -95,7 +96,7 @@ class Program extends Model implements ProgramInterface
                     Notification::make()
                         ->success()
                         ->title('User added')
-                        ->body('User '.$email.' has been added to this program')
+                        ->body('User ' . $email . ' has been added to this program')
                         ->send();
 
                     // send email notification to inform user that he/she has been added to a program
@@ -105,7 +106,7 @@ class Program extends Model implements ProgramInterface
                     Notification::make()
                         ->success()
                         ->title('Email Notification Sent')
-                        ->body('An email notification has been successfully sent to '.$email)
+                        ->body('An email notification has been successfully sent to ' . $email)
                         ->send();
                 }
 

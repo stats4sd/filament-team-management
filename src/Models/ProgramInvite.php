@@ -44,7 +44,8 @@ class ProgramInvite extends Model
     {
         return $this->belongsTo(
             related: config('filament-team-management.models.user'),
-            foreignKey: 'inviter_id');
+            foreignKey: 'inviter_id'
+        );
     }
 
     public function program(): BelongsTo

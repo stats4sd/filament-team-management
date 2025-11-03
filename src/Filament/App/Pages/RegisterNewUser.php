@@ -122,7 +122,7 @@ class RegisterNewUser extends BaseRegister
             ->required()
             ->maxLength(255)
             ->unique($this->getUserModel())
-                    ->readOnly();
+            ->readOnly();
     }
 
     protected function getPasswordFormComponent(): Component

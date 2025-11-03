@@ -3,7 +3,6 @@
 namespace Stats4sd\FilamentTeamManagement\Filament\App\Pages;
 
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use Filament\Pages\Tenancy\RegisterTenant;
 use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Model;

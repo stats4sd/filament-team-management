@@ -5,7 +5,6 @@ namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Programs;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
-use Illuminate\Support\Str;
 use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Programs\Pages\ListPrograms;
 use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Programs\Pages\ViewProgram;
 use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Programs\Schemas\ProgramForm;
@@ -15,10 +14,9 @@ use Stats4sd\FilamentTeamManagement\Filament\Traits\HasTeamManagementNavigationG
 
 class ProgramResource extends Resource
 {
-
     use HasTeamManagementNavigationGroup;
 
-    protected static string|null|\BackedEnum $navigationIcon = 'heroicon-o-building-library';
+    protected static string | null | \BackedEnum $navigationIcon = 'heroicon-o-building-library';
 
     public static function getModel(): string
     {
@@ -29,7 +27,6 @@ class ProgramResource extends Resource
     {
         return config('filament-team-management.use_programs');
     }
-
 
     public static function form(Schema $schema): Schema
     {

@@ -19,9 +19,9 @@ use Stats4sd\FilamentTeamManagement\Models\Interfaces\ProgramInterface;
 
 class UsersRelationManager extends RelationManager
 {
-
     // Hardcode relationship names, so we can use the relationships defined in the base models.
     protected static string $relationship = 'users';
+
     protected static ?string $inverseRelationship = 'programs';
 
     // turn on Edit mode so that "Add Existing User to program" button will be shown when viewing program record
@@ -79,7 +79,7 @@ class UsersRelationManager extends RelationManager
                             ->reorderable(false)
                             ->addActionLabel('Add Another Email Address'),
                     ])
-                    ->action(fn(array $data, RelationManager $livewire) => $this->handleInvitation($data, $livewire->getOwnerRecord())),
+                    ->action(fn (array $data, RelationManager $livewire) => $this->handleInvitation($data, $livewire->getOwnerRecord())),
                 AttachAction::make()
                     ->label('Add existing ' . Str::singular(config('filament-team-management.table_names.users')) . ' to program'),
             ])

@@ -48,7 +48,7 @@ class Team extends Model implements TeamInterface
             $user = User::where('email', $email)->first();
 
             // email address does not belong to any registered user
-            if (!$user) {
+            if (! $user) {
                 $invite = $this->invites()->create([
                     'email' => $email,
                     'inviter_id' => auth()->id(),

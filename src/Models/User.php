@@ -102,7 +102,7 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
                 Notification::make()
                     ->success()
                     ->title('Invitation Sent')
-                    ->body('An email invitation has been successfully sent to '.$item['email'])
+                    ->body('An email invitation has been successfully sent to ' . $item['email'])
                     ->send();
 
             } else {
@@ -114,7 +114,7 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
                     Notification::make()
                         ->success()
                         ->title('User already has this role')
-                        ->body('User '.$item['email'].' has '.$role->name.' role already')
+                        ->body('User ' . $item['email'] . ' has ' . $role->name . ' role already')
                         ->send();
                 } else {
                     // add role to user
@@ -141,9 +141,9 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
     {
         return $this->belongsToMany(
             config('filament-team-management.models.team'),
-            config('filament-team-management.models.team')::getModelNameLower().'_members',
-            config('filament-team-management.models.user')::getModelNameLower().'_id',
-            config('filament-team-management.models.team')::getModelNameLower().'_id',
+            config('filament-team-management.models.team')::getModelNameLower() . '_members',
+            config('filament-team-management.models.user')::getModelNameLower() . '_id',
+            config('filament-team-management.models.team')::getModelNameLower() . '_id',
         )->withPivot('is_admin');
     }
 
@@ -152,8 +152,8 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
         return $this->belongsToMany(
             config('filament-team-management.models.program'),
             config('filament-team-management.table_names.program_members'),
-            config('filament-team-management.models.user')::getModelNameLower().'_id',
-            config('filament-team-management.models.program')::getModelNameLower().'_id',
+            config('filament-team-management.models.user')::getModelNameLower() . '_id',
+            config('filament-team-management.models.program')::getModelNameLower() . '_id',
         );
     }
 
@@ -225,7 +225,7 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
         return false;
     }
 
-    public function getTenants(Panel $panel): array|Collection
+    public function getTenants(Panel $panel): array | Collection
     {
         // add different handling for different panel
         if ($panel->getTenantModel() === config('filament-team-management.models.team')) {

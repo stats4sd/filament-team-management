@@ -29,7 +29,7 @@ class InviteUser extends Mailable
     {
         return new Envelope(
             from: config('mail.from.address'),
-            subject: config('app.name').': Invitation to register',
+            subject: config('app.name') . ': Invitation to register',
         );
     }
 
