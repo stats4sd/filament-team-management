@@ -10,13 +10,11 @@ use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\ProgramResource\Pag
 use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\ProgramResource\RelationManagers;
 use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Programs\Schemas\ProgramForm;
 use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Programs\Schemas\ProgramInfolist;
-use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Programs\Schemas\TeamForm;
-use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Programs\Schemas\TeamInfolist;
 use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Programs\Tables\ProgramTable;
 
 class ProgramResource extends Resource
 {
-    protected static string|null|\BackedEnum $navigationIcon = 'heroicon-o-building-library';
+    protected static string | null | \BackedEnum $navigationIcon = 'heroicon-o-building-library';
 
     public static function getModel(): string
     {
@@ -31,9 +29,9 @@ class ProgramResource extends Resource
     public static function getNavigationGroup(): string
     {
         if (config('filament-team-management.use_programs')) {
-            return 'Programs, '.Str::ucfirst(Str::plural(config('filament-team-management.names.team'))).' and Users';
+            return 'Programs, ' . Str::ucfirst(Str::plural(config('filament-team-management.names.team'))) . ' and Users';
         } else {
-            return Str::ucfirst(Str::plural(config('filament-team-management.names.team'))).' and Users';
+            return Str::ucfirst(Str::plural(config('filament-team-management.names.team'))) . ' and Users';
         }
     }
 

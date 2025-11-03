@@ -37,7 +37,7 @@ class TeamsRelationManager extends RelationManager
     {
         return $schema
             ->schema([
-                Section::make(Str::ucfirst(config('filament-team-management.names.team')).' Details')
+                Section::make(Str::ucfirst(config('filament-team-management.names.team')) . ' Details')
                     ->schema([
                         TextInput::make('name')
                             ->required()
@@ -72,19 +72,19 @@ class TeamsRelationManager extends RelationManager
             ->headerActions([
                 CreateAction::make(),
                 AttachAction::make()
-                    ->label('Add Existing '.Str::ucfirst(config('filament-team-management.names.team')).' to program'),
+                    ->label('Add Existing ' . Str::ucfirst(config('filament-team-management.names.team')) . ' to program'),
             ])
             ->recordActions([
                 DetachAction::make()
-                    ->label('Remove '.Str::ucfirst(config('filament-team-management.names.team')))
-                    ->modalSubmitActionLabel('Remove '.Str::ucfirst(config('filament-team-management.names.team')))
-                    ->modalHeading('Remove '.Str::ucfirst(config('filament-team-management.names.team')).' from Program'),
+                    ->label('Remove ' . Str::ucfirst(config('filament-team-management.names.team')))
+                    ->modalSubmitActionLabel('Remove ' . Str::ucfirst(config('filament-team-management.names.team')))
+                    ->modalHeading('Remove ' . Str::ucfirst(config('filament-team-management.names.team')) . ' from Program'),
             ])
             ->groupedBulkActions([
                 BulkActionGroup::make([
                     DetachBulkAction::make()->label('Remove selected')
-                        ->modalSubmitActionLabel('Remove Selected '.Str::ucfirst(Str::plural(config('filament-team-management.names.team'))))
-                        ->modalHeading('Remove Selected '.Str::ucfirst(Str::plural(config('filament-team-management.names.team'))).' from Program'),
+                        ->modalSubmitActionLabel('Remove Selected ' . Str::ucfirst(Str::plural(config('filament-team-management.names.team'))))
+                        ->modalHeading('Remove Selected ' . Str::ucfirst(Str::plural(config('filament-team-management.names.team'))) . ' from Program'),
                 ]),
             ]);
     }

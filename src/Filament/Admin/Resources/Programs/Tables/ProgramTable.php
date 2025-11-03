@@ -22,7 +22,7 @@ class ProgramTable
                     ->sortable()
                     ->searchable(),
                 TextColumn::make('teams_count')
-                    ->label('# '.Str::ucfirst(Str::plural(config('filament-team-management.names.team'))))
+                    ->label('# ' . Str::ucfirst(Str::plural(config('filament-team-management.names.team'))))
                     ->counts('teams')
                     ->sortable(),
                 TextColumn::make('users_count')

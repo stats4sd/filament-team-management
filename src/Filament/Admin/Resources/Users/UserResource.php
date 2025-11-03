@@ -2,13 +2,8 @@
 
 namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources;
 
-use Filament\Forms\Components\CheckboxList;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
 use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\UserResource\Pages;
@@ -17,7 +12,7 @@ use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Users\Tables\UserTa
 
 class UserResource extends Resource
 {
-    protected static string|null|\BackedEnum $navigationIcon = 'heroicon-o-users';
+    protected static string | null | \BackedEnum $navigationIcon = 'heroicon-o-users';
 
     public static function getModel(): string
     {

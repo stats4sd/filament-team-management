@@ -18,7 +18,7 @@ use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Teams\Tables\TeamTa
 
 class TeamResource extends Resource
 {
-    protected static string|null|\BackedEnum $navigationIcon = 'heroicon-o-building-office-2';
+    protected static string | null | \BackedEnum $navigationIcon = 'heroicon-o-building-office-2';
 
     public static function getModel(): string
     {
@@ -28,9 +28,9 @@ class TeamResource extends Resource
     public static function getNavigationGroup(): string
     {
         if (config('filament-team-management.use_programs')) {
-            return 'Programs, '.Str::ucfirst(Str::plural(config('filament-team-management.names.team'))).' and Users';
+            return 'Programs, ' . Str::ucfirst(Str::plural(config('filament-team-management.names.team'))) . ' and Users';
         } else {
-            return Str::ucfirst(Str::plural(config('filament-team-management.names.team'))).' and Users';
+            return Str::ucfirst(Str::plural(config('filament-team-management.names.team'))) . ' and Users';
         }
     }
 

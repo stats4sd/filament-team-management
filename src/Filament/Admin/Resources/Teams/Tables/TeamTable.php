@@ -4,7 +4,6 @@ namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Teams\Tables;
 
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Illuminate\Support\Str;
 
 class TeamTable
 {
