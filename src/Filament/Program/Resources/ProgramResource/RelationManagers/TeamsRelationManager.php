@@ -21,7 +21,7 @@ class TeamsRelationManager extends RelationManager
 
     public static function getModelName(): string
     {
-        return Str::ucfirst(config('filament-team-management.names.team'));
+        return Str::ucfirst(config('filament-team-management.table_names.teams'));
     }
 
     public static function getModelNamePlural(): string

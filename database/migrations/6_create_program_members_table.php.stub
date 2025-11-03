@@ -10,13 +10,13 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create(config('filament-team-management.table_names.program_team'), function (Blueprint $table) {
+        Schema::create(config('filament-team-management.table_names.program_members'), function (Blueprint $table) {
             $table->id();
             $table->foreignId(config('filament-team-management.column_names.programs_foreign_key'))
                 ->constrained(config('filament-team-management.table_names.programs'))
                 ->cascadeOnDelete()->cascadeOnUpdate();
-            $table->foreignId(config('filament-team-management.column_names.teams_foreign_key'))
-                ->constrained(config('filament-team-management.table_names.teams'))
+            $table->foreignId(config('filament-team-management.column_names.users_foreign_key'))
+                ->constrained(config('filament-team-management.table_names.programs'))
                 ->cascadeOnDelete()->cascadeOnUpdate();
             $table->timestamps();
         });
@@ -27,6 +27,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists(config('filament-team-management.table_names.program_team'));
+        Schema::dropIfExists(config('filament-team-management.table_names.program_members'));
     }
 };

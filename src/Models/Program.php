@@ -24,8 +24,10 @@ class Program extends Model implements ProgramInterface
 {
     use HasModelNameLowerString;
 
-    protected $table = 'programs';
-
+    public function getTable()
+    {
+        return config('filament-team-management.table_names.programs');
+    }
     protected $guarded = ['id'];
 
     // ****** TEAM MANAGEMENT STUFF ******
@@ -121,9 +123,9 @@ class Program extends Model implements ProgramInterface
     {
         return $this->belongsToMany(
             related: config('filament-team-management.models.user'),
-            table: static::getModelNameLower().'_'.config('filament-team-management.models.user')::getModelNameLower(),
-            foreignPivotKey: static::getModelNameLower().'_id',
-            relatedPivotKey: config('filament-team-management.models.user')::getModelNameLower().'_id'
+            table: config('filament-team-management.table_names.program_members'),
+            foreignPivotKey: config('filament-team-management.column_names.programs_foreign_key'),
+            relatedPivotKey: config('filament-team-management.column_names.users_foreign_key'),
         )->withTimestamps();
     }
 
@@ -131,9 +133,9 @@ class Program extends Model implements ProgramInterface
     {
         return $this->belongsToMany(
             related: config('filament-team-management.models.team'),
-            table: static::getModelNameLower().'_'.config('filament-team-management.models.team')::getModelNameLower(),
-            foreignPivotKey: static::getModelNameLower().'_id',
-            relatedPivotKey: config('filament-team-management.models.team')::getModelNameLower().'_id'
+            table: config('filament-team-management.table_names.program_teams'),
+            foreignPivotKey: config('filament-team-management.column_names.programs_foreign_key'),
+            relatedPivotKey: config('filament-team-management.column_names.teams_foreign_key'),
         )->withTimestamps();
     }
 

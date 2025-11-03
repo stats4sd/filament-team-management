@@ -13,6 +13,7 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use Stats4sd\FilamentTeamManagement\Models\Interfaces\TeamInterface;
@@ -21,6 +22,11 @@ use Stats4sd\FilamentTeamManagement\Models\User;
 class UsersRelationManager extends RelationManager
 {
     protected static string $relationship = 'users';
+
+    public static function getTitle(Model $ownerRecord, string $pageClass): string
+    {
+        return Str::ucfirst(Str::plural(config('filament-team-management.table_names.users')));
+    }
 
     // turn on Edit mode so that "Add Existing User to team" button will be shown when viewing team record
     public function isReadOnly(): bool
@@ -69,7 +75,7 @@ class UsersRelationManager extends RelationManager
             ->filters([
                 //
                 // TODO
-                // Str::ucfirst(Str::plural(config('filament-team-management.names.team')))
+                // Str::ucfirst(Str::plural(config('filament-team-management.table_names.teams')))
             ])
             ->headerActions([
                 Action::make('invite users')
@@ -77,7 +83,7 @@ class UsersRelationManager extends RelationManager
                     ->form([
                         Shout::make('info')
                             ->type('info')
-                            ->content('Add the email address(es) of the user(s) you would like to invite to this '.config('filament-team-management.names.team').'. An invitation will be sent to each address.')
+                            ->content('Add the email address(es) of the user(s) you would like to invite to this '.config('filament-team-management.table_names.teams').'. An invitation will be sent to each address.')
                             ->columnSpanFull(),
                         Forms\Components\Repeater::make('users')
                             ->label('Email Addresses to Invite')
@@ -91,7 +97,7 @@ class UsersRelationManager extends RelationManager
                     ])
                     ->action(fn (array $data, RelationManager $livewire) => $this->handleInvitation($data, $livewire->getOwnerRecord())),
                 AttachAction::make()
-                    ->label('Add Existing User to '.config('filament-team-management.names.team')),
+                    ->label('Add Existing User to '.config('filament-team-management.table_names.teams')),
             ])
             ->recordActions([
                 // hide "Edit User Role" button as team admin is not being used in this application
@@ -100,13 +106,13 @@ class UsersRelationManager extends RelationManager
 
                 DetachAction::make()->label('Remove User')
                     ->modalSubmitActionLabel('Remove User')
-                    ->modalHeading('Remove User from '.Str::ucfirst(config('filament-team-management.names.team'))),
+                    ->modalHeading('Remove User from '.Str::ucfirst(config('filament-team-management.table_names.teams'))),
             ])
             ->groupedBulkActions([
                 BulkActionGroup::make([
                     DetachBulkAction::make()->label('Remove selected')
                         ->modalSubmitActionLabel('Remove Selected Users')
-                        ->modalHeading('Remove Selected Users from '.Str::ucfirst(config('filament-team-management.names.team'))),
+                        ->modalHeading('Remove Selected Users from '.Str::ucfirst(config('filament-team-management.table_names.teams'))),
                 ]),
             ]);
     }

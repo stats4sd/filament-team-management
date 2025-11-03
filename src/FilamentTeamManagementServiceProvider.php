@@ -143,7 +143,7 @@ class FilamentTeamManagementServiceProvider extends PackageServiceProvider
     {
         return [
             '5_create_programs_table',
-            '6_create_program_user_table',
+            '6_create_program_members_table',
             '7_create_program_team_table',
         ];
     }

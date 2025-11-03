@@ -16,7 +16,7 @@ class TestTeamSeeder extends Seeder
     public function run()
     {
 
-        \DB::table('teams')->delete();
+        \DB::table(config('filament-team-management.table_names.teams'))->delete();
 
         /** @var Team $team */
         $team = config('filament-team-management.models.team')::create([

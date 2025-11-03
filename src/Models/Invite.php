@@ -31,21 +31,25 @@ class Invite extends Model
     /** @return BelongsTo<Model, $this> */
     public function inviter(): BelongsTo
     {
-        return $this->belongsTo(config('filament-team-management.models.user'), 'inviter_id');
+        return $this->belongsTo(
+            related: config('filament-team-management.models.user'),
+            foreignKey: 'inviter_id');
     }
 
     /** @return BelongsTo<Model, $this> */
     public function role(): BelongsTo
     {
-        return $this->belongsTo(config('filament-team-management.models.role'), 'role_id');
+        return $this->belongsTo(
+            related: config('filament-team-management.models.role'),
+            foreignKey: config('permission.column_names.role_pivot_key') ?? 'role_id');
     }
 
     /** @return BelongsTo<Model, $this> */
     public function program(): BelongsTo
     {
         return $this->belongsTo(
-            config('filament-team-management.models.program'),
-            foreignKey: config('filament-team-management.models.program')::getModelNameLower().'_id'
+            related: config('filament-team-management.models.program'),
+            foreignKey: config('filament-team-management.column_names.program_foreign_key'),
         );
     }
 
@@ -53,8 +57,8 @@ class Invite extends Model
     public function team(): BelongsTo
     {
         return $this->belongsTo(
-            config('filament-team-management.models.team'),
-            foreignKey: config('filament-team-management.models.team')::getModelNameLower().'_id'
+            related: config('filament-team-management.models.team'),
+            foreignKey: config('filament-team-management.column_names.teams_foreign_key'),
         );
     }
 

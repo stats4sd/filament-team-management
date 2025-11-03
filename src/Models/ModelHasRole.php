@@ -10,7 +10,11 @@ use Stats4sd\FilamentTeamManagement\Mail\UpdateUser;
 
 class ModelHasRole extends MorphPivot
 {
-    protected $table = 'model_has_roles';
+
+    public function getTable()
+    {
+        return config('permission.table_names.model_has_roles') ?? 'model_has_roles';
+    }
 
     protected $guarded = ['id'];
 

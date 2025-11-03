@@ -53,6 +53,11 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
         'remember_token',
     ];
 
+    public function getTable()
+    {
+        return config('filament-team-management.table_names.users');
+    }
+
     /**
      * Get the attributes that should be cast.
      *
@@ -146,7 +151,7 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
     {
         return $this->belongsToMany(
             config('filament-team-management.models.program'),
-            config('filament-team-management.models.program')::getModelNameLower().'_'.config('filament-team-management.models.user')::getModelNameLower(),
+            config('filament-team-management.table_names.program_members'),
             config('filament-team-management.models.user')::getModelNameLower().'_id',
             config('filament-team-management.models.program')::getModelNameLower().'_id',
         );
@@ -250,7 +255,7 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
     {
         return $this->belongsTo(
             config('filament-team-management.models.team'),
-            foreignKey: 'latest_'.config('filament-team-management.models.team')::getModelNameLower().'_id'
+            foreignKey: 'latest_team_id'
         );
     }
 
@@ -259,7 +264,7 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
     {
         return $this->belongsTo(
             config('filament-team-management.models.program'),
-            foreignKey: 'latest_'.config('filament-team-management.models.program')::getModelNameLower().'_id'
+            foreignKey: 'latest_program_id'
         );
     }
 

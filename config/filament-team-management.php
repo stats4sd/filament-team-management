@@ -14,4 +14,19 @@ return [
         'program' => env('FILAMENT_TEAM_MANAGEMENT_PROGRAM_MODEL', Program::class),
         'role' => env('FILAMENT_TEAM_MANAGEMENT_ROLE_MODEL', \Spatie\Permission\Models\Role::class),
     ],
+
+
+    // When using custom table names for your users or teams table, you can set them here
+    'table_names' => [
+        'users' => env('FILAMENT_TEAM_MANAGEMENT_USERS_TABLE', 'users'),
+        'teams' => env('FILAMENT_TEAM_MANAGEMENT_TEAMS_TABLE', 'teams'),
+        'programs' => env('FILAMENT_TEAM_MANAGEMENT_PROGRAMS_TABLE', 'programs'),
+    ],
+
+    // When using custom foreign keys for your users or teams table, you can set them here
+    'column_names' => [
+        'users_foreign_key' => env('FILAMENT_TEAM_MANAGEMENT_USERS_FOREIGN_KEY', 'user_id'),
+        'teams_foreign_key' => env('FILAMENT_TEAM_MANAGEMENT_TEAMS_FOREIGN_KEY', 'team_id'),
+        'programs_foreign_key' => env('FILAMENT_TEAM_MANAGEMENT_PROGRAM_MODEL', 'program_id'),
+    ],
 ];

@@ -13,14 +13,12 @@ class TeamForm
     public static function configure(Schema $schema): Schema
     {
         return $schema
+            ->columns(1)
             ->schema([
-                Section::make(Str::ucfirst(config('filament-team-management.names.team')).' Details')
-                    ->schema([
-                        TextInput::make('name')
-                            ->required()
-                            ->maxLength(255),
-                        Textarea::make('description'),
-                    ]),
+                TextInput::make('name')
+                    ->required()
+                    ->maxLength(255),
+                Textarea::make('description'),
             ]);
     }
 }

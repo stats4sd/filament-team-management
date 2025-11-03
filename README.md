@@ -61,7 +61,9 @@ $panel
 
 This package includes the needed setup to let your users invite other users via email. You can invite a new user to join a specific team, a specific program, or with an assigned site-wide role.  
 
-To make the registration work, you **must** add the pages in the namespace `Stats4sd\\FilamentTeamManagement\\App\\Pages` to one of your Panels. Otherwise the registration page will not be correctly registered in the app. 
+To make the registration work, you **must** add the pages in the namespace `Stats4sd\\FilamentTeamManagement\\App\\Pages` to a PanelProvider. You should add this to the 'main' entry point to your application. For example, if you have an "AppPanel" as your front-end and an "AdminPanel" as your back-end, add the registration pages to your AppPanel. 
+
+If you do not, the registration process will fail with a `Livewire\Exceptions\ComponentNotFoundException` error when the application tries to reference the un-registered Livewire components. 
 
 For example: 
 

@@ -13,6 +13,7 @@ class ViewProgram extends ViewRecord
 {
     protected static string $resource = ProgramResource::class;
 
+
     public function getTitle(): string|Htmlable
     {
         return $this->getRecord()->name;
@@ -20,10 +21,12 @@ class ViewProgram extends ViewRecord
 
     protected function getHeaderActions(): array
     {
+        $modelName = config('filament-team-management.names.program');
+
         return [
             Actions\EditAction::make(),
             Actions\DeleteAction::make()
-                ->modalDescription('WARNING: This will permanently delete this program and all associated teams and data. This action cannot be undone.'),
+                ->modalDescription("WARNING: This will permanently delete this $modelName and all associated teams and data. This action cannot be undone."),
         ];
     }
 }

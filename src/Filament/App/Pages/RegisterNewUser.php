@@ -7,6 +7,7 @@ use Filament\Auth\Http\Responses\Contracts\RegistrationResponse;
 use Filament\Auth\Pages\Register as BaseRegister;
 use Filament\Facades\Filament;
 use Filament\Forms;
+use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Component;
 use Illuminate\Auth\Events\Registered;
@@ -115,13 +116,13 @@ class RegisterNewUser extends BaseRegister
 
     protected function getEmailFormComponent(): Component
     {
-        return Forms\Components\TextInput::make('email')
-            ->label(__('filament-panels::pages/auth/register.form.email.label'))
+        return TextInput::make('email')
+            ->label(__('filament-panels::auth/pages/register.form.email.label'))
             ->email()
             ->required()
             ->maxLength(255)
             ->unique($this->getUserModel())
-            ->readOnly();
+                    ->readOnly();
     }
 
     protected function getPasswordFormComponent(): Component

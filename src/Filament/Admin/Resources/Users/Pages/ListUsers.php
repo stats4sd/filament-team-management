@@ -37,7 +37,6 @@ class ListUsers extends ListRecords
                         ->addActionLabel('Add Another Email Address'),
                 ])
                 ->action(fn (array $data, ListRecords $livewire) => $this->handleInvitation($data)),
-            Actions\CreateAction::make(),
         ];
     }
 

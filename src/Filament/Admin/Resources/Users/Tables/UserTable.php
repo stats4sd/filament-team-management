@@ -25,7 +25,7 @@ class UserTable
                     ->color('success')
                     ->visible(config('filament-team-management.use_programs')),
                 TextColumn::make('teams.name')
-                    ->label(Str::ucfirst(Str::plural(config('filament-team-management.names.team'))))
+                    ->label(Str::ucfirst(Str::plural(config('filament-team-management.table_names.teams'))))
                     ->searchable()
                     ->badge()
                     ->color('success'),

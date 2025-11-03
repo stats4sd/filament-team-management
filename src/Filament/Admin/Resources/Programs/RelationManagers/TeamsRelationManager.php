@@ -24,7 +24,7 @@ class TeamsRelationManager extends RelationManager
     // customise relation manager title
     public static function getTitle(Model $ownerRecord, string $pageClass): string
     {
-        return Str::ucfirst(Str::plural(config('filament-team-management.names.team')));
+        return Str::ucfirst(Str::plural(config('filament-team-management.table_names.teams')));
     }
 
     // turn on Edit mode so that "Add Existing Team to program" button will be shown when viewing program record
@@ -36,14 +36,13 @@ class TeamsRelationManager extends RelationManager
     public function form(Schema $schema): Schema
     {
         return $schema
+            ->columns(1)
             ->schema([
-                Section::make(Str::ucfirst(config('filament-team-management.names.team')).' Details')
-                    ->schema([
-                        TextInput::make('name')
-                            ->required()
-                            ->maxLength(255),
-                        Textarea::make('description'),
-                    ]),
+                TextInput::make('name')
+                    ->required()
+                    ->maxLength(255),
+                Textarea::make('description'),
+
             ]);
     }
 
@@ -55,10 +54,6 @@ class TeamsRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('name')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('programs.name')
-                    ->searchable()
-                    ->badge()
-                    ->color('success'),
                 Tables\Columns\TextColumn::make('users_count')
                     ->label('# Users')
                     ->counts('users')
@@ -72,19 +67,19 @@ class TeamsRelationManager extends RelationManager
             ->headerActions([
                 CreateAction::make(),
                 AttachAction::make()
-                    ->label('Add Existing '.Str::ucfirst(config('filament-team-management.names.team')).' to program'),
+                    ->label('Add Existing ' . config('filament-team-management.models.team')::getModelNameLower() . ' to program'),
             ])
             ->recordActions([
                 DetachAction::make()
-                    ->label('Remove '.Str::ucfirst(config('filament-team-management.names.team')))
-                    ->modalSubmitActionLabel('Remove '.Str::ucfirst(config('filament-team-management.names.team')))
-                    ->modalHeading('Remove '.Str::ucfirst(config('filament-team-management.names.team')).' from Program'),
+                    ->label('Remove ' . config('filament-team-management.models.team')::getModelNameLower())
+                    ->modalSubmitActionLabel('Remove ' . config('filament-team-management.models.team')::getModelNameLower())
+                    ->modalHeading('Remove ' . config('filament-team-management.models.team')::getModelNameLower() . ' from Program'),
             ])
             ->groupedBulkActions([
                 BulkActionGroup::make([
                     DetachBulkAction::make()->label('Remove selected')
-                        ->modalSubmitActionLabel('Remove Selected '.Str::ucfirst(Str::plural(config('filament-team-management.names.team'))))
-                        ->modalHeading('Remove Selected '.Str::ucfirst(Str::plural(config('filament-team-management.names.team'))).' from Program'),
+                        ->modalSubmitActionLabel('Remove Selected ' . Str::ucfirst(Str::plural(config('filament-team-management.table_names.teams'))))
+                        ->modalHeading('Remove Selected ' . Str::ucfirst(Str::plural(config('filament-team-management.table_names.teams'))) . ' from Program'),
                 ]),
             ]);
     }

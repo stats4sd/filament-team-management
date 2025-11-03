@@ -14,16 +14,27 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 use Stats4sd\FilamentTeamManagement\Models\Interfaces\ProgramInterface;
 
 class UsersRelationManager extends RelationManager
 {
+
+    // Hardcode relationship names, so we can use the relationships defined in the base models.
     protected static string $relationship = 'users';
+    protected static ?string $inverseRelationship = 'programs';
 
     // turn on Edit mode so that "Add Existing User to program" button will be shown when viewing program record
     public function isReadOnly(): bool
     {
         return false;
+    }
+
+    // customise relation manager title
+    public static function getTitle(Model $ownerRecord, string $pageClass): string
+    {
+        return Str::ucfirst(Str::plural(config('filament-team-management.table_names.users')));
     }
 
     public function form(Schema $schema): Schema
@@ -53,7 +64,7 @@ class UsersRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                Action::make('invite users')
+                Action::make('invite ' . config('filament-team-management.table_names.users'))
                     ->form([
                         Shout::make('info')
                             ->type('info')
@@ -69,13 +80,13 @@ class UsersRelationManager extends RelationManager
                             ->reorderable(false)
                             ->addActionLabel('Add Another Email Address'),
                     ])
-                    ->action(fn (array $data, RelationManager $livewire) => $this->handleInvitation($data, $livewire->getOwnerRecord())),
+                    ->action(fn(array $data, RelationManager $livewire) => $this->handleInvitation($data, $livewire->getOwnerRecord())),
                 AttachAction::make()
-                    ->label('Add Existing User to program'),
+                    ->label('Add existing ' . Str::singular(config('filament-team-management.table_names.users')) . ' to program'),
             ])
             ->recordActions([
-                DetachAction::make()->label('Remove User')
-                    ->modalSubmitActionLabel('Remove User')
+                DetachAction::make()->label('Remove ' . config('filament-team-management.models.user')::getModelNameLower())
+                    ->modalSubmitActionLabel('Remove ' . config('filament-team-management.models.user')::getModelNameLower())
                     ->modalHeading('Remove User from Program'),
             ])
             ->groupedBulkActions([

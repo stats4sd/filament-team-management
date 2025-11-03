@@ -25,19 +25,10 @@ class UserForm
                     ->email()
                     ->required(),
 
-                TextInput::make('password')
-                    ->label('Password')
-                    ->placeholder('Password')
-                    // password field is compulsory when creating a new user record, it is optional when editing an existing user record
-                    ->required($schema->getRecord() == null)
-                    ->password()
-                    ->revealable(),
-
-                // TODO: make multiple select
-                //
-                // (It's also because there seems to be a bug in Filament where select multiples don't work if the disabled() state is live updated...)
-                Select::make('team_id')
-                    ->label('Which '.config('filament-team-management.names.team').' should the user be a member of?')
+                Select::make('teams')
+                    ->multiple()
+                    ->preload()
+                    ->label('Which ' . config('filament-team-management.table_names.teams') . ' should the user be a member of?')
                     ->exists((new $teamClass)->getTable(), 'id')
                     ->relationship('teams', titleAttribute: 'name'),
 
