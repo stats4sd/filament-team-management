@@ -1,11 +1,16 @@
 <?php
 
-namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\TeamResource\RelationManagers;
+namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Teams\RelationManagers;
 
 use Awcodes\Shout\Components\Shout;
+use Filament\Actions\Action;
+use Filament\Actions\AttachAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DetachAction;
+use Filament\Actions\DetachBulkAction;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\HtmlString;
@@ -29,9 +34,9 @@ class UsersRelationManager extends RelationManager
         return true;
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Shout::make('info')
                     ->content(fn (User $record) => new HtmlString("Edit user's role within this team<br/>$record->name ($record->email)")),
@@ -67,7 +72,7 @@ class UsersRelationManager extends RelationManager
                 // Str::ucfirst(Str::plural(config('filament-team-management.names.team')))
             ])
             ->headerActions([
-                Tables\Actions\Action::make('invite users')
+                Action::make('invite users')
                     ->visible(! $this->isReadOnly())
                     ->form([
                         Shout::make('info')
@@ -85,21 +90,21 @@ class UsersRelationManager extends RelationManager
                             ->addActionLabel('Add Another Email Address'),
                     ])
                     ->action(fn (array $data, RelationManager $livewire) => $this->handleInvitation($data, $livewire->getOwnerRecord())),
-                Tables\Actions\AttachAction::make()
+                AttachAction::make()
                     ->label('Add Existing User to '.config('filament-team-management.names.team')),
             ])
-            ->actions([
+            ->recordActions([
                 // hide "Edit User Role" button as team admin is not being used in this application
                 // keep below commented code, it will be used in other application
-                // Tables\Actions\EditAction::make()->label('Edit User Role'),
+                // EditAction::make()->label('Edit User Role'),
 
-                Tables\Actions\DetachAction::make()->label('Remove User')
+                DetachAction::make()->label('Remove User')
                     ->modalSubmitActionLabel('Remove User')
                     ->modalHeading('Remove User from '.Str::ucfirst(config('filament-team-management.names.team'))),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DetachBulkAction::make()->label('Remove selected')
+            ->groupedBulkActions([
+                BulkActionGroup::make([
+                    DetachBulkAction::make()->label('Remove selected')
                         ->modalSubmitActionLabel('Remove Selected Users')
                         ->modalHeading('Remove Selected Users from '.Str::ucfirst(config('filament-team-management.names.team'))),
                 ]),

@@ -1,9 +1,9 @@
 <?php
 
-namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources;
+namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Permissions;
 
 use Spatie\Permission\Models\Permission;
-use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\PermissionResource\Pages;
+use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Permissions\Pages\ManagePermissions;
 
 class PermissionResource extends \Althinect\FilamentSpatieRolesPermissions\Resources\PermissionResource
 {
@@ -12,7 +12,7 @@ class PermissionResource extends \Althinect\FilamentSpatieRolesPermissions\Resou
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ManagePermissions::route('/'),
+            'index' => ManagePermissions::route('/'),
         ];
     }
 }

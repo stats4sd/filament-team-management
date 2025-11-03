@@ -1,6 +1,6 @@
 <?php
 
-namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\TeamResource\RelationManagers;
+namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Teams\RelationManagers;
 
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;

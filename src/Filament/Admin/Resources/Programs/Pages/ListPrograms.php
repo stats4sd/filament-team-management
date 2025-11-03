@@ -1,6 +1,6 @@
 <?php
 
-namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\ProgramResource\Pages;
+namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Programs\Pages;
 
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;

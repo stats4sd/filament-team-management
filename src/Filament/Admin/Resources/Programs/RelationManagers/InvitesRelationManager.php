@@ -1,6 +1,6 @@
 <?php
 
-namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\ProgramResource\RelationManagers;
+namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Programs\RelationManagers;
 
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\ProgramResource\RelationManagers;
+namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Programs\RelationManagers;
 
 use Awcodes\Shout\Components\Shout;
 use Filament\Actions\Action;

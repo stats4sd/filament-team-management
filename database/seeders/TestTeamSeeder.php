@@ -33,7 +33,7 @@ class TestTeamSeeder extends Seeder
 
         $teamAdmin = config('filament-team-management.models.user')::create([
             'name' => 'Test Team Admin',
-            'email' => 'test - team - admin@example . com',
+            'email' => 'test-team-admin@example.com',
             'password' => bcrypt('password'),
         ]);
 

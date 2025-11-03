@@ -6,32 +6,26 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
-use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\TeamResource\Pages;
-use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\TeamResource\RelationManagers\InvitesRelationManager;
-use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\TeamResource\RelationManagers\UsersRelationManager;
+use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Teams\RelationManagers\InvitesRelationManager;
+use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Teams\RelationManagers\UsersRelationManager;
 use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Teams\Schemas\TeamForm;
 use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Teams\Schemas\TeamInfolist;
 use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Teams\Tables\TeamTable;
+use Stats4sd\FilamentTeamManagement\Filament\Traits\HasTeamManagementNavigationGroup;
 
 // filament-odk-link package related code are commented as some applications may not require ODK functionalities.
 // Please uncomment those code if filament-odk-link package is required and added to main repo.
 
 class TeamResource extends Resource
 {
+
+    use HasTeamManagementNavigationGroup;
+
     protected static string|null|\BackedEnum $navigationIcon = 'heroicon-o-building-office-2';
 
     public static function getModel(): string
     {
         return config('filament-team-management.models.team');
-    }
-
-    public static function getNavigationGroup(): string
-    {
-        if (config('filament-team-management.use_programs')) {
-            return 'Programs, '.Str::ucfirst(Str::plural(config('filament-team-management.names.team'))).' and Users';
-        } else {
-            return Str::ucfirst(Str::plural(config('filament-team-management.names.team'))).' and Users';
-        }
     }
 
     public static function form(Schema $schema): Schema

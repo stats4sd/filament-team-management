@@ -1,10 +1,10 @@
 <?php
 
-namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\PermissionResource\Pages;
+namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Permissions\Pages;
 
 use Filament\Actions;
 use Filament\Resources\Pages\ManageRecords;
-use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\PermissionResource;
+use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Permissions\PermissionResource;
 
 class ManagePermissions extends ManageRecords
 {

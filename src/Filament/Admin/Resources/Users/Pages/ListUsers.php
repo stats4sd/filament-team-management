@@ -1,12 +1,12 @@
 <?php
 
-namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\UserResource\Pages;
+namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Users\Pages;
 
 use Awcodes\Shout\Components\Shout;
 use Filament\Actions;
 use Filament\Forms;
 use Filament\Resources\Pages\ListRecords;
-use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\UserResource;
+use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Users\UserResource;
 use Stats4sd\FilamentTeamManagement\Models\User;
 
 class ListUsers extends ListRecords

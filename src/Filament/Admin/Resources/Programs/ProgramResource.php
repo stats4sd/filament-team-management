@@ -6,16 +6,18 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
-use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\ProgramResource\Pages;
-use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\ProgramResource\RelationManagers;
+use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Programs\Pages\ListPrograms;
+use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Programs\Pages\ViewProgram;
 use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Programs\Schemas\ProgramForm;
 use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Programs\Schemas\ProgramInfolist;
-use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Programs\Schemas\TeamForm;
-use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Programs\Schemas\TeamInfolist;
 use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Programs\Tables\ProgramTable;
+use Stats4sd\FilamentTeamManagement\Filament\Traits\HasTeamManagementNavigationGroup;
 
 class ProgramResource extends Resource
 {
+
+    use HasTeamManagementNavigationGroup;
+
     protected static string|null|\BackedEnum $navigationIcon = 'heroicon-o-building-library';
 
     public static function getModel(): string
@@ -28,14 +30,6 @@ class ProgramResource extends Resource
         return config('filament-team-management.use_programs');
     }
 
-    public static function getNavigationGroup(): string
-    {
-        if (config('filament-team-management.use_programs')) {
-            return 'Programs, '.Str::ucfirst(Str::plural(config('filament-team-management.names.team'))).' and Users';
-        } else {
-            return Str::ucfirst(Str::plural(config('filament-team-management.names.team'))).' and Users';
-        }
-    }
 
     public static function form(Schema $schema): Schema
     {
@@ -64,8 +58,8 @@ class ProgramResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListPrograms::route('/'),
-            'view' => Pages\ViewProgram::route('/{record}'),
+            'index' => ListPrograms::route('/'),
+            'view' => ViewProgram::route('/{record}'),
         ];
     }
 }

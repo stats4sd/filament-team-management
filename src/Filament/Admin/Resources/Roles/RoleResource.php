@@ -1,8 +1,8 @@
 <?php
 
-namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources;
+namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Roles;
 
-use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\RoleResource\Pages;
+use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Roles\Pages\ManageRoles;
 
 class RoleResource extends \Althinect\FilamentSpatieRolesPermissions\Resources\RoleResource
 {
@@ -14,7 +14,7 @@ class RoleResource extends \Althinect\FilamentSpatieRolesPermissions\Resources\R
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ManageRoles::route('/'),
+            'index' => ManageRoles::route('/'),
         ];
     }
 }

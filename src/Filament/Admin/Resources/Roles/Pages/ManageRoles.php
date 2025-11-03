@@ -1,10 +1,10 @@
 <?php
 
-namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\RoleResource\Pages;
+namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Roles\Pages;
 
 use Filament\Actions;
 use Filament\Resources\Pages\ManageRecords;
-use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\RoleResource;
+use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Roles\RoleResource;
 
 class ManageRoles extends ManageRecords
 {
