@@ -78,11 +78,11 @@ class ManageTeam extends EditTenantProfile
                     ->tabs([
                         Tabs\Tab::make('Members')
                             ->schema([
-                                Livewire::make(ManageTeamMembers::class),
+                                Livewire::make(ManageTeamMembers::class)->key('manage-team-members'),
                             ]),
                         Tabs\Tab::make('Invites')
                             ->schema([
-                                Livewire::make(ManageTeamInvites::class),
+                                Livewire::make(ManageTeamInvites::class)->key('manage-team-invites'),
                             ]),
                     ]),
             ]);
