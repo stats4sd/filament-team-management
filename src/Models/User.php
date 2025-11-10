@@ -226,7 +226,7 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
         return false;
     }
 
-    public function getTenants(Panel $panel): array|Collection
+    public function getTenants(Panel $panel): array | Collection
     {
         // add different handling for different panel
         if ($panel->getTenantModel() === config('filament-team-management.models.team')) {

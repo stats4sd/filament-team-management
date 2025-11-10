@@ -33,7 +33,8 @@ class Invite extends Model
     {
         return $this->belongsTo(
             related: config('filament-team-management.models.user'),
-            foreignKey: 'inviter_id');
+            foreignKey: 'inviter_id'
+        );
     }
 
     /** @return BelongsTo<Model, $this> */
@@ -41,7 +42,8 @@ class Invite extends Model
     {
         return $this->belongsTo(
             related: config('filament-team-management.models.role'),
-            foreignKey: config('permission.column_names.role_pivot_key') ?? 'role_id');
+            foreignKey: config('permission.column_names.role_pivot_key') ?? 'role_id'
+        );
     }
 
     /** @return BelongsTo<Model, $this> */
@@ -49,7 +51,7 @@ class Invite extends Model
     {
         return $this->belongsTo(
             related: config('filament-team-management.models.program'),
-            foreignKey: config('filament-team-management.column_names.program_foreign_key'),
+            foreignKey: config('filament-team-management.column_names.programs_foreign_key'),
         );
     }
 

@@ -10,7 +10,6 @@ use Filament\Actions\DetachBulkAction;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;

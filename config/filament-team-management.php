@@ -15,7 +15,6 @@ return [
         'role' => env('FILAMENT_TEAM_MANAGEMENT_ROLE_MODEL', \Spatie\Permission\Models\Role::class),
     ],
 
-
     // When using custom table names for your users or teams table, you can set them here
     'table_names' => [
         'users' => env('FILAMENT_TEAM_MANAGEMENT_USERS_TABLE', 'users'),

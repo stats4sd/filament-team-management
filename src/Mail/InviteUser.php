@@ -30,7 +30,7 @@ class InviteUser extends Mailable
     {
         return new Envelope(
             from: config('mail.from.address'),
-            subject: config('app.name').': Invitation to register',
+            subject: config('app.name') . ': Invitation to register',
         );
     }
 
@@ -40,7 +40,8 @@ class InviteUser extends Mailable
     public function content(): Content
     {
 
-        $routeName = Filament::getCurrentPanel()->generateRouteName('auth.register');
+        $routeName = Filament::getDefaultPanel()->generateRouteName('auth.register');
+
 
         return new Content(
             markdown: 'filament-team-management::emails.invite',

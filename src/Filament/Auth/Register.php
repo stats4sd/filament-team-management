@@ -90,7 +90,7 @@ class Register extends BaseRegister
             }
 
             if ($this->invite->program) {
-                $this->invite->program->users()->attach($user);
+                $this->invite->program->members()->attach($user);
             }
 
         }
@@ -119,7 +119,7 @@ class Register extends BaseRegister
             ->required()
             ->maxLength(255)
             ->unique($this->getUserModel())
-                    ->readOnly();
+            ->readOnly();
     }
 
     protected function getPasswordFormComponent(): Component
