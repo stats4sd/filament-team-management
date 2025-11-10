@@ -26,6 +26,13 @@ class Invite extends Model
         'is_confirmed' => 'boolean',
     ];
 
+    protected static function booted()
+    {
+        self::addGlobalScope('onlyUnconfirmed', function ($query) {
+            $query->where('is_confirmed', false);
+        });
+    }
+
     // *********** RELATIONSHIPS ************ //
 
     /** @return BelongsTo<Model, $this> */
