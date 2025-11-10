@@ -1,6 +1,6 @@
 <?php
 
-namespace Stats4sd\FilamentTeamManagement\Filament\App\Pages;
+namespace Stats4sd\FilamentTeamManagement\Filament\Auth;
 
 use DanHarrin\LivewireRateLimiting\Exceptions\TooManyRequestsException;
 use Filament\Auth\Http\Responses\Contracts\RegistrationResponse;
@@ -18,7 +18,7 @@ use Stats4sd\FilamentTeamManagement\Events\RegisteredWithData;
 use Stats4sd\FilamentTeamManagement\Http\Responses\RegisterResponse;
 use Stats4sd\FilamentTeamManagement\Models\Invite;
 
-class RegisterNewUser extends BaseRegister
+class Register extends BaseRegister
 {
     #[Url]
     public string $token = '';
@@ -29,11 +29,8 @@ class RegisterNewUser extends BaseRegister
 
     public function mount(): void
     {
-        $this->invite = Invite::where('token', $this->token)->firstOrFail();
 
-        if (Filament::auth()->check()) {
-            redirect()->intended(Filament::getUrl());
-        }
+        $this->invite = Invite::where('token', $this->token)->firstOrFail();
 
         $this->callHook('beforeFill');
 

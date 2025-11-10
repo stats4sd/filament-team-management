@@ -8,7 +8,7 @@
 Package for an opinionated 'teams' setup, including invites and integration with Laravel Filament + Spatie User Roles.
 
 
-## Installation
+# Installation
 
 You can install the package via composer:
 
@@ -24,7 +24,13 @@ php artisan filament-team-management:install
 
 The script will ask you if you want to use the concept of "programs" in your app. Based on your response, it will publish the appropriate migration files and update your .env file with the appropriate variables. It will also offer to add some example Database Seeders to your main `database/seeders/DatabaseSeeder.php` file. 
 
-For a full guide on how to set this package up with a brand new Laravel installation, see [SETUP.md](SETUP.md)
+# Integration into your app
+
+There are 2 ways to integrate this package into your new or existin Filament app. You can use the provided Team and Program Management panels as-is, or you can incorportate the Page and Resource classes into your own Filament Panels however you wish.  
+
+## Option 1: Use the provided panels
+
+
 
 
 ## Features

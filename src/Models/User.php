@@ -8,6 +8,7 @@ use Filament\Models\Contracts\HasDefaultTenant;
 use Filament\Models\Contracts\HasTenants;
 use Filament\Notifications\Notification;
 use Filament\Panel;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -88,7 +89,7 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
             $user = User::where('email', $item['email'])->first();
 
             // email address does not belong to any registered user
-            if (! $user) {
+            if (!$user) {
                 /** @var Invite $invite */
                 $invite = $this->invites()->create([
                     'email' => $item['email'],
@@ -102,7 +103,7 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
                 Notification::make()
                     ->success()
                     ->title('Invitation Sent')
-                    ->body('An email invitation has been successfully sent to '.$item['email'])
+                    ->body('An email invitation has been successfully sent to ' . $item['email'])
                     ->send();
 
             } else {
@@ -114,7 +115,7 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
                     Notification::make()
                         ->success()
                         ->title('User already has this role')
-                        ->body('User '.$item['email'].' has '.$role->name.' role already')
+                        ->body('User ' . $item['email'] . ' has ' . $role->name . ' role already')
                         ->send();
                 } else {
                     // add role to user
@@ -141,9 +142,9 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
     {
         return $this->belongsToMany(
             config('filament-team-management.models.team'),
-            config('filament-team-management.models.team')::getModelNameLower().'_members',
-            config('filament-team-management.models.user')::getModelNameLower().'_id',
-            config('filament-team-management.models.team')::getModelNameLower().'_id',
+            config('filament-team-management.models.team')::getModelNameLower() . '_members',
+            config('filament-team-management.models.user')::getModelNameLower() . '_id',
+            config('filament-team-management.models.team')::getModelNameLower() . '_id',
         )->withPivot('is_admin');
     }
 
@@ -152,8 +153,8 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
         return $this->belongsToMany(
             config('filament-team-management.models.program'),
             config('filament-team-management.table_names.program_members'),
-            config('filament-team-management.models.user')::getModelNameLower().'_id',
-            config('filament-team-management.models.program')::getModelNameLower().'_id',
+            config('filament-team-management.models.user')::getModelNameLower() . '_id',
+            config('filament-team-management.models.program')::getModelNameLower() . '_id',
         );
     }
 

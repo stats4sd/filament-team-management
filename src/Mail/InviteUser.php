@@ -2,6 +2,7 @@
 
 namespace Stats4sd\FilamentTeamManagement\Mail;
 
+use Filament\Facades\Filament;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
@@ -38,11 +39,14 @@ class InviteUser extends Mailable
      */
     public function content(): Content
     {
+
+        $routeName = Filament::getCurrentPanel()->generateRouteName('auth.register');
+
         return new Content(
             markdown: 'filament-team-management::emails.invite',
             with: [
                 'acceptUrl' => URL::signedRoute(
-                    'filament.app.register-invite',
+                    $routeName,
                     [
                         'token' => $this->invite->token,
                     ],

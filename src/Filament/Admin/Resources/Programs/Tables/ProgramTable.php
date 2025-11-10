@@ -10,7 +10,6 @@ class ProgramTable
 {
     public static function configure(Table $table): Table
     {
-
         return $table
             ->columns([
                 TextColumn::make('name')

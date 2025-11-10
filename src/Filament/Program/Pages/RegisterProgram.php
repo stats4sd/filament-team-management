@@ -1,6 +1,6 @@
 <?php
 
-namespace Stats4sd\FilamentTeamManagement\Filament\App\Pages;
+namespace Stats4sd\FilamentTeamManagement\Filament\Program\Pages;
 
 use Filament\Forms\Components\TextInput;
 use Filament\Pages\Tenancy\RegisterTenant;
