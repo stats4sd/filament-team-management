@@ -42,7 +42,6 @@ class InviteUser extends Mailable
 
         $routeName = Filament::getDefaultPanel()->generateRouteName('auth.register');
 
-
         return new Content(
             markdown: 'filament-team-management::emails.invite',
             with: [

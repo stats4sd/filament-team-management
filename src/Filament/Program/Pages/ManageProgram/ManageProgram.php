@@ -11,13 +11,13 @@ use Filament\Schemas\Schema;
 
 class ManageProgram extends EditTenantProfile
 {
-    protected static string|null|\BackedEnum $navigationIcon = 'heroicon-o-document-text';
+    protected static string | null | \BackedEnum $navigationIcon = 'heroicon-o-document-text';
 
     public static function getLabel(): string
     {
         $programTypeName = config('filament-team-management.models.program')::getModelNameLower();
 
-        return 'Manage '.ucfirst($programTypeName);
+        return 'Manage ' . ucfirst($programTypeName);
     }
 
     public function form(Schema $schema): Schema
@@ -34,23 +34,23 @@ class ManageProgram extends EditTenantProfile
         return $schema
             ->components([
                 Section::make('Basic Information')
-                ->schema([
-                   $this->getFormContentComponent()
-                ]),
-                Tabs::make('User Management')
-                ->contained(false)
-                ->tabs([
-                    Tabs\Tab::make('Members')
                     ->schema([
-                        Livewire::make(ManageProgramMembers::class)
-                        ->key('manage-program-members'),
+                        $this->getFormContentComponent(),
                     ]),
-                    Tabs\Tab::make('Invites')
-                    ->schema([
-                        Livewire::make(ManageProgramInvites::class)
-                        ->key('manage-program-invites'),
-                    ])
-                ])
+                Tabs::make('User Management')
+                    ->contained(false)
+                    ->tabs([
+                        Tabs\Tab::make('Members')
+                            ->schema([
+                                Livewire::make(ManageProgramMembers::class)
+                                    ->key('manage-program-members'),
+                            ]),
+                        Tabs\Tab::make('Invites')
+                            ->schema([
+                                Livewire::make(ManageProgramInvites::class)
+                                    ->key('manage-program-invites'),
+                            ]),
+                    ]),
             ]);
     }
 }
