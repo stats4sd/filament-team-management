@@ -20,6 +20,8 @@ return [
         'users' => env('FILAMENT_TEAM_MANAGEMENT_USERS_TABLE', 'users'),
         'teams' => env('FILAMENT_TEAM_MANAGEMENT_TEAMS_TABLE', 'teams'),
         'programs' => env('FILAMENT_TEAM_MANAGEMENT_PROGRAMS_TABLE', 'programs'),
+        'program_members' => env('FILAMENT_TEAM_MANAGEMENT_PROGRAM_MEMBERS_TABLE', 'program_members'),
+        'program_team' => env('FILAMENT_TEAM_MANAGEMENT_PROGRAM_TEAM_TABLE', 'program_team'),
     ],
 
     // When using custom foreign keys for your users or teams table, you can set them here

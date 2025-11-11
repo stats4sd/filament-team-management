@@ -8,6 +8,7 @@ use Filament\Schemas\Components\Livewire;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Schema;
+use Illuminate\Support\Str;
 
 class ManageProgram extends EditTenantProfile
 {
@@ -25,7 +26,7 @@ class ManageProgram extends EditTenantProfile
         return $schema
             ->schema([
                 TextInput::make('name')
-                    ->label('Enter a name for the team'),
+                    ->label('Enter a name for the '.Str::ucwords(config('filament-team-management.models.program')::getModelNameLower())),
             ]);
     }
 
@@ -34,23 +35,23 @@ class ManageProgram extends EditTenantProfile
         return $schema
             ->components([
                 Section::make('Basic Information')
-                ->schema([
-                   $this->getFormContentComponent()
-                ]),
-                Tabs::make('User Management')
-                ->contained(false)
-                ->tabs([
-                    Tabs\Tab::make('Members')
                     ->schema([
-                        Livewire::make(ManageProgramMembers::class)
-                        ->key('manage-program-members'),
+                        $this->getFormContentComponent(),
                     ]),
-                    Tabs\Tab::make('Invites')
-                    ->schema([
-                        Livewire::make(ManageProgramInvites::class)
-                        ->key('manage-program-invites'),
-                    ])
-                ])
+                Tabs::make('User Management')
+                    ->contained(false)
+                    ->tabs([
+                        Tabs\Tab::make('Members')
+                            ->schema([
+                                Livewire::make(ManageProgramMembers::class)
+                                    ->key('manage-program-members'),
+                            ]),
+                        Tabs\Tab::make('Invites')
+                            ->schema([
+                                Livewire::make(ManageProgramInvites::class)
+                                    ->key('manage-program-invites'),
+                            ]),
+                    ]),
             ]);
     }
 }
