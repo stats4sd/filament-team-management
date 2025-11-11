@@ -8,7 +8,6 @@ use Filament\Models\Contracts\HasDefaultTenant;
 use Filament\Models\Contracts\HasTenants;
 use Filament\Notifications\Notification;
 use Filament\Panel;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -89,7 +88,7 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
             $user = User::where('email', $item['email'])->first();
 
             // email address does not belong to any registered user
-            if (!$user) {
+            if (! $user) {
                 /** @var Invite $invite */
                 $invite = $this->invites()->create([
                     'email' => $item['email'],

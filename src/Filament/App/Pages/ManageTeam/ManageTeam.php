@@ -19,28 +19,28 @@ class ManageTeam extends EditTenantProfile
 {
     // use HasRelationManagers;
 
-    protected static string|null|\BackedEnum $navigationIcon = 'heroicon-o-document-text';
+    protected static string | null | \BackedEnum $navigationIcon = 'heroicon-o-document-text';
 
     //   protected string $view = 'filament-team-management::filament.app.pages.manage-team';
 
-    public function getHeading(): string|Htmlable|null
+    public function getHeading(): string | Htmlable | null
     {
-        return 'Manage '.config('filament-team-management.models.team')::getModelNameLower().': '.Filament::getTenant()->name;
+        return 'Manage ' . config('filament-team-management.models.team')::getModelNameLower() . ': ' . Filament::getTenant()->name;
     }
 
-    public function getSubheading(): string|Htmlable|null
+    public function getSubheading(): string | Htmlable | null
     {
         if (config('filament-team-management.use_programs')) {
 
             $programTypeName = Str::ucwords(config('filament-team-management.models.program')::getModelNameLower());
 
             $programLinks = Filament::getTenant()?->programs?->map(function ($program) {
-                $url = url('/programs/'.$program->id);
+                $url = url('/programs/' . $program->id);
 
-                return '<a href="'.$url.'" class="underline text-primary-600 hover:text-primary-700 focus:text-primary-700 transition">'.e($program->name).'</a>';
+                return '<a href="' . $url . '" class="underline text-primary-600 hover:text-primary-700 focus:text-primary-700 transition">' . e($program->name) . '</a>';
             })->join(', ');
 
-            return new HtmlString($programTypeName.': '.$programLinks);
+            return new HtmlString($programTypeName . ': ' . $programLinks);
 
         }
 
@@ -51,17 +51,17 @@ class ManageTeam extends EditTenantProfile
     {
         $teamTypeName = config('filament-team-management.models.team')::getModelNameLower();
 
-        return 'Manage '.ucfirst($teamTypeName);
+        return 'Manage ' . ucfirst($teamTypeName);
     }
 
     public function form(Schema $schema): Schema
     {
         return $schema->schema([
             TextInput::make('name')
-                ->label('Enter a name for the '.config('filament-team-management.models.team')::getModelNameLower()),
+                ->label('Enter a name for the ' . config('filament-team-management.models.team')::getModelNameLower()),
             Textarea::make('description')
                 ->rows(5)
-                ->label('Enter a brief description for the '.config('filament-team-management.models.team')::getModelNameLower()),
+                ->label('Enter a brief description for the ' . config('filament-team-management.models.team')::getModelNameLower()),
         ]);
     }
 

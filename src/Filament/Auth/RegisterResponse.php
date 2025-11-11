@@ -8,7 +8,7 @@ use Livewire\Features\SupportRedirects\Redirector;
 
 class RegisterResponse extends RegistrationResponse
 {
-    public function toResponse($request): RedirectResponse|Redirector
+    public function toResponse($request): RedirectResponse | Redirector
     {
         return redirect()->to('/');
     }

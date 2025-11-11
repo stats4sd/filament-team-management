@@ -7,8 +7,8 @@ Route::group([
     'middleware' => ['web'],
 ], function () {
 
-//    // user registration form for team-invites
-//    Route::get('register', RegisterNewUser::class)
-//        ->name('filament.app.register-invite')
-//        ->middleware('signed');
+    //    // user registration form for team-invites
+    //    Route::get('register', RegisterNewUser::class)
+    //        ->name('filament.app.register-invite')
+    //        ->middleware('signed');
 });

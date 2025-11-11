@@ -34,7 +34,7 @@ class TeamMembersTable
                     ->schema([
                         Shout::make('info')
                             ->type('info')
-                            ->content('Add the email address(es) of the user(s) you would like to invite to this '.config('filament-team-management.names.team').'. An invitation will be sent to each address.')
+                            ->content('Add the email address(es) of the user(s) you would like to invite to this ' . config('filament-team-management.names.team') . '. An invitation will be sent to each address.')
                             ->columnSpanFull(),
                         Repeater::make('users')
                             ->label('Email Addresses to Invite')

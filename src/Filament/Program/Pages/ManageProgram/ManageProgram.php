@@ -12,13 +12,13 @@ use Illuminate\Support\Str;
 
 class ManageProgram extends EditTenantProfile
 {
-    protected static string|null|\BackedEnum $navigationIcon = 'heroicon-o-document-text';
+    protected static string | null | \BackedEnum $navigationIcon = 'heroicon-o-document-text';
 
     public static function getLabel(): string
     {
         $programTypeName = config('filament-team-management.models.program')::getModelNameLower();
 
-        return 'Manage '.ucfirst($programTypeName);
+        return 'Manage ' . ucfirst($programTypeName);
     }
 
     public function form(Schema $schema): Schema
