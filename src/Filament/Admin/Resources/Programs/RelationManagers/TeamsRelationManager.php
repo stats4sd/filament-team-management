@@ -18,7 +18,10 @@ use Illuminate\Support\Str;
 
 class TeamsRelationManager extends RelationManager
 {
+    // hardcode relationship names, so we can use the relationships defined in the base models.
     protected static string $relationship = 'teams';
+
+    protected static ?string $inverseRelationship = 'programs';
 
     // customise relation manager title
     public static function getTitle(Model $ownerRecord, string $pageClass): string
