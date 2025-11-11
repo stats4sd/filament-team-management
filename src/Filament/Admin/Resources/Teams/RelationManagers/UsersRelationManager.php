@@ -21,7 +21,10 @@ use Stats4sd\FilamentTeamManagement\Models\User;
 
 class UsersRelationManager extends RelationManager
 {
+    // hardcode relationship names, so we can use the relationships defined in the base models.
     protected static string $relationship = 'users';
+
+    protected static ?string $inverseRelationship = 'teams';
 
     public static function getTitle(Model $ownerRecord, string $pageClass): string
     {
