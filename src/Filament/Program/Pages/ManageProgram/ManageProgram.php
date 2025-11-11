@@ -26,7 +26,7 @@ class ManageProgram extends EditTenantProfile
         return $schema
             ->schema([
                 TextInput::make('name')
-                    ->label('Enter a name for the '.Str::ucwords(config('filament-team-management.models.program')::getModelNameLower())),
+                    ->label('Enter a name for the ' . Str::ucwords(config('filament-team-management.models.program')::getModelNameLower())),
             ]);
     }
 

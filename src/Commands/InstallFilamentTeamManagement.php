@@ -133,11 +133,11 @@ class InstallFilamentTeamManagement extends Command
         }
 
         if ($usePrograms) {
-            $databaseSeederContents = substr_replace($databaseSeederContents, '$this->call(\Stats4sd\FilamentTeamManagement\Database\Seeders\DatabaseProgramSeeder::class);'.PHP_EOL, $runMethodEndPos, 0);
+            $databaseSeederContents = substr_replace($databaseSeederContents, '$this->call(\Stats4sd\FilamentTeamManagement\Database\Seeders\DatabaseProgramSeeder::class);' . PHP_EOL, $runMethodEndPos, 0);
         }
 
         // add the seeders to the run() method
-        $databaseSeederContents = substr_replace($databaseSeederContents, PHP_EOL.PHP_EOL.'$this->call(\Stats4sd\FilamentTeamManagement\Database\Seeders\DatabaseSeeder::class);'.PHP_EOL, $runMethodEndPos, 0);
+        $databaseSeederContents = substr_replace($databaseSeederContents, PHP_EOL . PHP_EOL . '$this->call(\Stats4sd\FilamentTeamManagement\Database\Seeders\DatabaseSeeder::class);' . PHP_EOL, $runMethodEndPos, 0);
 
         file_put_contents($databaseSeederPath, $databaseSeederContents);
 
@@ -164,13 +164,13 @@ class InstallFilamentTeamManagement extends Command
         $programTable = (new $programClass)->getTable();
         $userTable = (new $userClass)->getTable();
 
-        $teamForeignKey = Str::singular($userTable).'_id';
-        $programForeignKey = Str::singular($teamTable).'_id';
-        $userForeignKey = Str::singular($programTable).'_id';
+        $teamForeignKey = Str::singular($userTable) . '_id';
+        $programForeignKey = Str::singular($teamTable) . '_id';
+        $userForeignKey = Str::singular($programTable) . '_id';
 
-        $teamManagementMembersTable = Str::snake(Str::singular($teamTable)).'_members';
-        $programManagementMembersTable = Str::snake(Str::singular($programTable)).'_members';
-        $programTeamTable = Str::snake(Str::singular($programTable)).'_'.Str::snake(Str::singular($teamTable));
+        $teamManagementMembersTable = Str::snake(Str::singular($teamTable)) . '_members';
+        $programManagementMembersTable = Str::snake(Str::singular($programTable)) . '_members';
+        $programTeamTable = Str::snake(Str::singular($programTable)) . '_' . Str::snake(Str::singular($teamTable));
 
         $roleModel = config('permission.models.role');
 
@@ -198,14 +198,14 @@ class InstallFilamentTeamManagement extends Command
         }
 
         $variables = Arr::where($variables, function ($value, $key) use ($contents) {
-            return ! Str::contains($contents, PHP_EOL.$key); // check if the key is already in the .env file
+            return ! Str::contains($contents, PHP_EOL . $key); // check if the key is already in the .env file
         });
 
         $variables = trim(implode(PHP_EOL, $variables));
 
         File::append(
             $env,
-            Str::endsWith($contents, PHP_EOL) ? PHP_EOL.$variables.PHP_EOL : PHP_EOL.PHP_EOL.$variables.PHP_EOL,
+            Str::endsWith($contents, PHP_EOL) ? PHP_EOL . $variables . PHP_EOL : PHP_EOL . PHP_EOL . $variables . PHP_EOL,
         );
 
         // find and update env.example file
@@ -215,7 +215,7 @@ class InstallFilamentTeamManagement extends Command
 
             File::append(
                 $envExample,
-                Str::endsWith($contents, PHP_EOL) ? PHP_EOL.$variables.PHP_EOL : PHP_EOL.PHP_EOL.$variables.PHP_EOL,
+                Str::endsWith($contents, PHP_EOL) ? PHP_EOL . $variables . PHP_EOL : PHP_EOL . PHP_EOL . $variables . PHP_EOL,
             );
         }
 

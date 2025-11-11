@@ -14,7 +14,7 @@ class TeamInvitesTable
     public static function configure(Table $table): Table
     {
         return $table
-            ->relationship(fn() => Filament::getTenant()->invites())
+            ->relationship(fn () => Filament::getTenant()->invites())
             ->inverseRelationship('teams')
             ->columns([
                 TextColumn::make('email'),
@@ -28,7 +28,7 @@ class TeamInvitesTable
             ->filters([
                 Filter::make('only_unconfirmed')
                     ->label('Show accepted invites')
-                    ->baseQuery(fn(Builder $query) => $query->withoutGlobalScope('onlyUnconfirmed'))
+                    ->baseQuery(fn (Builder $query) => $query->withoutGlobalScope('onlyUnconfirmed'))
                     ->toggle(),
             ])
             ->headerActions([
