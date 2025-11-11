@@ -21,7 +21,8 @@ class RegisterProgram extends RegisterTenant
         return $schema
             ->schema([
                 TextInput::make('name')
-                    ->label('Enter a name for the program'),
+                    ->label('Enter a name for the program')
+                    ->required(),
             ]);
     }
 
