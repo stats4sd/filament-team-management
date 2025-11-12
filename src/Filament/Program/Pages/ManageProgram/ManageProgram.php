@@ -41,6 +41,11 @@ class ManageProgram extends EditTenantProfile
                 Tabs::make('User Management')
                     ->contained(false)
                     ->tabs([
+                        Tabs\Tab::make('Projects')
+                            ->schema([
+                                Livewire::make(ManageProgramProjects::class)
+                                    ->key('manage-program-projects'),
+                            ]),
                         Tabs\Tab::make('Members')
                             ->schema([
                                 Livewire::make(ManageProgramMembers::class)
