@@ -35,7 +35,7 @@ class ManageTeam extends EditTenantProfile
             $programTypeName = Str::ucwords(config('filament-team-management.models.program')::getModelNameLower());
 
             $programLinks = Filament::getTenant()?->programs?->map(function ($program) {
-                $url = url('/programs/' . $program->id);
+                $url = url('/program/' . $program->id);
 
                 return '<a href="' . $url . '" class="underline text-primary-600 hover:text-primary-700 focus:text-primary-700 transition">' . e($program->name) . '</a>';
             })->join(', ');
