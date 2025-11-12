@@ -2,24 +2,20 @@
 
 namespace Stats4sd\FilamentTeamManagement\Filament\Program\Pages\ManageProgram;
 
-use Awcodes\Shout\Components\Shout;
-use Filament\Actions\Action;
 use Filament\Actions\AttachAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DetachAction;
 use Filament\Actions\EditAction;
 use Filament\Facades\Filament;
-use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\TextInput;
-use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\Textarea;
-use Filament\Tables\Table;
+use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Table;
 
 class ProgramProjectsTable
 {
-
     // TODO: check how to use this form when "New project" button is clicked
     public function form(Schema $schema): Schema
     {
