@@ -2,20 +2,14 @@
 
 namespace Stats4sd\FilamentTeamManagement\Filament\Program\Pages\ManageProgram;
 
-use Filament\Tables\Table;
-use Filament\Actions\Action;
-use Filament\Schemas\Schema;
-use Filament\Facades\Filament;
-use Filament\Actions\EditAction;
 use Filament\Actions\AttachAction;
+use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DetachAction;
-use Awcodes\Shout\Components\Shout;
-use Filament\Actions\BulkActionGroup;
-use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Textarea;
+use Filament\Actions\EditAction;
+use Filament\Facades\Filament;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Forms\Components\TextInput;
+use Filament\Tables\Table;
 use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Teams\Schemas\TeamForm;
 
 class ProgramProjectsTable
@@ -42,7 +36,7 @@ class ProgramProjectsTable
                 AttachAction::make('Add Existing Projects')
                     ->recordTitleAttribute('name')
                     ->multiple(),
-                    
+
             ])
             ->recordActions([
                 DetachAction::make(),
