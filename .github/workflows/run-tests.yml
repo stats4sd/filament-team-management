@@ -1,8 +1,6 @@
 name: run-tests
 
 on:
-  push:
-    branches: [main, dev]
   pull_request:
     branches: [main, dev]
 
@@ -15,9 +13,9 @@ jobs:
         os: [ubuntu-latest, windows-latest]
         php: [8.4]
         laravel: [12.*]
-        stability: [prefer-lowest, prefer-stable]
+        stability: [prefer-stable]
         include:
-          - laravel: 12.23.8
+          - laravel: 12.*
             testbench: 10.*
             carbon: 3.*
 
