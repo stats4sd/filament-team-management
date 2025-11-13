@@ -2,6 +2,14 @@
 
 All notable changes to `filament-team-management` will be documented in this file.
 
+## 4.0 - "What happened to Version 3?" - 2025-11-13
+
+Sometimes, you just need to accept someone else's numbering system. Here, we skipped version 3 so that our versions match the version of Filament that they are built for.
+
+This version re-writes a lot of the core internals to be easier to manage, (hopefully) easier to use and extend in applications, and to work with Filament 4.
+
+**Requires Filament 4!**
+
 ## v2.1 - The quick bug release - 2025-06-16
 
 Fixes bugs found in model references and registering new users.
