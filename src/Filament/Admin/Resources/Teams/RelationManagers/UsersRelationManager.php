@@ -67,18 +67,9 @@ class UsersRelationManager extends RelationManager
                     ->searchable()
                     ->sortable(),
 
-                // hide column "is_admin" as team admin is not being used in this application
-                // keep below commented code, it will be used in other application
-                // Tables\Columns\IconColumn::make('is_admin')
-                //     ->label('Is a Team Admin?')
-                //     ->boolean(),
-
                 Tables\Columns\TextColumn::make('created_at'),
             ])
             ->filters([
-                //
-                // TODO
-                // Str::ucfirst(Str::plural(config('filament-team-management.table_names.teams')))
             ])
             ->headerActions([
                 Action::make('invite users')
@@ -103,10 +94,6 @@ class UsersRelationManager extends RelationManager
                     ->label('Add Existing User to ' . config('filament-team-management.table_names.teams')),
             ])
             ->recordActions([
-                // hide "Edit User Role" button as team admin is not being used in this application
-                // keep below commented code, it will be used in other application
-                // EditAction::make()->label('Edit User Role'),
-
                 DetachAction::make()->label('Remove User')
                     ->modalSubmitActionLabel('Remove User')
                     ->modalHeading('Remove User from ' . Str::ucfirst(config('filament-team-management.table_names.teams'))),
