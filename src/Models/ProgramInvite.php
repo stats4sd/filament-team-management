@@ -42,14 +42,17 @@ class ProgramInvite extends Model
     // *********** RELATIONSHIPS ************ //
     public function inviter(): BelongsTo
     {
-        return $this->belongsTo(config('filament-team-management.models.user'), 'inviter_id');
+        return $this->belongsTo(
+            related: config('filament-team-management.models.user'),
+            foreignKey: 'inviter_id'
+        );
     }
 
     public function program(): BelongsTo
     {
         return $this->belongsTo(
-            config('filament-team-management.models.program'),
-            foreignKey: config('filament-team-management.models.program')::getModelNameLower() . '_id'
+            related: config('filament-team-management.models.program'),
+            foreignKey: config('filament-team-management.column_names.programs_foreign_key'),
         );
     }
 

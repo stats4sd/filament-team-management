@@ -23,7 +23,10 @@ class Team extends Model implements TeamInterface
 {
     use HasModelNameLowerString;
 
-    protected $table = 'teams';
+    public function getTable()
+    {
+        return config('filament-team-management.table_names.teams');
+    }
 
     protected $guarded = ['id'];
 
@@ -111,7 +114,7 @@ class Team extends Model implements TeamInterface
     public function invites(): HasMany
     {
         return $this->hasMany(
-            Invite::class,
+            related: Invite::class,
             foreignKey: static::getModelNameLower() . '_id',
             localKey: 'id'
         );
@@ -122,9 +125,9 @@ class Team extends Model implements TeamInterface
     {
         return $this->belongsToMany(
             related: config('filament-team-management.models.user'),
-            table: static::getModelNameLower() . '_members',
-            foreignPivotKey: static::getModelNameLower() . '_id',
-            relatedPivotKey: config('filament-team-management.models.user')::getModelNameLower() . '_id'
+            table: config('filament-team-management.table_names.team_members'),
+            foreignPivotKey: config('filament-team-management.column_names.teams_foreign_key'),
+            relatedPivotKey: config('filament-team-management.column_names.users_foreign_key')
         )
             ->withPivot('is_admin');
     }
@@ -133,10 +136,10 @@ class Team extends Model implements TeamInterface
     public function admins(): BelongsToMany
     {
         return $this->belongsToMany(
-            config('filament-team-management.models.user'),
-            static::getModelNameLower() . '_members',
-            static::getModelNameLower() . '_id',
-            config('filament-team-management.models.user')::getModelNameLower() . '_id'
+            related: config('filament-team-management.models.user'),
+            table: config('filament-team-management.table_names.team_members'),
+            foreignPivotKey: config('filament-team-management.column_names.teams_foreign_key'),
+            relatedPivotKey: config('filament-team-management.column_names.users_foreign_key')
         )
             ->withPivot('is_admin')
             ->wherePivot('is_admin', 1);
@@ -146,10 +149,10 @@ class Team extends Model implements TeamInterface
     public function members(): BelongsToMany
     {
         return $this->belongsToMany(
-            config('filament-team-management.models.user'),
-            static::getModelNameLower() . '_members',
-            static::getModelNameLower() . '_id',
-            config('filament-team-management.models.user')::getModelNameLower() . '_id'
+            related: config('filament-team-management.models.user'),
+            table: config('filament-team-management.table_names.team_members'),
+            foreignPivotKey: config('filament-team-management.column_names.teams_foreign_key'),
+            relatedPivotKey: config('filament-team-management.column_names.users_foreign_key')
         )
             ->withPivot('is_admin')
             ->wherePivot('is_admin', 0);
@@ -159,14 +162,15 @@ class Team extends Model implements TeamInterface
     public function programs(): BelongsToMany
     {
         return $this->belongsToMany(
-            config('filament-team-management.models.program'),
-            config('filament-team-management.models.program')::getModelNameLower() . '_' . static::getModelNameLower(),
-            static::getModelNameLower() . '_id',
-            config('filament-team-management.models.program')::getModelNameLower() . '_id'
+            related: config('filament-team-management.models.program'),
+            table: config('filament-team-management.table_names.team_programs'),
+            foreignPivotKey: config('filament-team-management.column_names.teams_foreign_key'),
+            relatedPivotKey: config('filament-team-management.column_names.programs_foreign_key')
         );
     }
 
     // add relationship to refer to team model itself, so that app panel > Teams resource can show the selected team for editing
+
     /** @return HasOne<self, $this> */
     public function team(): HasOne
     {

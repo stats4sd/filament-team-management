@@ -22,15 +22,17 @@ class TestUserSeeder extends Seeder
         Permission::create(['name' => 'view all teams']);
 
         // create users
-        $user = config('filament-team-management.models.user')::create([
-            'name' => 'Test User',
+        $user = config('filament-team-management.models.user')::updateOrCreate([
             'email' => 'test@example.com',
+        ], [
+            'name' => 'Test User',
             'password' => bcrypt('password'),
         ]);
 
-        $admin = config('filament-team-management.models.user')::create([
-            'name' => 'Test Admin',
+        $admin = config('filament-team-management.models.user')::updateOrCreate([
             'email' => 'admin@example.com',
+        ], [
+            'name' => 'Test Admin',
             'password' => bcrypt('password'),
         ]);
 
