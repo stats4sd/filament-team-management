@@ -2,19 +2,20 @@
 
 namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Programs\RelationManagers;
 
-use Filament\Actions\AttachAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\CreateAction;
-use Filament\Actions\DetachAction;
-use Filament\Actions\DetachBulkAction;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
-use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use Filament\Schemas\Schema;
+use Filament\Actions\AttachAction;
+use Filament\Actions\CreateAction;
+use Filament\Actions\DetachAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DetachBulkAction;
+use Filament\Forms\Components\Textarea;
+use Illuminate\Database\Eloquent\Model;
+use Filament\Forms\Components\TextInput;
+use Filament\Resources\RelationManagers\RelationManager;
+use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Teams\Schemas\TeamForm;
 
 class TeamsRelationManager extends RelationManager
 {
@@ -39,13 +40,7 @@ class TeamsRelationManager extends RelationManager
     {
         return $schema
             ->columns(1)
-            ->schema([
-                TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
-                Textarea::make('description'),
-
-            ]);
+            ->schema(TeamForm::getFormSchema());
     }
 
     public function table(Table $table): Table
