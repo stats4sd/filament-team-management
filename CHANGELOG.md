@@ -2,6 +2,22 @@
 
 All notable changes to `filament-team-management` will be documented in this file.
 
+## 4.0.1 - Fixed Tests - 2025-11-13
+
+### What's Changed
+
+* Bump stefanzweifel/git-auto-commit-action from 5 to 6 by @dependabot[bot] in https://github.com/stats4sd/filament-team-management/pull/35
+* Add Program Panel Submodule by @dan-tang-ssd in https://github.com/stats4sd/filament-team-management/pull/36
+* Add management pages submodule by @dave-mills in https://github.com/stats4sd/filament-team-management/pull/37
+* Invite workflow updates by @dave-mills in https://github.com/stats4sd/filament-team-management/pull/39
+* Refine Invite System Submodule by @dan-tang-ssd in https://github.com/stats4sd/filament-team-management/pull/40
+* Bump aglipanci/laravel-pint-action from 2.5 to 2.6 by @dependabot[bot] in https://github.com/stats4sd/filament-team-management/pull/41
+* Bump actions/checkout from 4 to 5 by @dependabot[bot] in https://github.com/stats4sd/filament-team-management/pull/42
+* Bump stefanzweifel/git-auto-commit-action from 6 to 7 by @dependabot[bot] in https://github.com/stats4sd/filament-team-management/pull/43
+* Filament 4 by @dave-mills in https://github.com/stats4sd/filament-team-management/pull/45
+
+**Full Changelog**: https://github.com/stats4sd/filament-team-management/compare/v2.1...v4.0.1
+
 ## 4.0 - "What happened to Version 3?" - 2025-11-13
 
 Sometimes, you just need to accept someone else's numbering system. Here, we skipped version 3 so that our versions match the version of Filament that they are built for.
