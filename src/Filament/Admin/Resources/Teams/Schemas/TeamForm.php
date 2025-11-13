@@ -18,11 +18,10 @@ class TeamForm
     public static function getFormSchema(): array
     {
         return [
-                TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
-                Textarea::make('description'),
-            ];
+            TextInput::make('name')
+                ->required()
+                ->maxLength(255),
+            Textarea::make('description'),
+        ];
     }
-
 }
