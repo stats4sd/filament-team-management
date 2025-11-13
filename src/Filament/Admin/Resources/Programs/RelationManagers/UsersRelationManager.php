@@ -64,7 +64,7 @@ class UsersRelationManager extends RelationManager
             ])
             ->headerActions([
                 Action::make('invite ' . config('filament-team-management.table_names.users'))
-                    ->form([
+                    ->schema([
                         Shout::make('info')
                             ->type('info')
                             ->content('Add the email address(es) of the user(s) you would like to invite to this program. An invitation will be sent to each address.')
