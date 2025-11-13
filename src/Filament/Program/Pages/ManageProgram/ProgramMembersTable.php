@@ -55,7 +55,7 @@ class ProgramMembersTable
             ->recordActions([
                 DetachAction::make(),
                 // program admin should not be able to edit member details here
-                // suppose program admin can attach or detach a program members only
+                // suppose program admin can attach or detach program members only
                 // EditAction::make(),
             ])
             ->toolbarActions([

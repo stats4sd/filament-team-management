@@ -54,7 +54,9 @@ class TeamMembersTable
             ])
             ->recordActions([
                 DetachAction::make(),
-                EditAction::make(),
+                // team member should not be able to edit team member details here
+                // suppose team member can attach or detach team members only
+                // EditAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
