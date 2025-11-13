@@ -17,7 +17,7 @@ class ListUsers extends ListRecords
     {
         return [
             Actions\Action::make('invite users')
-                ->form([
+                ->schema([
                     Shout::make('info')
                         ->type('info')
                         ->content('Add the email address(es) of the user(s) you would like to invite with a role. An invitation will be sent to each address.')
