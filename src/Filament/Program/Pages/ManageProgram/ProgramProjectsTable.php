@@ -20,21 +20,6 @@ use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Teams\Schemas\TeamF
 
 class ProgramProjectsTable
 {
-
-    // TODO: check how to use this form when "New project" button is clicked
-    public function form(Schema $schema): Schema
-    {
-        return $schema
-            ->columns(1)
-            ->schema([
-                TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
-                Textarea::make('description'),
-
-            ]);
-    }
-
     public static function configure(Table $table): Table
     {
         return $table
@@ -57,7 +42,7 @@ class ProgramProjectsTable
                 AttachAction::make('Add Existing Projects')
                     ->recordTitleAttribute('name')
                     ->multiple(),
-
+                    
             ])
             ->recordActions([
                 DetachAction::make(),
