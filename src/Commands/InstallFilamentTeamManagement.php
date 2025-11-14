@@ -164,8 +164,8 @@ class InstallFilamentTeamManagement extends Command
         $programTable = (new $programClass)->getTable();
         $userTable = (new $userClass)->getTable();
 
-        $teamForeignKey = Str::singular($userTable) . '_id';
-        $programForeignKey = Str::singular($teamTable) . '_id';
+        $teamForeignKey = Str::singular($teamTable) . '_id';
+        $programForeignKey = Str::singular($programTable) . '_id';
         $userForeignKey = Str::singular($userTable) . '_id';
 
         $teamManagementMembersTable = Str::snake(Str::singular($teamTable)) . '_members';

@@ -88,7 +88,7 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
             $user = User::where('email', $item['email'])->first();
 
             // email address does not belong to any registered user
-            if (! $user) {
+            if (!$user) {
                 /** @var Invite $invite */
                 $invite = $this->invites()->create([
                     'email' => $item['email'],
@@ -225,7 +225,7 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
         return false;
     }
 
-    public function getTenants(Panel $panel): array | Collection
+    public function getTenants(Panel $panel): array|Collection
     {
         // add different handling for different panel
         if ($panel->getTenantModel() === config('filament-team-management.models.team')) {
@@ -244,6 +244,9 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
 
     public function getAllAccessibleTeams(): Collection
     {
+        if (!config('filament-team-management.use_programs')) {
+            return $this->teams;
+        }
         return $this->programs->pluck('teams')
             ->flatten()
             ->merge($this->teams)
