@@ -244,6 +244,10 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
 
     public function getAllAccessibleTeams(): Collection
     {
+        if (! config('filament-team-management.use_programs')) {
+            return $this->teams;
+        }
+
         return $this->programs->pluck('teams')
             ->flatten()
             ->merge($this->teams)
