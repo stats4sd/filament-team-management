@@ -19,8 +19,13 @@ class SetLatestProgramMiddleware
     {
         $user = auth()->user();
 
-        if (! $user instanceof User) {
-            abort(500, 'User is not an instance of Stats4sd\FilamentTeamManagement\Models\User. Please make sure your user model extends the model provided by this package to use this middleware.');
+        // check the user has a latestTeam method
+        if (! method_exists($user, 'latestProgram')) {
+            return $next($request);
+        }
+
+        if (! Filament::getTenant()) {
+            return $next($request);
         }
 
         $user->latestProgram()->associate(Filament::getTenant())->save();
