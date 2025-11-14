@@ -13,18 +13,18 @@ class SetLatestProgramMiddleware
     /**
      * Handle an incoming request.
      *
-     * @param Closure(Request): (Response) $next
+     * @param  Closure(Request): (Response)  $next
      */
     public function handle(Request $request, Closure $next): Response
     {
         $user = auth()->user();
 
         // check the user has a latestTeam method
-        if (!method_exists($user, 'latestProgram')) {
+        if (! method_exists($user, 'latestProgram')) {
             return $next($request);
         }
 
-        if (!Filament::getTenant()) {
+        if (! Filament::getTenant()) {
             return $next($request);
         }
 
