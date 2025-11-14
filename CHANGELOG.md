@@ -2,6 +2,10 @@
 
 All notable changes to `filament-team-management` will be documented in this file.
 
+## 4.0.3 - Fixes for non-program apps - 2025-11-14
+
+Bug fixes for apps that don't use programs.
+
 ## 4.0.2: More Test Update Attempts - 2025-11-13
 
 More test updates. I wonder if the badge will update?
