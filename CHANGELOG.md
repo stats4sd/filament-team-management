@@ -2,6 +2,10 @@
 
 All notable changes to `filament-team-management` will be documented in this file.
 
+## 4.0.4 - User teams relationship fix - 2025-11-17
+
+Hotfix for a bug encountered in apps that don't use the default "team_membes" table name.
+
 ## 4.0.3 - Fixes for non-program apps - 2025-11-14
 
 Bug fixes for apps that don't use programs.
