@@ -2,6 +2,12 @@
 
 All notable changes to `filament-team-management` will be documented in this file.
 
+## 4.0.5 - Should have been in the previous - 2025-11-17
+
+One hotfix makes you identify another that's needed...
+
+Fixes ordering of the teams() and programs() key variables for the `User` model.
+
 ## 4.0.4 - User teams relationship fix - 2025-11-17
 
 Hotfix for a bug encountered in apps that don't use the default "team_membes" table name.
