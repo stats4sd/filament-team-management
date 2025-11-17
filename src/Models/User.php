@@ -140,20 +140,20 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
     public function teams(): BelongsToMany
     {
         return $this->belongsToMany(
-            config('filament-team-management.models.team'),
-            config('filament-team-management.models.team')::getModelNameLower() . '_members',
-            config('filament-team-management.models.user')::getModelNameLower() . '_id',
-            config('filament-team-management.models.team')::getModelNameLower() . '_id',
+            related: config('filament-team-management.models.team'),
+            table: config('filament-team-management.table_names.team_members'),
+            foreignPivotKey: config('filament-team-management.column_names.teams_foreign_key'),
+            relatedPivotKey: config('filament-team-management.column_names.users_foreign_key')
         )->withPivot('is_admin');
     }
 
     public function programs(): BelongsToMany
     {
         return $this->belongsToMany(
-            config('filament-team-management.models.program'),
-            config('filament-team-management.table_names.program_members'),
-            config('filament-team-management.models.user')::getModelNameLower() . '_id',
-            config('filament-team-management.models.program')::getModelNameLower() . '_id',
+            related: config('filament-team-management.models.program'),
+            table: config('filament-team-management.table_names.program_members'),
+            foreignPivotKey: config('filament-team-management.column_names.programs_foreign_key'),
+            relatedPivotKey: config('filament-team-management.column_names.users_foreign_key')
         );
     }
 
