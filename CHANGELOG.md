@@ -2,6 +2,12 @@
 
 All notable changes to `filament-team-management` will be documented in this file.
 
+## 4.0.6 - Add non-team / non-panel panel tenancy fallback - 2025-11-18
+
+If the tenant Model is not the defined `Team` or `Program` model, it now falls back to trying to guess the tenancy relationship name based on the tenant model of the current panel.
+
+Also fixes a bug where the program relationship was being checked even when `use_progams` was set to false.
+
 ## 4.0.5 - Should have been in the previous - 2025-11-17
 
 One hotfix makes you identify another that's needed...
