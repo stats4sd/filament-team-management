@@ -88,7 +88,7 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
             $user = User::where('email', $item['email'])->first();
 
             // email address does not belong to any registered user
-            if (!$user) {
+            if (! $user) {
                 /** @var Invite $invite */
                 $invite = $this->invites()->create([
                     'email' => $item['email'],
@@ -102,7 +102,7 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
                 Notification::make()
                     ->success()
                     ->title('Invitation Sent')
-                    ->body('An email invitation has been successfully sent to ' . $item['email'])
+                    ->body('An email invitation has been successfully sent to '.$item['email'])
                     ->send();
 
             } else {
@@ -114,7 +114,7 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
                     Notification::make()
                         ->success()
                         ->title('User already has this role')
-                        ->body('User ' . $item['email'] . ' has ' . $role->name . ' role already')
+                        ->body('User '.$item['email'].' has '.$role->name.' role already')
                         ->send();
                 } else {
                     // add role to user
@@ -141,9 +141,9 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
     {
         return $this->belongsToMany(
             config('filament-team-management.models.team'),
-            config('filament-team-management.models.team')::getModelNameLower() . '_members',
-            config('filament-team-management.models.user')::getModelNameLower() . '_id',
-            config('filament-team-management.models.team')::getModelNameLower() . '_id',
+            config('filament-team-management.models.team')::getModelNameLower().'_members',
+            config('filament-team-management.models.user')::getModelNameLower().'_id',
+            config('filament-team-management.models.team')::getModelNameLower().'_id',
         )->withPivot('is_admin');
     }
 
@@ -152,8 +152,8 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
         return $this->belongsToMany(
             config('filament-team-management.models.program'),
             config('filament-team-management.table_names.program_members'),
-            config('filament-team-management.models.user')::getModelNameLower() . '_id',
-            config('filament-team-management.models.program')::getModelNameLower() . '_id',
+            config('filament-team-management.models.user')::getModelNameLower().'_id',
+            config('filament-team-management.models.program')::getModelNameLower().'_id',
         );
     }
 
@@ -222,7 +222,13 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
             return false;
         }
 
-        return false;
+
+        // pluralise the tenant ownership relationship name, as the default for a many-many relationship is plural.
+        $tenantOwnershipRelationship = Str::plural(Filament::getCurrentPanel()->getTenantOwnershipRelationshipName());
+
+        return $this->$tenantOwnershipRelationship->contains($tenant);
+
+
     }
 
     public function getTenants(Panel $panel): array|Collection
@@ -236,17 +242,26 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
                 // find all accessible Team models
                 return $this->getAllAccessibleTeams();
             }
-        } else {
+        }
+
+        if (config('filament-team-management.use_programs') && $panel->getTenantModel() === config('filament-team-management.models.program')) {
             // program admin panel
             return $this->can('view all programs') ? config('filament-team-management.models.program')::all() : $this->programs;
         }
+
+        // other panels with different tenant models
+
+        // pluralise the tenant ownership relationship name, as the default for a many-many relationship is plural.
+        $tenantOwnershipRelationship = Str::plural($panel->getTenantOwnershipRelationshipName());
+        return $this->$tenantOwnershipRelationship;
     }
 
     public function getAllAccessibleTeams(): Collection
     {
-        if (!config('filament-team-management.use_programs')) {
+        if (! config('filament-team-management.use_programs')) {
             return $this->teams;
         }
+
         return $this->programs->pluck('teams')
             ->flatten()
             ->merge($this->teams)
