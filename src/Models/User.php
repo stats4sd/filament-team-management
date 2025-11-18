@@ -222,7 +222,11 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
             return false;
         }
 
-        return false;
+        // pluralise the tenant ownership relationship name, as the default for a many-many relationship is plural.
+        $tenantOwnershipRelationship = Str::plural(Filament::getCurrentPanel()->getTenantOwnershipRelationshipName());
+
+        return $this->$tenantOwnershipRelationship->contains($tenant);
+
     }
 
     public function getTenants(Panel $panel): array | Collection
@@ -236,10 +240,19 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
                 // find all accessible Team models
                 return $this->getAllAccessibleTeams();
             }
-        } else {
+        }
+
+        if (config('filament-team-management.use_programs') && $panel->getTenantModel() === config('filament-team-management.models.program')) {
             // program admin panel
             return $this->can('view all programs') ? config('filament-team-management.models.program')::all() : $this->programs;
         }
+
+        // other panels with different tenant models
+
+        // pluralise the tenant ownership relationship name, as the default for a many-many relationship is plural.
+        $tenantOwnershipRelationship = Str::plural($panel->getTenantOwnershipRelationshipName());
+
+        return $this->$tenantOwnershipRelationship;
     }
 
     public function getAllAccessibleTeams(): Collection
