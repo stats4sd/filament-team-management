@@ -18,13 +18,12 @@ class RegisterTeam extends RegisterTenant
 
     public function form(Form $form): Form
     {
-        // Question: why the changes does not take effect...?
-        ray('RegisterTeam.form()...');
-
         return $form
             ->schema([
                 TextInput::make('name')
-                    ->label('Enter a name for the team 123')
+                    ->label('Enter a name for the team')
+                    // team name is a compulsory field, user cannot create a team without a team name
+                    // Question: why the changes in submodule does not take effect in local env?
                     ->required(),
             ]);
     }
