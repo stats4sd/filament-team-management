@@ -2,6 +2,10 @@
 
 All notable changes to `filament-team-management` will be documented in this file.
 
+## 4.0.7 - Hide Program Invite Info - 2025-12-08
+
+Small update to hide the 'programs assigned' column in the Team Invites table when not using programs.
+
 ## 4.0.6 - Add non-team / non-panel panel tenancy fallback - 2025-11-18
 
 If the tenant Model is not the defined `Team` or `Program` model, it now falls back to trying to guess the tenancy relationship name based on the tenant model of the current panel.
