@@ -18,6 +18,11 @@ class ProgramResource extends Resource
 {
     protected static ?string $navigationIcon = 'heroicon-o-building-library';
 
+    // Programs are top-level entities, not children of the current tenant program.
+    // Disabling tenant scoping prevents Filament from trying to associate a new
+    // program with the current tenant via a non-existent self-referential relationship.
+    protected static bool $isScopedToTenant = false;
+
     protected static ?string $navigationGroup = 'Settings';
 
     public static function getModel(): string
