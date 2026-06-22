@@ -22,7 +22,11 @@ class ViewTeam extends ViewRecord
         return [
             Actions\EditAction::make(),
             Actions\DeleteAction::make()
-                ->modalDescription('WARNING: This will permanently delete this team and all associated data. This action cannot be undone. Do you wish to continue?'),
+                ->modalDescription('WARNING: Please do not delete when there is actual survey data collected, as deletion is unreversable. Are you sure you would like to do this?')
+                // redirect to app panel dashboard after soft deleting a team.
+                // if the deleted team is the last team, user will be prompted to create a new team
+                // Question: why the changes in submodule does not take effect in local env?
+                ->successRedirectUrl('/app'),
         ];
     }
 }
