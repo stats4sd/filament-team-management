@@ -16,9 +16,9 @@ class TestProgramSeeder extends Seeder
     public function run()
     {
 
-        \DB::table('programs')->delete();
+        \DB::table(config('filament-team-management.table_names.programs'))->delete();
 
-        $program = Program::create([
+        $program = config('filament-team-management.models.program')::create([
             'name' => 'Test Program',
             'description' => fake()->paragraph(),
         ]);

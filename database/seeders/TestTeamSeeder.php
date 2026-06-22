@@ -16,7 +16,7 @@ class TestTeamSeeder extends Seeder
     public function run()
     {
 
-        \DB::table('teams')->delete();
+        \DB::table(config('filament-team-management.table_names.teams'))->delete();
 
         /** @var Team $team */
         $team = config('filament-team-management.models.team')::create([
@@ -33,7 +33,7 @@ class TestTeamSeeder extends Seeder
 
         $teamAdmin = config('filament-team-management.models.user')::create([
             'name' => 'Test Team Admin',
-            'email' => 'test - team - admin@example . com',
+            'email' => 'test-team-admin@example.com',
             'password' => bcrypt('password'),
         ]);
 

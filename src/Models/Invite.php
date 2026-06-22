@@ -26,30 +26,49 @@ class Invite extends Model
         'is_confirmed' => 'boolean',
     ];
 
+    protected static function booted()
+    {
+        self::addGlobalScope('onlyUnconfirmed', function ($query) {
+            $query->where('is_confirmed', false);
+        });
+    }
+
     // *********** RELATIONSHIPS ************ //
 
     /** @return BelongsTo<Model, $this> */
     public function inviter(): BelongsTo
     {
-        return $this->belongsTo(config('filament-team-management.models.user'), 'inviter_id');
+        return $this->belongsTo(
+            related: config('filament-team-management.models.user'),
+            foreignKey: 'inviter_id'
+        );
     }
 
     /** @return BelongsTo<Model, $this> */
     public function role(): BelongsTo
     {
-        return $this->belongsTo(config('filament-team-management.models.role'), 'role_id');
+        return $this->belongsTo(
+            related: config('filament-team-management.models.role'),
+            foreignKey: config('permission.column_names.role_pivot_key') ?? 'role_id'
+        );
     }
 
     /** @return BelongsTo<Model, $this> */
     public function program(): BelongsTo
     {
-        return $this->belongsTo(config('filament-team-management.models.program'), 'program_id');
+        return $this->belongsTo(
+            related: config('filament-team-management.models.program'),
+            foreignKey: config('filament-team-management.column_names.programs_foreign_key'),
+        );
     }
 
     /** @return BelongsTo<Model, $this> */
     public function team(): BelongsTo
     {
-        return $this->belongsTo(config('filament-team-management.models.team'), Team::getModelNameLower() . '_id');
+        return $this->belongsTo(
+            related: config('filament-team-management.models.team'),
+            foreignKey: config('filament-team-management.column_names.teams_foreign_key'),
+        );
     }
 
     public function confirm(): bool

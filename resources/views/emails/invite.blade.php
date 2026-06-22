@@ -3,7 +3,7 @@
 {{ $invite->inviter->name }} ({{ $invite->inviter->email }}) has invited you to join the web platform: {{ config('app.name') }}.
 
 @if($invite->team)
-You have been invited to join the team: {{ $invite->team->name }}.
+You have been invited to join the {{ config('filament-team-management.models.team')::getModelNameLower() }}: {{ $invite->team->name }}.
 @endif
 
 @if($invite->role)

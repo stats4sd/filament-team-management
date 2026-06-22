@@ -1,0 +1,32 @@
+<?php
+
+namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Teams\Pages;
+
+use Filament\Actions;
+use Filament\Resources\Pages\ViewRecord;
+use Illuminate\Contracts\Support\Htmlable;
+use Stats4sd\FilamentTeamManagement\Models\Team;
+
+/** @method Team getRecord() */
+class ViewTeam extends ViewRecord
+{
+    protected static string $resource = \Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Teams\TeamResource::class;
+
+    public function getTitle(): string | Htmlable
+    {
+        return $this->getRecord()->name;
+    }
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            Actions\EditAction::make(),
+            Actions\DeleteAction::make()
+                ->modalDescription('WARNING: Please do not delete when there is actual survey data collected, as deletion is unreversable. Are you sure you would like to do this?')
+                // redirect to app panel dashboard after soft deleting a team.
+                // if the deleted team is the last team, user will be prompted to create a new team
+                // Question: why the changes in submodule does not take effect in local env?
+                ->successRedirectUrl('/app'),
+        ];
+    }
+}
