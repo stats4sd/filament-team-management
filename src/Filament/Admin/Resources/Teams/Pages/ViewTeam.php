@@ -5,12 +5,13 @@ namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Teams\Pages;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 use Illuminate\Contracts\Support\Htmlable;
+use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Teams\TeamResource;
 use Stats4sd\FilamentTeamManagement\Models\Team;
 
 /** @method Team getRecord() */
 class ViewTeam extends ViewRecord
 {
-    protected static string $resource = \Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Teams\TeamResource::class;
+    protected static string $resource = TeamResource::class;
 
     public function getTitle(): string | Htmlable
     {

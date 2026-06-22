@@ -20,8 +20,8 @@ class TeamInvitesTable
             ->columns([
                 TextColumn::make('email'),
                 TextColumn::make('role.name')->label('Roles assigned'),
-                TextColumn::make('team.name')->label(config('filament-team-management.table_names.teams').' assigned'),
-                TextColumn::make('project.name')->label(config('filament-team-management.table_names.programs').' assigned')
+                TextColumn::make('team.name')->label(config('filament-team-management.table_names.teams') . ' assigned'),
+                TextColumn::make('project.name')->label(config('filament-team-management.table_names.programs') . ' assigned')
                     ->visible(fn () => config('filament-team-management.use_programs')),
                 TextColumn::make('created_at')->dateTime(),
                 IconColumn::make('is_confirmed')->boolean(),
