@@ -21,10 +21,10 @@
     ],
     "require": {
         "php": "^8.4",
-        "filament/filament": "^4.2",
+        "filament/filament": "^3.0",
         "spatie/laravel-package-tools": "^1.15.0",
-        "awcodes/shout": "^3.0",
-        "althinect/filament-spatie-roles-permissions": "^3.x-dev",
+        "awcodes/shout": "^2.0",
+        "althinect/filament-spatie-roles-permissions": "^2.2",
         "livewire/livewire": "^3.6.4"
     },
     "require-dev": {

@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git submodule *)",
+      "Bash(vendor/bin/pest tests/ExampleTest.php)"
+    ]
+  }
+}
