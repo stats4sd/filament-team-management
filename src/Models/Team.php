@@ -3,6 +3,7 @@
 namespace Stats4sd\FilamentTeamManagement\Models;
 
 use Filament\Notifications\Notification;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -21,6 +22,7 @@ use Stats4sd\FilamentTeamManagement\Models\Traits\HasModelNameLowerString;
  */
 class Team extends Model implements TeamInterface
 {
+    use HasFactory;
     use HasModelNameLowerString;
 
     public function getTable()

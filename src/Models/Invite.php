@@ -2,6 +2,7 @@
 
 namespace Stats4sd\FilamentTeamManagement\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\Permission\Models\Role;
@@ -18,6 +19,8 @@ use Spatie\Permission\Models\Role;
  */
 class Invite extends Model
 {
+    use HasFactory;
+
     protected $table = 'invites';
 
     protected $guarded = ['id'];

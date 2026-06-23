@@ -8,6 +8,7 @@ use Filament\Models\Contracts\HasDefaultTenant;
 use Filament\Models\Contracts\HasTenants;
 use Filament\Notifications\Notification;
 use Filament\Panel;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -33,6 +34,7 @@ use Stats4sd\FilamentTeamManagement\Models\Traits\HasModelNameLowerString;
  */
 class User extends Authenticatable implements FilamentUser, HasDefaultTenant, HasTenants
 {
+    use HasFactory;
     use HasModelNameLowerString;
 
     // alias trait method roles() as spatieRoles()

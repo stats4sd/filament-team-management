@@ -6,7 +6,17 @@
       "WebSearch",
       "WebFetch(domain:repo.packagist.org)",
       "Bash(composer analyse *)",
-      "Bash(composer validate *)"
+      "Bash(composer validate *)",
+      "Bash(vendor/bin/pest)",
+      "Bash(vendor/bin/pest --filter=\"HarnessSmokeTmp\")",
+      "Bash(composer format *)",
+      "Bash(vendor/bin/pest --filter=\"*\")",
+      "Bash(composer show *)",
+      "Bash(grep -vE \"^\\\\s*$\")",
+      "Bash(vendor/bin/pest *)",
+      "mcp__Claude_Preview__preview_screenshot",
+      "mcp__Claude_Preview__preview_snapshot",
+      "mcp__laravel-boost__search-docs"
     ]
   }
 }
