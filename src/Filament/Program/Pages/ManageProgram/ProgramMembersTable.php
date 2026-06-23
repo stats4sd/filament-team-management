@@ -2,7 +2,6 @@
 
 namespace Stats4sd\FilamentTeamManagement\Filament\Program\Pages\ManageProgram;
 
-use Awcodes\Shout\Components\Shout;
 use Filament\Actions\Action;
 use Filament\Actions\AttachAction;
 use Filament\Actions\BulkActionGroup;
@@ -11,6 +10,7 @@ use Filament\Actions\EditAction;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Callout;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -32,9 +32,9 @@ class ProgramMembersTable
             ->headerActions([
                 Action::make('Invite')
                     ->schema([
-                        Shout::make('info')
-                            ->type('info')
-                            ->content('Add the email address(es) of the user(s) you would like to invite to this ' . config('filament-team-management.names.team') . '. An invitation will be sent to each address.')
+                        Callout::make('Invitation')
+                            ->info()
+                            ->description('Add the email address(es) of the user(s) you would like to invite to this ' . config('filament-team-management.names.team') . '. An invitation will be sent to each address.')
                             ->columnSpanFull(),
                         Repeater::make('users')
                             ->label('Email Addresses to Invite')

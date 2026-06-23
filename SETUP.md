@@ -1,7 +1,7 @@
 # Setup new web platform with this package
 
 The following instructions will guide you through the process of setting up a new web platform using this package, including the installation of Laravel Filament and the required roles and permissions package. They 
- assume you are starting from a fresh Laravel 11 Installation. If you have an existing app, you may need to adapt some of the instructions.
+ assume you are starting from a fresh Laravel 13 Installation. If you have an existing app, you may need to adapt some of the instructions.
 
 
 ###  1. Initial setup:

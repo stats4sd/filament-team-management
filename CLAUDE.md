@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 `stats4sd/filament-team-management` is an installable Laravel/Filament **package** (not an app). It provides an opinionated teams setup — Teams, optional Programs (groups of teams), invite-based registration, and Spatie roles/permissions integration — that consuming apps wire into their own Filament panels. There is no panel of its own; the package ships resources/pages that the host app discovers into 2–3 panels (App, Program, Admin).
 
-Requires PHP ^8.4, Filament ^3.0, Livewire ^3.6.4. Built on `spatie/laravel-package-tools ^1.15`, `althinect/filament-spatie-roles-permissions ^2.2`, and `awcodes/shout ^2.0`. Dev tooling: Pest ^4.1, Orchestra Testbench ^10.0, Larastan v3.8, Laravel Pint ^1.0.
+Requires PHP ^8.4, Filament ^5.2, Livewire ^4.0 (Laravel 13). Built on `spatie/laravel-package-tools ^1.15` and `althinect/filament-spatie-roles-permissions ^3.0`. Dev tooling: Pest ^4.1, Orchestra Testbench ^11.0, Larastan ^3.10, Laravel Pint ^1.0.
 
 ## Commands
 
@@ -49,7 +49,7 @@ Namespaced by intended panel — the host app discovers each into the matching p
 - `Filament\App\*` — end-user panel; `ManageTeam` pages back Filament's `tenantProfile`.
 - `Filament\Auth\*` — Login/Register shared by the default (App) panel.
 
-Resources follow Filament 4 layout: `Resources/{Name}/{Name}Resource.php` with `Schemas/` (forms+infolists), `Tables/`, `Pages/`, `RelationManagers/`.
+Resources follow Filament 5 layout: `Resources/{Name}/{Name}Resource.php` with `Schemas/` (forms+infolists), `Tables/`, `Pages/`, `RelationManagers/`.
 
 ### Middleware (`src/Http/Middleware/`)
 

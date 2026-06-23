@@ -2,7 +2,11 @@
   "permissions": {
     "allow": [
       "Bash(git submodule *)",
-      "Bash(vendor/bin/pest tests/ExampleTest.php)"
+      "Bash(vendor/bin/pest tests/ExampleTest.php)",
+      "WebSearch",
+      "WebFetch(domain:repo.packagist.org)",
+      "Bash(composer analyse *)",
+      "Bash(composer validate *)"
     ]
   }
 }

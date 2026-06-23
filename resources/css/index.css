@@ -1,1 +1,6 @@
 @import '../../vendor/filament/filament/resources/css/theme.css';
+
+/* Filament's theme imports Tailwind with `source(none)`, so the build's content
+   sources must be declared explicitly here (Tailwind 4 CSS-first config). */
+@source '../../src/Filament';
+@source '../../resources/views';

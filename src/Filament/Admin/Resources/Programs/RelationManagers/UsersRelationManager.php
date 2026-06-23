@@ -2,7 +2,6 @@
 
 namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Programs\RelationManagers;
 
-use Awcodes\Shout\Components\Shout;
 use Filament\Actions\Action;
 use Filament\Actions\AttachAction;
 use Filament\Actions\BulkActionGroup;
@@ -10,6 +9,7 @@ use Filament\Actions\DetachAction;
 use Filament\Actions\DetachBulkAction;
 use Filament\Forms;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Schemas\Components\Callout;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -65,9 +65,9 @@ class UsersRelationManager extends RelationManager
             ->headerActions([
                 Action::make('invite ' . config('filament-team-management.table_names.users'))
                     ->schema([
-                        Shout::make('info')
-                            ->type('info')
-                            ->content('Add the email address(es) of the user(s) you would like to invite to this program. An invitation will be sent to each address.')
+                        Callout::make('Invitation')
+                            ->info()
+                            ->description('Add the email address(es) of the user(s) you would like to invite to this program. An invitation will be sent to each address.')
                             ->columnSpanFull(),
                         Forms\Components\Repeater::make('users')
                             ->label('Email Addresses to Invite')

@@ -2,7 +2,6 @@
 
 namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Teams\RelationManagers;
 
-use Awcodes\Shout\Components\Shout;
 use Filament\Actions\Action;
 use Filament\Actions\AttachAction;
 use Filament\Actions\BulkActionGroup;
@@ -10,6 +9,7 @@ use Filament\Actions\DetachAction;
 use Filament\Actions\DetachBulkAction;
 use Filament\Forms;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Schemas\Components\Callout;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -47,8 +47,8 @@ class UsersRelationManager extends RelationManager
     {
         return $schema
             ->schema([
-                Shout::make('info')
-                    ->content(fn (User $record) => new HtmlString("Edit user's role within this team<br/>$record->name ($record->email)")),
+                Callout::make("Edit user's role within this team")
+                    ->description(fn (User $record) => new HtmlString("$record->name ($record->email)")),
                 Forms\Components\Checkbox::make('is_admin')
                     ->label(fn (User $record): string => "$record->name is a Team Admin")
                     ->helperText('Team Admins have full access to all team settings and can manage all team members. They can edit or delete data. Non-admins can only collect data and view data.'),
@@ -75,9 +75,9 @@ class UsersRelationManager extends RelationManager
                 Action::make('invite users')
                     ->visible(! $this->isReadOnly())
                     ->schema([
-                        Shout::make('info')
-                            ->type('info')
-                            ->content('Add the email address(es) of the user(s) you would like to invite to this ' . config('filament-team-management.table_names.teams') . '. An invitation will be sent to each address.')
+                        Callout::make('Invitation')
+                            ->info()
+                            ->description('Add the email address(es) of the user(s) you would like to invite to this ' . config('filament-team-management.table_names.teams') . '. An invitation will be sent to each address.')
                             ->columnSpanFull(),
                         Forms\Components\Repeater::make('users')
                             ->label('Email Addresses to Invite')
