@@ -29,8 +29,13 @@ class Register extends BaseRegister
 
     public function mount(): void
     {
+        $this->invite = Invite::where('token', $this->token)->first();
 
-        $this->invite = Invite::where('token', $this->token)->firstOrFail();
+        if (! $this->invite) {
+            $this->redirect(Filament::getLoginUrl());
+
+            return;
+        }
 
         $this->callHook('beforeFill');
 
