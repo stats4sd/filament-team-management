@@ -165,7 +165,7 @@ class Team extends Model implements TeamInterface
     {
         return $this->belongsToMany(
             related: config('filament-team-management.models.program'),
-            table: config('filament-team-management.table_names.team_programs'),
+            table: config('filament-team-management.table_names.program_team'),
             foreignPivotKey: config('filament-team-management.column_names.teams_foreign_key'),
             relatedPivotKey: config('filament-team-management.column_names.programs_foreign_key')
         );

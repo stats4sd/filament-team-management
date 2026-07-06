@@ -18,7 +18,7 @@ return [
 
     // When using custom table names for your users or teams table, you can set them here
     'table_names' => [
-        'users' => env('FILAMENT_TEAM_MANAGEMENT_USERS_TABLE', 'users'),
+        'users' => env('FILAMENT_TEAM_MANAGEMENT_USER_TABLE', 'users'),
         'teams' => env('FILAMENT_TEAM_MANAGEMENT_TEAMS_TABLE', 'teams'),
         'programs' => env('FILAMENT_TEAM_MANAGEMENT_PROGRAMS_TABLE', 'programs'),
         'program_members' => env('FILAMENT_TEAM_MANAGEMENT_PROGRAM_MEMBERS_TABLE', 'program_members'),
@@ -28,8 +28,8 @@ return [
 
     // When using custom foreign keys for your users or teams table, you can set them here
     'column_names' => [
-        'users_foreign_key' => env('FILAMENT_TEAM_MANAGEMENT_USERS_FOREIGN_KEY', 'user_id'),
+        'users_foreign_key' => env('FILAMENT_TEAM_MANAGEMENT_USER_FOREIGN_KEY', 'user_id'),
         'teams_foreign_key' => env('FILAMENT_TEAM_MANAGEMENT_TEAMS_FOREIGN_KEY', 'team_id'),
-        'programs_foreign_key' => env('FILAMENT_TEAM_MANAGEMENT_PROGRAM_MODEL', 'program_id'),
+        'programs_foreign_key' => env('FILAMENT_TEAM_MANAGEMENT_PROGRAMS_FOREIGN_KEY', 'program_id'),
     ],
 ];

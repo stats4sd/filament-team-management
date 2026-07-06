@@ -141,7 +141,7 @@ class Program extends Model implements ProgramInterface
     {
         return $this->belongsToMany(
             related: config('filament-team-management.models.team'),
-            table: config('filament-team-management.table_names.program_teams'),
+            table: config('filament-team-management.table_names.program_team'),
             foreignPivotKey: config('filament-team-management.column_names.programs_foreign_key'),
             relatedPivotKey: config('filament-team-management.column_names.teams_foreign_key'),
         )->withTimestamps();
