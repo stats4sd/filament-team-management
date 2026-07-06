@@ -2,7 +2,6 @@
 
 use Filament\Facades\Filament;
 use Illuminate\Auth\Events\Registered;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Event;
 use Livewire\Livewire;
 use Stats4sd\FilamentTeamManagement\Events\RegisteredWithData;
@@ -29,9 +28,11 @@ it('prefills the invited email from the token', function () {
         ->assertFormSet(['email' => 'invited@example.test']);
 });
 
-it('rejects a missing or unknown token', function () {
-    Livewire::withQueryParams(['token' => 'does-not-exist'])->test(Register::class);
-})->throws(ModelNotFoundException::class);
+it('redirects to the login page when the token is missing or unknown', function () {
+    Livewire::withQueryParams(['token' => 'does-not-exist'])
+        ->test(Register::class)
+        ->assertRedirect(Filament::getLoginUrl());
+});
 
 it('creates the user, links the invite role + team, confirms it, and fires events', function () {
     Event::fake([Registered::class, RegisteredWithData::class]);
