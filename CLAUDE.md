@@ -39,7 +39,7 @@ Models, table names, and foreign-key column names all resolve through `config/fi
 
 ### Invite + registration flow
 
-The package allows registration **only via invite**. `Filament\Auth\Register` reads a `?token=` URL param, `firstOrFail()`s the matching Invite, prefills+readonly-locks the email, and on submit creates the user then links role/team/program from the invite and marks it confirmed. `sendInvites()` on User/Team/Program either creates a pending Invite + emails `InviteUser`, or — if the email already belongs to a registered user — attaches them directly and emails `UpdateUser`. Password hashing is overridden in the register form (`dehydrateStateUsing` returns plain state) so the plaintext can be forwarded to external systems (e.g. ODK Central) via the `RegisteredWithData` event; hashing happens explicitly in `register()`.
+The package allows registration **only via invite**. `Filament\Auth\Register` reads a `?token=` URL param; in `mount()` it first redirects an already-authenticated user away, then `->first()`s the matching Invite and redirects to the login page when the token is missing or invalid. Otherwise it prefills+readonly-locks the email, and on submit creates the user then links role/team/program from the invite and marks it confirmed. `sendInvites()` on User/Team/Program either creates a pending Invite + emails `InviteUser`, or — if the email already belongs to a registered user — attaches them directly and emails `UpdateUser`. Password hashing is overridden in the register form (`dehydrateStateUsing` returns plain state) so the plaintext can be forwarded to external systems (e.g. ODK Central) via the `RegisteredWithData` event; hashing happens explicitly in `register()`.
 
 ### Filament resources/pages (`src/Filament/`)
 
