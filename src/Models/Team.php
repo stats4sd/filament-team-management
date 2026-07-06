@@ -39,6 +39,7 @@ class Team extends Model implements TeamInterface
      */
     public function sendInvites(array $emails): void
     {
+        // Phase 2: this logic is triplicated across User/Team/Program::sendInvites — collapse into an InviteService.
         foreach ($emails as $email) {
 
             // if email is empty, skip to next email
@@ -47,7 +48,7 @@ class Team extends Model implements TeamInterface
             }
 
             // check if email address belong to any registered user
-            $user = User::where('email', $email)->first();
+            $user = config('filament-team-management.models.user')::where('email', $email)->first();
 
             // email address does not belong to any registered user
             if (! $user) {

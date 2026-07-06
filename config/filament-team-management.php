@@ -32,4 +32,13 @@ return [
         'teams_foreign_key' => env('FILAMENT_TEAM_MANAGEMENT_TEAMS_FOREIGN_KEY', 'team_id'),
         'programs_foreign_key' => env('FILAMENT_TEAM_MANAGEMENT_PROGRAMS_FOREIGN_KEY', 'program_id'),
     ],
+
+    // Human-readable words used in UI copy (lowercase singular, e.g. "…invite to this team.").
+    // Deliberately plain literals, NOT env-backed: these are display-only and must not add env
+    // keys the installer doesn't write, or the installer<->config parity test would break.
+    // Phase 2: may become env-overridable (Decision 4) with matching installer writes + a parity allowlist.
+    'names' => [
+        'team' => 'team',
+        'program' => 'program',
+    ],
 ];

@@ -125,6 +125,27 @@ it('resolves column_names.programs_foreign_key on program relations', function (
         ->and((new Team)->programs()->getRelatedPivotKeyName())->toBe('custom_program_id');
 });
 
+// ---------------------------------------------------------------------------
+// names.* — display words used in UI copy resolve through config (added PR 2)
+// ---------------------------------------------------------------------------
+
+it('defaults names.team and names.program to lowercase singular words', function () {
+    expect(config('filament-team-management.names.team'))->toBe('team')
+        ->and(config('filament-team-management.names.program'))->toBe('program');
+});
+
+it('resolves names.team from config', function () {
+    config()->set('filament-team-management.names.team', 'squad');
+
+    expect(config('filament-team-management.names.team'))->toBe('squad');
+});
+
+it('resolves names.program from config', function () {
+    config()->set('filament-team-management.names.program', 'initiative');
+
+    expect(config('filament-team-management.names.program'))->toBe('initiative');
+});
+
 // This is the case that would have caught bug 4.1: the config file mapped
 // column_names.programs_foreign_key to the WRONG env var
 // (FILAMENT_TEAM_MANAGEMENT_PROGRAM_MODEL, a class name) instead of

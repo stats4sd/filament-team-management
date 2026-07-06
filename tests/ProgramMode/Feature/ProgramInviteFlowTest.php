@@ -50,3 +50,19 @@ it('does not duplicate program membership', function () {
     expect($program->users()->whereKey($existing->id)->count())->toBe(1);
     Mail::assertNothingSent();
 });
+
+// Guards bug 4.7: a missing "Program Admin" role (the package seeders are optional) must
+// not fatal on a null-pointer deep in sendInvites — it should bail out gracefully.
+it('does not fatal when the Program Admin role is missing (guards 4.7)', function () {
+    config('permission.models.role')::findByName('Program Admin', 'web')->delete();
+
+    $program = Program::factory()->create();
+
+    // Pre-fix this threw "Attempt to read property id on null"; the fix bails out
+    // gracefully, so reaching the assertions at all proves no fatal occurred.
+    $program->sendInvites(['orphan@example.test']);
+
+    // Early return: no invite created and nothing mailed.
+    expect(Invite::withoutGlobalScope('onlyUnconfirmed')->where('email', 'orphan@example.test')->exists())->toBeFalse();
+    Mail::assertNothingSent();
+});

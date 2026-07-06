@@ -18,7 +18,6 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
-use Spatie\Permission\Models\Role;
 use Spatie\Permission\Traits\HasRoles;
 use Stats4sd\FilamentTeamManagement\Mail\InviteUser;
 use Stats4sd\FilamentTeamManagement\Models\Interfaces\ProgramInterface;
@@ -80,6 +79,7 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
      */
     public function sendInvites(array $items): void
     {
+        // Phase 2: this logic is triplicated across User/Team/Program::sendInvites — collapse into an InviteService.
         foreach ($items as $item) {
             // if email is empty, skip to next email
             if ($item['email'] == null || $item['email'] == '') {
@@ -87,7 +87,7 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
             }
 
             // check if email address belong to any registered user
-            $user = User::where('email', $item['email'])->first();
+            $user = config('filament-team-management.models.user')::where('email', $item['email'])->first();
 
             // email address does not belong to any registered user
             if (! $user) {
@@ -109,7 +109,7 @@ class User extends Authenticatable implements FilamentUser, HasDefaultTenant, Ha
 
             } else {
                 // add role to user if user does not have this role yet
-                $role = Role::find($item['role']);
+                $role = config('filament-team-management.models.role')::find($item['role']);
 
                 if ($user->roles->contains($role)) {
                     // show notification

@@ -10,7 +10,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
-use Spatie\Permission\Models\Role;
 use Stats4sd\FilamentTeamManagement\Mail\InviteUser;
 use Stats4sd\FilamentTeamManagement\Mail\UpdateUser;
 use Stats4sd\FilamentTeamManagement\Models\Interfaces\ProgramInterface;
@@ -40,7 +39,21 @@ class Program extends Model implements ProgramInterface
      */
     public function sendInvites(array $emails): void
     {
-        $programAdminRole = Role::where('name', 'Program Admin')->first();
+        // Phase 2: this logic is triplicated across User/Team/Program::sendInvites — collapse into an InviteService.
+        // Phase 2: the "Program Admin" role name should come from config rather than being hardcoded here.
+        $programAdminRole = config('filament-team-management.models.role')::where('name', 'Program Admin')->first();
+
+        // Guard against a missing role (the package seeders are optional): surface a warning
+        // and bail out gracefully rather than fataling on a null role further down.
+        if (! $programAdminRole) {
+            Notification::make()
+                ->warning()
+                ->title('Program Admin role missing')
+                ->body('The "Program Admin" role does not exist, so no invitations were sent. Run the package seeders or create the role first.')
+                ->send();
+
+            return;
+        }
 
         foreach ($emails as $email) {
             // if email is empty, skip to next email
@@ -49,7 +62,7 @@ class Program extends Model implements ProgramInterface
             }
 
             // check if email address belong to any registered user
-            $user = User::where('email', $email)->first();
+            $user = config('filament-team-management.models.user')::where('email', $email)->first();
 
             // email address does not belong to any registered user
             if (! $user) {
