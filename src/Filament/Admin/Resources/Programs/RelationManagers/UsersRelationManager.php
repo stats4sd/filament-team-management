@@ -10,7 +10,6 @@ use Filament\Actions\DetachBulkAction;
 use Filament\Forms;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Components\Callout;
-use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
@@ -36,15 +35,11 @@ class UsersRelationManager extends RelationManager
         return Str::ucfirst(Str::plural(config('filament-team-management.table_names.users')));
     }
 
-    public function form(Schema $schema): Schema
-    {
-        return $schema
-            ->schema([
-                Forms\Components\TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
-            ]);
-    }
+    // Phase 2: program_members has no is_admin column and program-admin
+    // enforcement is deferred to Phase 2. A program-admin concept (pivot flag +
+    // an EditAction to set it, mirroring the Teams relation manager) would land
+    // here. The previous name-editing form() was dead (no EditAction opened it,
+    // and editing a user's name from a program pivot was wrong) and was removed.
 
     public function table(Table $table): Table
     {

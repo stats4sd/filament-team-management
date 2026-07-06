@@ -20,7 +20,7 @@ class ProgramMembersTable
     {
         return $table
             ->relationship(fn () => Filament::getTenant()->members())
-            ->inverseRelationship('teams')
+            ->inverseRelationship('programs')
             ->columns([
                 TextColumn::make('name'),
                 TextColumn::make('email'),

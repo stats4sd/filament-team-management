@@ -30,7 +30,11 @@ class RegisterTeam extends RegisterTenant
     {
         $team = config('filament-team-management.models.team')::create($data);
 
-        $team->members()->attach(auth()->user());
+        // The user who registers a team becomes its admin. Attach via users()
+        // (the unfiltered pivot relation) with the is_admin pivot flag set.
+        // Phase 2: is_admin is set here but not yet enforced (intra-team
+        // authorization based on the flag is deferred to Phase 2).
+        $team->users()->attach(auth()->user(), ['is_admin' => true]);
 
         return $team;
     }
