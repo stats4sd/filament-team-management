@@ -11,7 +11,6 @@ use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Component;
 use Illuminate\Auth\Events\Registered;
-use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Support\Facades\Hash;
 use Livewire\Attributes\Url;
 use Stats4sd\FilamentTeamManagement\Events\RegisteredWithData;
@@ -29,6 +28,12 @@ class Register extends BaseRegister
 
     public function mount(): void
     {
+        if (Filament::auth()->check()) {
+            $this->redirect(Filament::getUrl());
+
+            return;
+        }
+
         $this->invite = Invite::where('token', $this->token)->first();
 
         if (! $this->invite) {
@@ -100,10 +105,6 @@ class Register extends BaseRegister
 
         }
 
-        app()->bind(
-            SendEmailVerificationNotification::class,
-        );
-
         // pass in the registered form data to the event for extensibility
         event(new Registered($user));
         event(new RegisteredWithData($user, $data));
@@ -135,6 +136,7 @@ class Register extends BaseRegister
         return $field
             ->dehydrateStateUsing(fn ($state) => $state) // override default hashing so we have the option of passing the plain password to register on ODK Central
             ->helperText('Your password must be at least 10 characters long')
-            ->rule('min:10', 'Password must be at least 10 characters long.');
+            ->rule('min:10')
+            ->validationMessages(['min' => 'Password must be at least 10 characters long.']);
     }
 }
