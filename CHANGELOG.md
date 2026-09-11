@@ -10,6 +10,7 @@ All notable changes to `filament-team-management` will be documented in this fil
 
 - Upgraded to Filament 5 and Livewire 4 (Laravel 13). `awcodes/shout` is no longer a dependency; the package uses Filament's `Callout` instead.
 - `althinect/filament-spatie-roles-permissions` is now required at `^3.0` stable.
+- `spatie/laravel-permission` is now a direct dependency (`^7.0`); the package extends its models and pivots, so it no longer relies on the transitive requirement. (3.13)
 
 ### Fixes
 
