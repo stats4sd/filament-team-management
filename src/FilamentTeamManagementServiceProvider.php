@@ -42,12 +42,14 @@ class FilamentTeamManagementServiceProvider extends PackageServiceProvider
      */
     public function packageBooted(): void
     {
-        // handle migrations is a custom way (to split between regular and program migrations)
-        $defaultMigrations = $this->getDefaultMigrations();
-        $programMigrations = $this->getProgramMigrations();
+        // Migrations are handled in a custom way, split into a default and a program publish tag.
+        // A single clock is shared across both tags so every published program migration gets a
+        // timestamp strictly after every default one: 10_add_program_foreign_keys must run after
+        // stubs 3 and 9 have created the columns it constrains.
+        $now = Carbon::now();
 
-        $this->handleMigrations($defaultMigrations, 'default');
-        $this->handleMigrations($programMigrations, 'program');
+        $this->handleMigrations($this->getDefaultMigrations(), 'default', $now);
+        $this->handleMigrations($this->getProgramMigrations(), 'program', $now);
 
         // Asset Registration
         FilamentAsset::register(
@@ -129,20 +131,25 @@ class FilamentTeamManagementServiceProvider extends PackageServiceProvider
         ];
     }
 
+    /**
+     * @return array<string>
+     */
     protected function getProgramMigrations(): array
     {
         return [
             '5_create_programs_table',
             '6_create_program_members_table',
             '7_create_program_team_table',
+            '10_add_program_foreign_keys',
         ];
     }
 
-    protected function handleMigrations(array $migrations, string $tag): void
+    /**
+     * @param  array<string>  $migrations
+     * @param  Carbon  $now  Shared, mutable clock: each published file advances it by one second.
+     */
+    protected function handleMigrations(array $migrations, string $tag, Carbon $now): void
     {
-
-        $now = Carbon::now();
-
         foreach ($migrations as $migrationFileName) {
 
             $filePath = $this->package->basePath("/../database/migrations/{$migrationFileName}.php");

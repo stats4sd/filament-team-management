@@ -10,28 +10,30 @@ return new class extends Migration {
      */
     public function up(): void
     {
-
-
         Schema::create('invites', function (Blueprint $table) {
             $table->id();
             $table->string('email');
 
-            // nullable foreign keys to link invite to team, role, and program
-            if (config('filament-team-management.use_programs')) {
-                $table->foreignId(config('filament-team-management.column_names.programs_foreign_key'))
-                    ->nullable()->constrained()->onDelete('cascade');
-            }
+            // Link to a program. The column is always created (nullable) so the invites schema
+            // does not depend on `use_programs` at migration time. The foreign-key constraint is
+            // added by 10_add_program_foreign_keys, which ships with the program migration tag.
+            $table->foreignId(config('filament-team-management.column_names.programs_foreign_key'))
+                ->nullable();
 
             $table->foreignId(config('filament-team-management.column_names.teams_foreign_key'))
-                ->nullable()->constrained()->onDelete('cascade');
+                ->nullable()
+                ->constrained(config('filament-team-management.table_names.teams'))
+                ->cascadeOnDelete();
+
             $table->foreignId(config('permission.column_names.role_pivot_key') ?? 'role_id')
-                ->nullable()->constrained()->onDelete('cascade');
+                ->nullable()
+                ->constrained(config('permission.table_names.roles') ?? 'roles')
+                ->cascadeOnDelete();
 
             $table->foreignId('inviter_id');
             $table->string('token');
             $table->tinyInteger('is_confirmed')->default(0);
             $table->timestamps();
-
         });
     }
 

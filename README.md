@@ -26,7 +26,7 @@ php artisan filament-team-management:install
 
 The script will ask you if you want to use the concept of "programs" in your app. It will then make the following changes: 
 
-1. It will publish the appropriate migration files.
+1. It will publish the appropriate migration files: the default set (teams, team members, invites, the `latest_team_id` / `latest_program_id` user columns) and, if you opt into programs, the program set (programs, program members, program ↔ team pivot, and the foreign-key constraints on the two program columns). The program columns are always created so you can enable programs later by publishing just the program set: `php artisan vendor:publish --tag=filament-team-management-migrations-program`.
 2. It will update your .env file with the appropriate variables. 
 3. It will offer to add some example Database Seeders to your main `database/seeders/DatabaseSeeder.php` file.
 
@@ -68,7 +68,7 @@ Everything the package touches (model classes, table names, foreign-key columns)
 
 | Variable | Default | Controls |
 | --- | --- | --- |
-| `FILAMENT_TEAM_MANAGEMENT_USE_PROGRAMS` | `false` | Enables the Program concept: program migrations, program relationships, the Program panel pages and the program column on invites. Everything program-related is skipped when `false`. |
+| `FILAMENT_TEAM_MANAGEMENT_USE_PROGRAMS` | `false` | Enables the Program concept at runtime: program relationships and tenancy, the Program panel pages, program-reachable teams in `getAllAccessibleTeams()`, and the program columns/actions in the UI. It does not decide which migrations you get; that is the publish tag (see Installation). The `program_id` / `latest_program_id` columns exist either way. |
 | `FILAMENT_TEAM_MANAGEMENT_USER_MODEL` | `Stats4sd\FilamentTeamManagement\Models\User` | The User model. Usually your `App\Models\User`, which should extend the package model. |
 | `FILAMENT_TEAM_MANAGEMENT_TEAM_MODEL` | `Stats4sd\FilamentTeamManagement\Models\Team` | The Team model. Extend the package model if you need custom fields. |
 | `FILAMENT_TEAM_MANAGEMENT_PROGRAM_MODEL` | `Stats4sd\FilamentTeamManagement\Models\Program` | The Program model. Only used when programs are enabled. |
