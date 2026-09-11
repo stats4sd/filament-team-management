@@ -10,9 +10,10 @@ use Filament\Actions\EditAction;
 use Filament\Facades\Filament;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Support\Str;
 use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Teams\Schemas\TeamForm;
 
-class ProgramProjectsTable
+class ProgramTeamsTable
 {
     public static function configure(Table $table): Table
     {
@@ -33,7 +34,8 @@ class ProgramProjectsTable
                 CreateAction::make()
                     ->schema(TeamForm::getFormSchema()),
 
-                AttachAction::make('Add Existing Projects')
+                AttachAction::make('attach')
+                    ->label('Add Existing ' . Str::ucfirst(Str::plural(config('filament-team-management.names.team'))))
                     ->recordTitleAttribute('name')
                     ->multiple(),
 

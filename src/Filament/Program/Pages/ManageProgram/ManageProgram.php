@@ -16,9 +16,7 @@ class ManageProgram extends EditTenantProfile
 
     public static function getLabel(): string
     {
-        $programTypeName = config('filament-team-management.models.program')::getModelNameLower();
-
-        return 'Manage ' . ucfirst($programTypeName);
+        return 'Manage ' . Str::ucfirst(config('filament-team-management.names.program'));
     }
 
     public function form(Schema $schema): Schema
@@ -26,7 +24,7 @@ class ManageProgram extends EditTenantProfile
         return $schema
             ->schema([
                 TextInput::make('name')
-                    ->label('Enter a name for the ' . Str::ucwords(config('filament-team-management.models.program')::getModelNameLower())),
+                    ->label('Enter a name for the ' . config('filament-team-management.names.program')),
             ]);
     }
 
@@ -41,10 +39,10 @@ class ManageProgram extends EditTenantProfile
                 Tabs::make('User Management')
                     ->contained(false)
                     ->tabs([
-                        Tabs\Tab::make('Projects')
+                        Tabs\Tab::make(Str::ucfirst(Str::plural(config('filament-team-management.names.team'))))
                             ->schema([
-                                Livewire::make(ManageProgramProjects::class)
-                                    ->key('manage-program-projects'),
+                                Livewire::make(ManageProgramTeams::class)
+                                    ->key('manage-program-teams'),
                             ]),
                         Tabs\Tab::make('Members')
                             ->schema([

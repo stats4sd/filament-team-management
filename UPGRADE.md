@@ -56,6 +56,17 @@ The program columns (`invites.program_id`, `users.latest_program_id`) are now **
 - [ ] **Existing install, programs never enabled, enabling them now:** your `invites` and `users` tables do not have the columns, and `add_program_foreign_keys` assumes they do. Publish the program tag, then add a hand-written migration that runs **before** it (give it an earlier timestamp) with `$table->foreignId(config('filament-team-management.column_names.programs_foreign_key'))->nullable();` on `invites` and `$table->foreignId('latest_program_id')->nullable();` on your users table.
 - [ ] **Custom teams or Spatie roles table name:** the invites migration used bare `constrained()`, which guesses the referenced table from the column name, so a custom `table_names.teams` or a custom `permission.table_names.roles` broke fresh installs. It now names both tables from config. Existing databases are unaffected.
 
+### Renamed classes (Program panel)
+
+The Program panel's team-management widget was named "Projects" although it manages Teams. Pages are directory-discovered, so most apps need no change, but any subclass, direct reference or published view override must follow the rename.
+
+- [ ] `Stats4sd\FilamentTeamManagement\Filament\Program\Pages\ManageProgram\ManageProgramProjects` → `ManageProgramTeams`.
+- [ ] `Stats4sd\FilamentTeamManagement\Filament\Program\Pages\ManageProgram\ProgramProjectsTable` → `ProgramTeamsTable`.
+- [ ] The attach action on that table is now named `attach` (Filament's default), labelled "Add Existing Teams" from `names.team`. It was previously named `Add Existing Projects`, so any `getAction('Add Existing Projects')`, `TestAction::make('Add Existing Projects')` or visibility override keyed on the old name must switch to `attach`.
+- [ ] The Livewire key inside `ManageProgram::content()` is now `manage-program-teams` (was `manage-program-projects`). Apps that override `content()` and reuse the key should update it, and pass the new class to `Livewire::make()`.
+- [ ] The tab label is no longer the hardcoded "Projects": it is `Str::plural(config('filament-team-management.names.team'))`, capitalised, so a default install shows "Teams". Apps that call teams "projects" should set `names.team` to `project` in their published config rather than overriding the page. `ManageProgram::getLabel()` and its name field likewise read `names.program` instead of the model class name.
+- [ ] `groundswell_platform` subclasses `ManageProgramProjects` in `app/Filament/Program/ManageProgram/` and reuses the `manage-program-projects` key in its own `ManageProgram::content()`; both must be updated.
+
 ### Removed classes and files
 
 Dead code that nothing in the package used has been deleted. None of the five active consuming apps reference any of it in application code (checked 2026-09-11); notes on the two incidental hits are inline.
