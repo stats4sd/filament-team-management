@@ -47,6 +47,18 @@ These were always required; 5.0 makes them explicit in the README.
 - [ ] **Inviting an existing user now records the role under the app's User class** in `model_has_roles.model_type`. Under 4.x it wrote the package's `Stats4sd\FilamentTeamManagement\Models\User`, so roles granted via invite to existing users never applied. Check `model_has_roles` for rows with the package class as `model_type` and rewrite them to the app's class (or re-assign the roles).
 - [ ] **`TestUserSeeder`** is now idempotent (`findOrCreate`) and attaches permissions. Apps that run it alongside their own seeders that `Role::create` the same names will still collide on the app side, as before.
 
+### Removed classes and files
+
+Dead code that nothing in the package used has been deleted. None of the five active consuming apps reference any of it in application code (checked 2026-09-11); notes on the two incidental hits are inline.
+
+- [ ] `Stats4sd\FilamentTeamManagement\FilamentTeamManagement` and its facade `Stats4sd\FilamentTeamManagement\Facades\FilamentTeamManagement` (both were empty), plus the `FilamentTeamManagement` alias in `composer.json` `extra.laravel.aliases`. `apni-research` has a generated reference in `_ide_helper.php`; regenerate it with `php artisan ide-helper:generate` after updating.
+- [ ] `Stats4sd\FilamentTeamManagement\FilamentTeamManagementPlugin` (an empty Filament plugin). If a panel called `->plugin(FilamentTeamManagementPlugin::make())`, remove that line; the package registers nothing through it.
+- [ ] `Stats4sd\FilamentTeamManagement\Filament\Auth\RegisterResponse`. `Register` uses `Http\Responses\RegisterResponse`, which stays.
+- [ ] `Stats4sd\FilamentTeamManagement\Models\ProgramInvite` and `ProgramInviteFactory`. Program invites have been rows in `invites` with a `program_id` since 2.0; this model pointed at the long-gone `program_invites` table.
+- [ ] `routes/team-management.php` (contained only commented-out routes) and the provider's `hasRoute()` / `getRoutes()`. The package registers no routes of its own; Filament panels own the auth routes.
+- [ ] The view `filament-team-management::filament.app.pages.manage-team` (a placeholder never rendered). `ManageTeam` uses Filament's default tenant-profile view.
+- [ ] `Team::team()` and `Program::program()`, self-referencing `hasOne` relations declared on `TeamInterface` / `ProgramInterface`. If a custom Team/Program model implements the interface and declared these methods, they can be deleted; if anything eager-loaded `->with('team')` on a Team, use the model itself.
+
 ### Verify after upgrade
 
 - [ ] Log in as a seeded admin and reach the Admin panel (permission wiring).
