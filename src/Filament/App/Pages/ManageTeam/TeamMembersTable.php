@@ -19,7 +19,7 @@ class TeamMembersTable
     public static function configure(Table $table): Table
     {
         return $table
-            ->relationship(fn () => Filament::getTenant()->members())
+            ->relationship(fn () => Filament::getTenant()->users())
             ->inverseRelationship('teams')
             ->columns([
                 TextColumn::make('name'),
