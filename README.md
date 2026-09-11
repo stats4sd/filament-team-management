@@ -10,6 +10,8 @@ Package for an opinionated 'teams' setup, including invites and integration with
 
 # Installation
 
+> **Upgrading from 4.x?** 5.0 is a breaking release. Follow [UPGRADE.md](UPGRADE.md) before updating.
+
 You can install the package via composer:
 
 ```bash

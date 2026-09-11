@@ -2,6 +2,35 @@
 
 All notable changes to `filament-team-management` will be documented in this file.
 
+## 5.0.0 - Filament 5 / Livewire 4 / Laravel 13 - unreleased
+
+**Requires Laravel 13, Filament ^5.2, Livewire ^4 and PHP ^8.4.** This is a breaking release. Every change a consuming app must act on is listed in [UPGRADE.md](UPGRADE.md); read it before updating.
+
+### Framework
+
+- Upgraded to Filament 5 and Livewire 4 (Laravel 13). `awcodes/shout` is no longer a dependency; the package uses Filament's `Callout` instead.
+- `althinect/filament-spatie-roles-permissions` is now required at `^3.0` stable.
+
+### Fixes
+
+- **Config keys ignored under 4.x are now read.** The config read `FILAMENT_TEAM_MANAGEMENT_USERS_TABLE` / `USERS_FOREIGN_KEY` while the installer wrote the singular `USER_TABLE` / `USER_FOREIGN_KEY`, so custom users-table settings never took effect. The config now reads the singular keys the installer writes. `programs_foreign_key` read the wrong env key (`PROGRAM_MODEL`) and now reads `PROGRAMS_FOREIGN_KEY`. The installer now also writes `ROLE_MODEL`. A parity test guards installer-written keys against config-read keys in both directions. (Review 4.1, 4.2)
+- **Team ↔ Program pivot table name was wrong.** `Team::programs()` and `Program::teams()` queried `team_programs` / `program_teams`; the migration creates `program_team`. Both now use the configured `table_names.program_team`. (4.3)
+- **Invites and role tracing now honour the app's User and Role classes.** `sendInvites()` and the role-assignment tracing resolved the package's own `User` / `Role` models, so roles granted to existing users via invite were recorded against the wrong class and never applied. They now resolve through `models.user` / `models.role`. (4.6)
+- **Inviting to a program with no `Program Admin` role no longer crashes.** A missing role now surfaces a warning notification and sends nothing. (4.7)
+- **UI copy no longer renders a blank where the team/program noun should be.** Added the `names` config block that the invite callouts and program delete modal read. Also fixed the program members table using the team word instead of the program word. (2.2)
+- **Invite tables showed an empty "program" column.** The column was bound to a non-existent `project` relationship; it now reads `program.name`. (4.4)
+- **Team admin flag was unreachable.** The admin panel Team → Users relation manager gains an "Edit Role" action to toggle `is_admin`, and the user who registers a team is now attached as its admin. The dead name-edit form on Program → Users was removed. (4.5)
+- **Manage Team → Members tab hid team admins.** The tab was bound to the non-admin-only relationship, so the team creator vanished from their own members list. It now lists all members. (2.3)
+- **Admin Invites relation managers no longer offer Create/Edit.** Invites are system-generated and double as an audit log; hand-authored invites are not supported. Delete remains. (4.8)
+- **Wrong `inverseRelationship` names on tenant tables** (`teams` where the inverse was `program`, `programs` or `team`) corrected. (4.13)
+- **Invite emails now link to a plain (unsigned) URL.** The token is the secret; Livewire stripped the signature parameter anyway. (4.10)
+- **Register page guards.** An already-authenticated user following an invite link is redirected to the panel home; a missing or invalid token redirects to login instead of a 404. (4.10)
+- **Password minimum-length message now displays** (the rule was enforced, the custom message was not). (4.12)
+- Removed an inert `SendEmailVerificationNotification` bind. (4.11)
+- **`CheckIfAdmin` / `CheckIfProgramAdmin` return 403 for guests** instead of a 500 null dereference. (4.14)
+- **Seeded admins can reach the admin panels.** `TestUserSeeder` now creates the four permissions (`access admin panel`, `access program admin panel`, `view all teams`, `view all programs`) and attaches them to the seeded roles, idempotently. (4.9)
+- **Docs:** README navigation examples used an invented `viewAdminPanel` permission; corrected to the real strings and added a canonical Permissions section. `SetLatestTeamMiddleware` / `SetLatestProgramMiddleware` are documented as required tenant middleware. (4.15)
+
 ## 4.0.7 - Hide Program Invite Info - 2025-12-08
 
 Small update to hide the 'programs assigned' column in the Team Invites table when not using programs.
