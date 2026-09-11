@@ -34,7 +34,7 @@ php artisan filament:install --panels
 This will:
 - ask if you want to use 'programs' or not.
 - publish the required migrations
-- add the needed environment variables to your .env and .env.exmaple files (if they don't already exist)
+- add the needed environment variables to your .env and .env.example files (if they don't already exist)
 - optionally run the migrations
 - optionally add the test DB seeders to your DatabaseSeeder.php file
 

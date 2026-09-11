@@ -16,9 +16,11 @@ class CheckIfProgramAdmin
     public function handle(Request $request, Closure $next): Response
     {
         // Check if the user has permission to access program admin panel
-        if (! auth()->user()->can('access program admin panel')) {
-            abort(403, 'Only program admin can access this page');
-        }
+        abort_unless(
+            auth()->check() && auth()->user()->can('access program admin panel'),
+            403,
+            'Only program admin can access this page'
+        );
 
         return $next($request);
     }

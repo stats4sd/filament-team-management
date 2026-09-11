@@ -5,7 +5,6 @@ namespace Stats4sd\FilamentTeamManagement\Models;
 use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Relations\MorphPivot;
 use Illuminate\Support\Facades\Mail;
-use Spatie\Permission\Models\Role;
 use Stats4sd\FilamentTeamManagement\Mail\UpdateUser;
 
 class ModelHasRole extends MorphPivot
@@ -25,11 +24,20 @@ class ModelHasRole extends MorphPivot
 
         // after creating model_has_roles record
         static::created(function ($item) {
+            // Phase 2: replace this pivot-event heuristic with an explicit UserRoleAssigned event + listener.
+            // Only act on roles assigned to the configured user model; rows for any other morph target
+            // (e.g. a role attached to a non-user model) are not ours to trace and would look up the wrong table.
+            // Compare against the model's morph class so a host-registered morph-map alias still matches.
+            $userClass = config('filament-team-management.models.user');
+            if ($item->model_type !== (new $userClass)->getMorphClass()) {
+                return;
+            }
+
             // find email address
-            $user = User::find($item->model_id);
+            $user = $userClass::find($item->model_id);
             $email = $user->email;
 
-            $role = Role::find($item->role_id);
+            $role = config('filament-team-management.models.role')::find($item->role_id);
 
             // it is new user registration if auth()->id() is null, otherwise it is Super Admin adding role to an existing user
             if (auth()->id() != null) {

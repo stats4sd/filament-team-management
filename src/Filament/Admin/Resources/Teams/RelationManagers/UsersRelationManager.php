@@ -7,6 +7,7 @@ use Filament\Actions\AttachAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DetachAction;
 use Filament\Actions\DetachBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Forms;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Components\Callout;
@@ -94,6 +95,11 @@ class UsersRelationManager extends RelationManager
                     ->label('Add Existing User to ' . config('filament-team-management.table_names.teams')),
             ])
             ->recordActions([
+                // Exposes the is_admin pivot form defined in form() above so the
+                // team-admin flag is actually settable through the UI.
+                // Phase 2: is_admin is only *settable* here; enforcement (intra-team
+                // authorization based on the flag) is deferred to Phase 2.
+                EditAction::make()->label('Edit Role'),
                 DetachAction::make()->label('Remove User')
                     ->modalSubmitActionLabel('Remove User')
                     ->modalHeading('Remove User from ' . Str::ucfirst(config('filament-team-management.table_names.teams'))),

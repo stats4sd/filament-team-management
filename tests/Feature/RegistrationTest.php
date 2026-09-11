@@ -34,6 +34,14 @@ it('redirects to the login page when the token is missing or unknown', function 
         ->assertRedirect(Filament::getLoginUrl());
 });
 
+it('redirects an already-authenticated user away from the register page', function () {
+    $invite = Invite::factory()->create(['email' => 'invited@example.test']);
+    $this->actingAs(User::factory()->create());
+
+    mountRegister($invite)
+        ->assertRedirect(Filament::getUrl());
+});
+
 it('creates the user, links the invite role + team, confirms it, and fires events', function () {
     Event::fake([Registered::class, RegisteredWithData::class]);
 
@@ -77,4 +85,17 @@ it('enforces a minimum 10-character password', function () {
         ->assertHasFormErrors(['password']);
 
     expect(User::where('email', 'shortpw@example.test')->exists())->toBeFalse();
+});
+
+it('surfaces the custom minimum-length validation message', function () {
+    $invite = Invite::factory()->create(['email' => 'pwmsg@example.test']);
+
+    mountRegister($invite)
+        ->fillForm([
+            'name' => 'Shorty',
+            'password' => 'short',
+            'passwordConfirmation' => 'short',
+        ])
+        ->call('register')
+        ->assertHasFormErrors(['password' => 'Password must be at least 10 characters long.']);
 });

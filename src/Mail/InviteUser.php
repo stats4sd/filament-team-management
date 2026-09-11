@@ -8,7 +8,6 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\URL;
 use Stats4sd\FilamentTeamManagement\Models\Invite;
 
 class InviteUser extends Mailable
@@ -45,7 +44,7 @@ class InviteUser extends Mailable
         return new Content(
             markdown: 'filament-team-management::emails.invite',
             with: [
-                'acceptUrl' => URL::signedRoute(
+                'acceptUrl' => route(
                     $routeName,
                     [
                         'token' => $this->invite->token,

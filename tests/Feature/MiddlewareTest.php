@@ -17,6 +17,15 @@ function passThrough(): Closure
 }
 
 describe('CheckIfAdmin', function () {
+    it('aborts with 403 (not 500) for an unauthenticated request', function () {
+        try {
+            (new CheckIfAdmin)->handle(new Request, passThrough());
+            $this->fail('Expected an HttpException to be thrown');
+        } catch (HttpException $e) {
+            expect($e->getStatusCode())->toBe(403);
+        }
+    });
+
     it('aborts with 403 without the access admin panel permission', function () {
         $this->actingAs(User::factory()->create());
 
@@ -35,6 +44,15 @@ describe('CheckIfAdmin', function () {
 });
 
 describe('CheckIfProgramAdmin', function () {
+    it('aborts with 403 (not 500) for an unauthenticated request', function () {
+        try {
+            (new CheckIfProgramAdmin)->handle(new Request, passThrough());
+            $this->fail('Expected an HttpException to be thrown');
+        } catch (HttpException $e) {
+            expect($e->getStatusCode())->toBe(403);
+        }
+    });
+
     it('aborts with 403 without the access program admin panel permission', function () {
         $this->actingAs(User::factory()->create());
 

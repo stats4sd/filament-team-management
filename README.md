@@ -95,6 +95,11 @@ return $panel
     ->tenantProfile(Stats4sd\FilamentTeamManagement\Filament\App\Pages\ManageTeam\ManageTeam::class)
     ->tenantRegistration(Stats4sd\FilamentTeamManagement\Filament\App\Pages\RegisterTeam::class)
 
+    // Required: add SetLatestTeamMiddleware to the panel's tenant middleware so the user's most recently used team is recorded. getDefaultTenant() relies on this to send returning users back to their last-used team.
+    ->tenantMiddleware([
+        \Stats4sd\FilamentTeamManagement\Http\Middleware\SetLatestTeamMiddleware::class,
+    ], isPersistent: true)
+
     // Add the resources and pages from the App namespace
     ->discoverPages(
         in: base_path('vendor/stats4sd/filament-team-management/src/Filament/App/Pages'), 
@@ -107,7 +112,7 @@ return $panel
             ->url('/admin')
             ->label('Admin Panel')
             ->icon('heroicon-o-cog')
-            ->visible(fn () => auth()->user()->can('viewAdminPanel')),
+            ->visible(fn () => auth()->user()->can('access admin panel')),
     ]);
 ```
 
@@ -140,13 +145,18 @@ return $panel
     ->tenantProfile(Stats4sd\FilamentTeamManagement\Filament\Program\Pages\ManageProgram\ManageProgram::class)
     ->tenantRegistration(Stats4sd\FilamentTeamManagement\Filament\Program\Pages\RegisterProgram::class)
 
+    // Required: add SetLatestProgramMiddleware to the panel's tenant middleware so the user's most recently used program is recorded. getDefaultTenant() relies on this to send returning users back to their last-used program.
+    ->tenantMiddleware([
+        \Stats4sd\FilamentTeamManagement\Http\Middleware\SetLatestProgramMiddleware::class,
+    ], isPersistent: true)
+
     // Add the resources and pages from the Program namespace
     ->discoverPages(
         in: base_path('vendor/stats4sd/filament-team-management/src/Filament/Program/Pages'), 
         for: 'Stats4sd\FilamentTeamManagement\Filament\Program\Pages'
     )
     
-    // the package assumes that all users will register and log in via the 'App' (default) panel, so this panel should not have a `login()` or `registration()` method. To ensure users are redirected to the correct login page, add _replace_ the `Authenticate::class` in authMiddleware with the following:
+    // the package assumes that all users will register and log in via the 'App' (default) panel, so this panel should not have a `login()` or `registration()` method. To ensure users are redirected to the correct login page, replace the `Authenticate::class` in authMiddleware with the following:
     ->authMiddleware([
         \Stats4sd\FilamentTeamManagement\Http\Middleware\AuthenticateThroughDefaultPanel::class,
     ])
@@ -157,7 +167,7 @@ return $panel
             ->url('/admin')
             ->label('Admin Panel')
             ->icon('heroicon-o-cog')
-            ->visible(fn() => auth()->user()->can('viewAdminPanel')),
+            ->visible(fn() => auth()->user()->can('access admin panel')),
         NavigationItem::make('app')
             ->url('/')
             ->icon('heroicon-o-arrow-left')
@@ -183,7 +193,7 @@ return $panel
         for: 'Stats4sd\FilamentTeamManagement\Filament\Admin\Resources'
     )
     
-    // the package assumes that all users will register and log in via the 'App' (default) panel, so this panel should not have a `login()` or `registration()` method. To ensure users are redirected to the correct login page, add _replace_ the `Authenticate::class` in authMiddleware with the following:
+    // the package assumes that all users will register and log in via the 'App' (default) panel, so this panel should not have a `login()` or `registration()` method. To ensure users are redirected to the correct login page, replace the `Authenticate::class` in authMiddleware with the following:
     ->authMiddleware([
         \Stats4sd\FilamentTeamManagement\Http\Middleware\AuthenticateThroughDefaultPanel::class,
     ])
@@ -194,7 +204,7 @@ return $panel
             ->url('/program')
             ->label('Go to program panel')
             ->icon('heroicon-o-cog')
-            ->visible(fn() => auth()->user()->can('viewAdminPanel')),
+            ->visible(fn() => auth()->user()->can('access program admin panel')),
         NavigationItem::make('app')
             ->url('/')
             ->icon('heroicon-o-arrow-left')
@@ -202,6 +212,17 @@ return $panel
     ]);
 
 ```
+
+### Permissions
+
+The package gates panel access and global data visibility on a small set of Spatie permissions. These are the exact permission strings it checks for, so create them (and assign them to the appropriate roles) in your app's seeders:
+
+- `access admin panel` — required to pass `CheckIfAdmin` and enter the Admin panel. This is also the permission the "Admin Panel" navigation links above check with `can(...)`.
+- `access program admin panel` — required to pass `CheckIfProgramAdmin` and enter the Program panel. Only applies when programs are enabled.
+- `view all teams` — grants a user access to every team, bypassing team membership.
+- `view all programs` — grants a user access to every program, bypassing program membership. Only applies when programs are enabled.
+
+The package's example `TestUserSeeder` creates these permissions and attaches them to the `Super Admin` and `Program Admin` roles; use it as a reference for wiring them up in your own app.
 
 ### Invitations and User Registration
 
@@ -237,8 +258,3 @@ Please review [our security policy](../../security/policy) on how to report secu
 ## License
 
 The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
-
-
-
-TODO: 
-- add info on SetLatestTeam middleware - must be in the TenantMiddleware. 

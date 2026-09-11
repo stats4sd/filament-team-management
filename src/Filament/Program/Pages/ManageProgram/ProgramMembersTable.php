@@ -20,7 +20,7 @@ class ProgramMembersTable
     {
         return $table
             ->relationship(fn () => Filament::getTenant()->members())
-            ->inverseRelationship('teams')
+            ->inverseRelationship('programs')
             ->columns([
                 TextColumn::make('name'),
                 TextColumn::make('email'),
@@ -34,7 +34,7 @@ class ProgramMembersTable
                     ->schema([
                         Callout::make('Invitation')
                             ->info()
-                            ->description('Add the email address(es) of the user(s) you would like to invite to this ' . config('filament-team-management.names.team') . '. An invitation will be sent to each address.')
+                            ->description('Add the email address(es) of the user(s) you would like to invite to this ' . config('filament-team-management.names.program') . '. An invitation will be sent to each address.')
                             ->columnSpanFull(),
                         Repeater::make('users')
                             ->label('Email Addresses to Invite')

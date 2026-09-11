@@ -16,9 +16,11 @@ class CheckIfAdmin
     public function handle(Request $request, Closure $next): Response
     {
         // Check if the user has permission to access admin panel
-        if (! auth()->user()->can('access admin panel')) {
-            abort(403, 'Only platform administrators can access this page');
-        }
+        abort_unless(
+            auth()->check() && auth()->user()->can('access admin panel'),
+            403,
+            'Only platform administrators can access this page'
+        );
 
         return $next($request);
     }

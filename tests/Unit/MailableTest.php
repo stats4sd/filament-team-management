@@ -12,13 +12,13 @@ it('builds the InviteUser envelope subject from the app name', function () {
     expect($mailable->envelope()->subject)->toBe('Test App: Invitation to register');
 });
 
-it('embeds the signed registration URL carrying the invite token', function () {
+it('embeds a plain (unsigned) registration URL carrying the invite token', function () {
     $invite = Invite::factory()->make(['token' => 'tok-xyz']);
 
     $acceptUrl = (new InviteUser($invite))->content()->with['acceptUrl'];
 
     expect($acceptUrl)->toContain('token=tok-xyz')
-        ->and($acceptUrl)->toContain('signature=');
+        ->and($acceptUrl)->not->toContain('signature=');
 });
 
 it('builds the UpdateUser envelope subject from the app name', function () {

@@ -2,9 +2,7 @@
 
 namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Programs\RelationManagers;
 
-use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
-use Filament\Actions\EditAction;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -38,11 +36,14 @@ class InvitesRelationManager extends RelationManager
             ->filters([
                 //
             ])
+            // Phase 3: invites are system-generated (via sendInvites() and
+            // role-assignment tracing) and double as an audit log, so no
+            // hand-authored Create/Edit here — only Delete. A proper "send
+            // invite" UX lands in the Phase 3 consolidated invite flow.
             ->headerActions([
-                CreateAction::make(),
+                //
             ])
             ->recordActions([
-                EditAction::make(),
                 DeleteAction::make(),
             ]);
     }
