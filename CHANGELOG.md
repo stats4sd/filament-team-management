@@ -12,6 +12,11 @@ All notable changes to `filament-team-management` will be documented in this fil
 - `althinect/filament-spatie-roles-permissions` is now required at `^3.0` stable.
 - `spatie/laravel-permission` is now a direct dependency (`^7.0`); the package extends its models and pivots, so it no longer relies on the transitive requirement. (3.13)
 
+### Schema
+
+- **Program columns are always created.** The default migrations now always add nullable `invites.program_id` and `users.latest_program_id` without a constraint; a new `add_program_foreign_keys` migration in the program tag adds the foreign keys. Enabling programs on an existing 5.0 install is now "publish the program tag and migrate". Published program migrations are timestamped strictly after the default ones so the constraint migration cannot run first. Pre-5.0 installs enabling programs later must add the columns by hand first; see UPGRADE.md "Migrations". (3.12)
+- **Invites migration names its referenced tables.** `team_id` and `role_id` used bare `constrained()`, which guesses the table from the column name and broke fresh installs with a custom teams table or a custom Spatie roles table. Both now read the table name from config.
+
 ### Fixes
 
 - **Config keys ignored under 4.x are now read.** The config read `FILAMENT_TEAM_MANAGEMENT_USERS_TABLE` / `USERS_FOREIGN_KEY` while the installer wrote the singular `USER_TABLE` / `USER_FOREIGN_KEY`, so custom users-table settings never took effect. The config now reads the singular keys the installer writes. `programs_foreign_key` read the wrong env key (`PROGRAM_MODEL`) and now reads `PROGRAMS_FOREIGN_KEY`. The installer now also writes `ROLE_MODEL`. A parity test guards installer-written keys against config-read keys in both directions. (Review 4.1, 4.2)

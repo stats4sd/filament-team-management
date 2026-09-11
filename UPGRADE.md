@@ -47,6 +47,15 @@ These were always required; 5.0 makes them explicit in the README.
 - [ ] **Inviting an existing user now records the role under the app's User class** in `model_has_roles.model_type`. Under 4.x it wrote the package's `Stats4sd\FilamentTeamManagement\Models\User`, so roles granted via invite to existing users never applied. Check `model_has_roles` for rows with the package class as `model_type` and rewrite them to the app's class (or re-assign the roles).
 - [ ] **`TestUserSeeder`** is now idempotent (`findOrCreate`) and attaches permissions. Apps that run it alongside their own seeders that `Role::create` the same names will still collide on the app side, as before.
 
+### Migrations
+
+The program columns (`invites.program_id`, `users.latest_program_id`) are now **always** created by the default migrations, as plain nullable columns with no constraint. The program migration tag gains a new migration, `add_program_foreign_keys`, that adds the two foreign keys (cascade on delete for invites, set null for users) after the programs table exists. The schema therefore no longer depends on `use_programs` at migration time, and programs can be enabled on an existing 5.0 install by publishing only the program tag. Published program migrations are also now timestamped strictly after the default ones.
+
+- [ ] **Existing install, programs enabled:** the columns and constraints already exist from the guarded 4.x stubs. If you re-run the installer or `vendor:publish --tag=filament-team-management-migrations-program`, the newly published `*_add_program_foreign_keys.php` detects the existing constraints and does nothing; running it is safe but optional.
+- [ ] **Existing install, programs never enabled, staying that way:** no action. Your tables simply lack the two columns; nothing in the package requires them while `use_programs` is `false`.
+- [ ] **Existing install, programs never enabled, enabling them now:** your `invites` and `users` tables do not have the columns, and `add_program_foreign_keys` assumes they do. Publish the program tag, then add a hand-written migration that runs **before** it (give it an earlier timestamp) with `$table->foreignId(config('filament-team-management.column_names.programs_foreign_key'))->nullable();` on `invites` and `$table->foreignId('latest_program_id')->nullable();` on your users table.
+- [ ] **Custom teams or Spatie roles table name:** the invites migration used bare `constrained()`, which guesses the referenced table from the column name, so a custom `table_names.teams` or a custom `permission.table_names.roles` broke fresh installs. It now names both tables from config. Existing databases are unaffected.
+
 ### Removed classes and files
 
 Dead code that nothing in the package used has been deleted. None of the five active consuming apps reference any of it in application code (checked 2026-09-11); notes on the two incidental hits are inline.

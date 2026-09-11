@@ -33,7 +33,7 @@ php artisan filament:install --panels
 
 This will:
 - ask if you want to use 'programs' or not.
-- publish the required migrations
+- publish the required migrations. The default set always creates the `program_id` (invites) and `latest_program_id` (users) columns, unconstrained. The program set creates the program tables and then adds the foreign-key constraints on those two columns, so it can be published later (`php artisan vendor:publish --tag=filament-team-management-migrations-program`) without touching the default migrations.
 - add the needed environment variables to your .env and .env.example files (if they don't already exist)
 - optionally run the migrations
 - optionally add the test DB seeders to your DatabaseSeeder.php file

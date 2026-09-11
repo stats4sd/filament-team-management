@@ -12,13 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table(config('filament-team-management.table_names.users'), function (Blueprint $table) {
-            // Always add the latest_team_id column
-            $table->foreignId('latest_team_id')->nullable()->constrained(config('filament-team-management.table_names.teams'))->onDelete('set null');
+            $table->foreignId('latest_team_id')
+                ->nullable()
+                ->constrained(config('filament-team-management.table_names.teams'))
+                ->nullOnDelete();
 
-            // Only add the latest_program_id column if the app is using programs
-            if (config('filament-team-management.use_programs')) {
-                $table->foreignId('latest_program_id')->nullable()->constrained(config('filament-team-management.table_names.programs'))->onDelete('set null');
-            }
+            // Always created (nullable) so the users schema does not depend on `use_programs` at
+            // migration time. The foreign-key constraint is added by 10_add_program_foreign_keys,
+            // which ships with the program migration tag.
+            $table->foreignId('latest_program_id')->nullable();
         });
     }
 
@@ -29,12 +31,7 @@ return new class extends Migration
     {
         Schema::table(config('filament-team-management.table_names.users'), function (Blueprint $table) {
             $table->dropForeign(['latest_team_id']);
-            $table->dropColumn('latest_team_id');
-
-            if (config('filament-team-management.use_programs')) {
-                $table->dropForeign(['latest_program_id']);
-                $table->dropColumn('latest_program_id');
-            }
+            $table->dropColumn(['latest_team_id', 'latest_program_id']);
         });
     }
 };
