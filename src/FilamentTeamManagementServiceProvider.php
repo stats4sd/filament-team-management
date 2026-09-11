@@ -33,8 +33,6 @@ class FilamentTeamManagementServiceProvider extends PackageServiceProvider
 
         $package->hasTranslations();
         $package->hasViews(static::$viewNamespace);
-
-        $package->hasRoute('team-management');
     }
 
     public function packageRegistered(): void {}
@@ -108,14 +106,6 @@ class FilamentTeamManagementServiceProvider extends PackageServiceProvider
     protected function getIcons(): array
     {
         return [];
-    }
-
-    /**
-     * @return array<string>
-     */
-    protected function getRoutes(): array
-    {
-        return ['team-management'];
     }
 
     /**

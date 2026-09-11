@@ -50,9 +50,6 @@ class ModelHasRole extends MorphPivot
                     'is_confirmed' => true,
                 ]);
 
-                // save invite model
-                $invite->save();
-
                 // show notification
                 Notification::make()
                     ->success()

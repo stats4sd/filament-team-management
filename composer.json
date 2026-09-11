@@ -69,10 +69,7 @@
         "laravel": {
             "providers": [
                 "Stats4sd\\FilamentTeamManagement\\FilamentTeamManagementServiceProvider"
-            ],
-            "aliases": {
-                "FilamentTeamManagement": "Stats4sd\\FilamentTeamManagement\\Facades\\FilamentTeamManagement"
-            }
+            ]
         }
     },
     "minimum-stability": "dev",

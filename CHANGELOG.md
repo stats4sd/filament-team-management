@@ -29,6 +29,7 @@ All notable changes to `filament-team-management` will be documented in this fil
 - Removed an inert `SendEmailVerificationNotification` bind. (4.11)
 - **`CheckIfAdmin` / `CheckIfProgramAdmin` return 403 for guests** instead of a 500 null dereference. (4.14)
 - **Seeded admins can reach the admin panels.** `TestUserSeeder` now creates the four permissions (`access admin panel`, `access program admin panel`, `view all teams`, `view all programs`) and attaches them to the seeded roles, idempotently. (4.9)
+- **Removed dead code** (breaking only if an app imported it; none of ours do): the empty `FilamentTeamManagement` class, its facade and composer alias; the empty `FilamentTeamManagementPlugin`; the unused `Filament\Auth\RegisterResponse`; the `ProgramInvite` model and factory (program invites live in `invites` since 2.0); the empty `routes/team-management.php` and provider route registration; the placeholder `manage-team` view; and the self-referencing `Team::team()` / `Program::program()` relations and their interface declarations. See UPGRADE.md "Removed classes and files". (3.6, 3.9)
 - **Docs:** README navigation examples used an invented `viewAdminPanel` permission; corrected to the real strings and added a canonical Permissions section. `SetLatestTeamMiddleware` / `SetLatestProgramMiddleware` are documented as required tenant middleware. (4.15)
 
 ## 4.0.7 - Hide Program Invite Info - 2025-12-08

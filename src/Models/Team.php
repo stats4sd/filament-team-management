@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Stats4sd\FilamentTeamManagement\Mail\InviteUser;
@@ -170,13 +169,5 @@ class Team extends Model implements TeamInterface
             foreignPivotKey: config('filament-team-management.column_names.teams_foreign_key'),
             relatedPivotKey: config('filament-team-management.column_names.programs_foreign_key')
         );
-    }
-
-    // add relationship to refer to team model itself, so that app panel > Teams resource can show the selected team for editing
-
-    /** @return HasOne<self, $this> */
-    public function team(): HasOne
-    {
-        return $this->hasOne(Team::class, 'id');
     }
 }

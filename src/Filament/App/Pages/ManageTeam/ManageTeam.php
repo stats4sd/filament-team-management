@@ -6,7 +6,6 @@ use Filament\Facades\Filament;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Pages\Tenancy\EditTenantProfile;
-use Filament\Resources\Pages\Concerns\HasRelationManagers;
 use Filament\Schemas\Components\Livewire;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
@@ -17,11 +16,7 @@ use Illuminate\Support\Str;
 
 class ManageTeam extends EditTenantProfile
 {
-    // use HasRelationManagers;
-
     protected static string | null | \BackedEnum $navigationIcon = 'heroicon-o-document-text';
-
-    //   protected string $view = 'filament-team-management::filament.app.pages.manage-team';
 
     public function getHeading(): string | Htmlable | null
     {
