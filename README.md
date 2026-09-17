@@ -10,6 +10,8 @@ Package for an opinionated 'teams' setup, including invites and integration with
 
 # Installation
 
+> **Upgrading from 4.x?** 5.0 is a breaking release. Follow [UPGRADE.md](UPGRADE.md) before updating.
+
 You can install the package via composer:
 
 ```bash
@@ -24,7 +26,7 @@ php artisan filament-team-management:install
 
 The script will ask you if you want to use the concept of "programs" in your app. It will then make the following changes: 
 
-1. It will publish the appropriate migration files.
+1. It will publish the appropriate migration files: the default set (teams, team members, invites, the `latest_team_id` / `latest_program_id` user columns) and, if you opt into programs, the program set (programs, program members, program ↔ team pivot, and the foreign-key constraints on the two program columns). The program columns are always created so you can enable programs later by publishing just the program set: `php artisan vendor:publish --tag=filament-team-management-migrations-program`.
 2. It will update your .env file with the appropriate variables. 
 3. It will offer to add some example Database Seeders to your main `database/seeders/DatabaseSeeder.php` file.
 
@@ -59,6 +61,32 @@ FILAMENT_TEAM_MANAGEMENT_TEAM_MODEL=App\Models\Team
 
 > [!NOTE] 
 > You are not required to call your custom models `Team`, `Program` or `User`. You can name them whatever you like, as long as you update the .env variables to point to your custom models. Use the other .env variables to point to the correct database tables, foreign key column names and pivot tables if you have changed them. 
+
+## Environment variables
+
+Everything the package touches (model classes, table names, foreign-key columns) resolves through `config/filament-team-management.php`, which reads the `FILAMENT_TEAM_MANAGEMENT_*` variables below. The install command writes them all to `.env` / `.env.example`, deriving the table and key names from the configured models, so you normally only edit them when you rename a model or table. A test in the package asserts that the installer writes exactly the keys the config reads.
+
+| Variable | Default | Controls |
+| --- | --- | --- |
+| `FILAMENT_TEAM_MANAGEMENT_USE_PROGRAMS` | `false` | Enables the Program concept at runtime: program relationships and tenancy, the Program panel pages, program-reachable teams in `getAllAccessibleTeams()`, and the program columns/actions in the UI. It does not decide which migrations you get; that is the publish tag (see Installation). The `program_id` / `latest_program_id` columns exist either way. |
+| `FILAMENT_TEAM_MANAGEMENT_USER_MODEL` | `Stats4sd\FilamentTeamManagement\Models\User` | The User model. Usually your `App\Models\User`, which should extend the package model. |
+| `FILAMENT_TEAM_MANAGEMENT_TEAM_MODEL` | `Stats4sd\FilamentTeamManagement\Models\Team` | The Team model. Extend the package model if you need custom fields. |
+| `FILAMENT_TEAM_MANAGEMENT_PROGRAM_MODEL` | `Stats4sd\FilamentTeamManagement\Models\Program` | The Program model. Only used when programs are enabled. |
+| `FILAMENT_TEAM_MANAGEMENT_ROLE_MODEL` | `Spatie\Permission\Models\Role` | The Spatie Role model used for invite roles and role-assignment tracing. Set it if your app uses a custom role model. |
+| `FILAMENT_TEAM_MANAGEMENT_USER_TABLE` | `users` | The users table. The `latest_team_id` / `latest_program_id` columns are added here. |
+| `FILAMENT_TEAM_MANAGEMENT_TEAMS_TABLE` | `teams` | The teams table. |
+| `FILAMENT_TEAM_MANAGEMENT_PROGRAMS_TABLE` | `programs` | The programs table (programs only). |
+| `FILAMENT_TEAM_MANAGEMENT_TEAM_MEMBERS_TABLE` | `team_members` | The user ↔ team pivot (carries the `is_admin` flag). |
+| `FILAMENT_TEAM_MANAGEMENT_PROGRAM_MEMBERS_TABLE` | `program_members` | The user ↔ program pivot (programs only). |
+| `FILAMENT_TEAM_MANAGEMENT_PROGRAM_TEAM_TABLE` | `program_team` | The program ↔ team pivot (programs only). |
+| `FILAMENT_TEAM_MANAGEMENT_USER_FOREIGN_KEY` | `user_id` | The user foreign-key column on the pivots. |
+| `FILAMENT_TEAM_MANAGEMENT_TEAMS_FOREIGN_KEY` | `team_id` | The team foreign-key column on `team_members`, `program_team` and `invites`. |
+| `FILAMENT_TEAM_MANAGEMENT_PROGRAMS_FOREIGN_KEY` | `program_id` | The program foreign-key column on `program_members`, `program_team` and `invites` (programs only). |
+
+The `names` block in the config (`names.team`, `names.program`) holds the lowercase singular words used in UI copy ("…invite to this team."). It is deliberately not env-backed: publish the config file and edit it there if your app calls teams or programs something else.
+
+> [!IMPORTANT]
+> **Renamed in 5.0:** the config now reads `FILAMENT_TEAM_MANAGEMENT_USER_TABLE` and `FILAMENT_TEAM_MANAGEMENT_USER_FOREIGN_KEY` (singular `USER_`), which is what the installer has always written. Under 4.x the config read the plural `USERS_TABLE` / `USERS_FOREIGN_KEY`, so those values were silently ignored. If your `.env` or `.env.example` still has the plural names, rename them. See [UPGRADE.md](UPGRADE.md).
 
 ## Filament Panels
 

@@ -4,7 +4,6 @@ namespace Stats4sd\FilamentTeamManagement\Models\Interfaces;
 
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * @property string $name
@@ -22,7 +21,4 @@ interface ProgramInterface
     public function users(): BelongsToMany;
 
     public function teams(): BelongsToMany;
-
-    // add relationship to refer to program model itself, so that program admin panel > Programs resource can show the selected program for editing
-    public function program(): HasOne;
 }

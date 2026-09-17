@@ -9,6 +9,7 @@ use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Programs\RelationMa
 use Stats4sd\FilamentTeamManagement\Filament\App\Pages\ManageTeam\ManageTeamInvites;
 use Stats4sd\FilamentTeamManagement\Filament\Program\Pages\ManageProgram\ManageProgramInvites;
 use Stats4sd\FilamentTeamManagement\Filament\Program\Pages\ManageProgram\ManageProgramMembers;
+use Stats4sd\FilamentTeamManagement\Filament\Program\Pages\ManageProgram\ManageProgramTeams;
 use Stats4sd\FilamentTeamManagement\Models\Invite;
 use Stats4sd\FilamentTeamManagement\Models\Program;
 use Stats4sd\FilamentTeamManagement\Models\Team;
@@ -104,4 +105,24 @@ it('exposes no Create action but keeps Delete on the Program Invites relation ma
     ])
         ->assertActionDoesNotExist(TestAction::make(CreateAction::getDefaultName())->table())
         ->assertActionExists(TestAction::make(DeleteAction::getDefaultName())->table($invite));
+});
+
+// A7 (2.5): the Program panel's team-management widget was named "Projects" (ManageProgramProjects /
+// ProgramProjectsTable) although it manages Teams. Renamed; it renders and lists the program's teams.
+it('renders the Program teams table and lists the tenant program\'s teams', function () {
+    $program = Program::factory()->create();
+    $team = Team::factory()->create(['name' => 'Charlie Team']);
+    $other = Team::factory()->create(['name' => 'Unrelated Team']);
+    $program->teams()->attach($team);
+
+    Filament::setCurrentPanel(Filament::getPanel('program'));
+    Filament::setTenant($program);
+
+    $component = livewire(ManageProgramTeams::class)
+        ->assertSuccessful()
+        ->assertCanSeeTableRecords([$team])
+        ->assertCanNotSeeTableRecords([$other])
+        ->assertSee('Charlie Team');
+
+    expect($component->instance()->getTable()->getInverseRelationship())->toBe('programs');
 });

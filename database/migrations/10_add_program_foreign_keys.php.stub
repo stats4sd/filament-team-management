@@ -1,0 +1,65 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+/**
+ * Adds the foreign-key constraints for the program columns that 3_create_invites_table and
+ * 9_add_column_to_users_table always create. Published only with the program migration tag, so
+ * the constraints exist exactly when the programs table does. Assumes both columns already exist.
+ *
+ * Each constraint is skipped if the column already carries one, so this is safe to run on a
+ * database migrated under 4.x with programs enabled (where the guarded stubs created the
+ * constraints inline).
+ */
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        $programsTable = config('filament-team-management.table_names.programs');
+        $usersTable = config('filament-team-management.table_names.users');
+        $programKey = config('filament-team-management.column_names.programs_foreign_key');
+
+        if (! $this->hasForeignKeyOn('invites', $programKey)) {
+            Schema::table('invites', function (Blueprint $table) use ($programsTable, $programKey) {
+                $table->foreign($programKey)
+                    ->references('id')
+                    ->on($programsTable)
+                    ->cascadeOnDelete();
+            });
+        }
+
+        if (! $this->hasForeignKeyOn($usersTable, 'latest_program_id')) {
+            Schema::table($usersTable, function (Blueprint $table) use ($programsTable) {
+                $table->foreign('latest_program_id')
+                    ->references('id')
+                    ->on($programsTable)
+                    ->nullOnDelete();
+            });
+        }
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::table('invites', function (Blueprint $table) {
+            $table->dropForeign([config('filament-team-management.column_names.programs_foreign_key')]);
+        });
+
+        Schema::table(config('filament-team-management.table_names.users'), function (Blueprint $table) {
+            $table->dropForeign(['latest_program_id']);
+        });
+    }
+
+    private function hasForeignKeyOn(string $table, string $column): bool
+    {
+        return collect(Schema::getForeignKeys($table))
+            ->contains(fn (array $foreignKey) => $foreignKey['columns'] === [$column]);
+    }
+};

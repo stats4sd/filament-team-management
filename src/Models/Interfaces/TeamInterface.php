@@ -4,7 +4,6 @@ namespace Stats4sd\FilamentTeamManagement\Models\Interfaces;
 
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 
 interface TeamInterface
 {
@@ -19,7 +18,4 @@ interface TeamInterface
     public function members(): BelongsToMany;
 
     public function programs(): BelongsToMany;
-
-    // add relationship to refer to team model itself, so that app panel > Teams resource can show the selected team for editing
-    public function team(): HasOne;
 }

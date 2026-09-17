@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Stats4sd\FilamentTeamManagement\Mail\InviteUser;
@@ -158,11 +157,5 @@ class Program extends Model implements ProgramInterface
             foreignPivotKey: config('filament-team-management.column_names.programs_foreign_key'),
             relatedPivotKey: config('filament-team-management.column_names.teams_foreign_key'),
         )->withTimestamps();
-    }
-
-    // add relationship to refer to program model itself, so that program admin panel > Programs resource can show the selected program for editing
-    public function program(): HasOne
-    {
-        return $this->hasOne(Program::class, 'id');
     }
 }

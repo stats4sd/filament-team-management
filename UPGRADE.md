@@ -1,0 +1,88 @@
+# Upgrade guide
+
+This file lists every change a consuming app must act on when moving between major versions of `stats4sd/filament-team-management`. The [CHANGELOG](CHANGELOG.md) describes what changed; this file describes what you have to do about it.
+
+## 4.x → 5.0
+
+5.0 moves the package to Laravel 13, Filament 5 and Livewire 4, and ships the Phase 1 defect fixes from the 2026 package review. Work through each section in order.
+
+### Dependencies
+
+- [ ] App is on **Laravel 13, Filament ^5.2, Livewire ^4** before requiring this version. The package no longer resolves on Filament 4 / Livewire 3. The app's own panels, resources, and Livewire components must already be upgraded (see the Filament and Livewire upgrade guides).
+- [ ] PHP ^8.4 (unchanged from 4.0.7).
+- [ ] **`awcodes/shout` is no longer a dependency.** If the app used `Shout::make()` anywhere without requiring `awcodes/shout` itself, either require it directly or migrate to Filament's `Callout` (`->type('info')` → `->info()`, `->content()` → `->description()`).
+- [ ] `althinect/filament-spatie-roles-permissions` is now `^3.0` stable (was `^3.x-dev`). Remove any `minimum-stability` / `prefer-stable` workarounds added for it.
+
+### Environment variables now honoured
+
+Three env vars the installer has always written were previously ignored by the config. They are now read, so values that silently did nothing before now take effect. The full list of keys is in the README ([Environment variables](README.md#environment-variables)).
+
+- [ ] `FILAMENT_TEAM_MANAGEMENT_USER_TABLE` and `FILAMENT_TEAM_MANAGEMENT_USER_FOREIGN_KEY`: if the app hand-set the old plural names `USERS_TABLE` / `USERS_FOREIGN_KEY`, rename them. If the installer wrote non-default values (custom users table or model), confirm they match the real table and pivot column names, because they were ignored under 4.x. (`ae-policy-tracking-tool` has the plural names in `.env.example`.)
+- [ ] `FILAMENT_TEAM_MANAGEMENT_PROGRAMS_FOREIGN_KEY`: under 4.x `programs_foreign_key` read `PROGRAM_MODEL`, so any program app that worked had either no `PROGRAM_MODEL` set or a patched config. Confirm the value (default `program_id`) matches the column in `program_members`, `program_team`, `invites`, and `users.latest_program_id`.
+- [ ] `FILAMENT_TEAM_MANAGEMENT_PROGRAM_TEAM_TABLE`: `Team::programs()` / `Program::teams()` now use this key. If it is set to a non-default value, confirm the pivot table actually has that name (4.x created it with the configured name but queried `program_team`).
+- [ ] `FILAMENT_TEAM_MANAGEMENT_ROLE_MODEL`: newly written by the installer; only relevant if the app uses a custom Spatie role model and never set it.
+
+### Published config
+
+- [ ] If the app has published `config/filament-team-management.php`, add the new `names` block (`'names' => ['team' => 'team', 'program' => 'program']`). Without it the invite callouts and program delete modal render a blank where the noun should be.
+
+### Panel wiring
+
+These were always required; 5.0 makes them explicit in the README.
+
+- [ ] App panel `->tenantMiddleware([SetLatestTeamMiddleware::class], isPersistent: true)`; Program panel the same with `SetLatestProgramMiddleware`. `getDefaultTenant()` depends on this. It was a README TODO in 4.x.
+- [ ] Navigation items copied from the 4.x README that check `can('viewAdminPanel')` must change to `can('access admin panel')` (admin links) or `can('access program admin panel')` (program link). If the app created a `viewAdminPanel` permission to make the old example work, it can be removed.
+- [ ] The four permissions `access admin panel`, `access program admin panel`, `view all teams`, `view all programs` must exist and be assigned to the intended roles. The package seeder now does this; apps with their own seeders should mirror it. A `Gate::before` super-admin bypass still works but is no longer needed for the seeded admin.
+
+### Behaviour changes
+
+- [ ] **Team creators are now team admins.** `RegisterTeam` attaches the creating user with `is_admin = true`. Existing teams have no admin flagged; decide whether to backfill (e.g. set `is_admin` for the oldest member of each team). `is_admin` is still not enforced, so this changes data, not access.
+- [ ] **App panel → Manage Team → Members now lists every member, including admins.** Under 4.x (and briefly under the 5.0 development branch) the tab was bound to the non-admin-only relationship, so the team creator vanished from their own members list.
+- [ ] **Admin panel → Team → Users** gains an "Edit Role" action that toggles `is_admin`. **Admin panel → Program → Users** loses the (dead) name-edit form. **Admin panel Invites relation managers** lose Create and Edit; Delete remains. Update any app tests or overrides that referenced those actions.
+- [ ] **Program invites with no `Program Admin` role** now show a warning and send nothing instead of throwing. Make sure the role exists in every environment (the package seeder creates it).
+- [ ] **Invite emails link to an unsigned URL.** `InviteUser` now uses `route()` instead of `URL::signedRoute()`. If the app added `signed` middleware to the register route, or its tests assert a `signature=` parameter, remove them. Apps overriding the `InviteUser` mailable or `emails.invite` view should check their copies.
+- [ ] **Register page:** an authenticated user following an invite link is redirected to the panel home; a missing or invalid token redirects to login (4.x returned 404). Apps overriding `Register::mount()` should port both guards.
+- [ ] **Register password rule:** the custom "at least 10 characters" message now actually displays. No action, unless tests asserted the default Laravel message.
+- [ ] **`CheckIfAdmin` / `CheckIfProgramAdmin`** return 403 when unauthenticated (was a 500). No action.
+- [ ] **Inviting an existing user now records the role under the app's User class** in `model_has_roles.model_type`. Under 4.x it wrote the package's `Stats4sd\FilamentTeamManagement\Models\User`, so roles granted via invite to existing users never applied. Check `model_has_roles` for rows with the package class as `model_type` and rewrite them to the app's class (or re-assign the roles).
+- [ ] **`TestUserSeeder`** is now idempotent (`findOrCreate`) and attaches permissions. Apps that run it alongside their own seeders that `Role::create` the same names will still collide on the app side, as before.
+
+### Migrations
+
+The program columns (`invites.program_id`, `users.latest_program_id`) are now **always** created by the default migrations, as plain nullable columns with no constraint. The program migration tag gains a new migration, `add_program_foreign_keys`, that adds the two foreign keys (cascade on delete for invites, set null for users) after the programs table exists. The schema therefore no longer depends on `use_programs` at migration time, and programs can be enabled on an existing 5.0 install by publishing only the program tag. Published program migrations are also now timestamped strictly after the default ones.
+
+- [ ] **Existing install, programs enabled:** the columns and constraints already exist from the guarded 4.x stubs. If you re-run the installer or `vendor:publish --tag=filament-team-management-migrations-program`, the newly published `*_add_program_foreign_keys.php` detects the existing constraints and does nothing; running it is safe but optional.
+- [ ] **Existing install, programs never enabled, staying that way:** no action. Your tables simply lack the two columns; nothing in the package requires them while `use_programs` is `false`.
+- [ ] **Existing install, programs never enabled, enabling them now:** your `invites` and `users` tables do not have the columns, and `add_program_foreign_keys` assumes they do. Publish the program tag, then add a hand-written migration that runs **before** it (give it an earlier timestamp) with `$table->foreignId(config('filament-team-management.column_names.programs_foreign_key'))->nullable();` on `invites` and `$table->foreignId('latest_program_id')->nullable();` on your users table.
+- [ ] **Custom teams or Spatie roles table name:** the invites migration used bare `constrained()`, which guesses the referenced table from the column name, so a custom `table_names.teams` or a custom `permission.table_names.roles` broke fresh installs. It now names both tables from config. Existing databases are unaffected.
+
+### Renamed classes (Program panel)
+
+The Program panel's team-management widget was named "Projects" although it manages Teams. Pages are directory-discovered, so most apps need no change, but any subclass, direct reference or published view override must follow the rename.
+
+- [ ] `Stats4sd\FilamentTeamManagement\Filament\Program\Pages\ManageProgram\ManageProgramProjects` → `ManageProgramTeams`.
+- [ ] `Stats4sd\FilamentTeamManagement\Filament\Program\Pages\ManageProgram\ProgramProjectsTable` → `ProgramTeamsTable`.
+- [ ] The attach action on that table is now named `attach` (Filament's default), labelled "Add Existing Teams" from `names.team`. It was previously named `Add Existing Projects`, so any `getAction('Add Existing Projects')`, `TestAction::make('Add Existing Projects')` or visibility override keyed on the old name must switch to `attach`.
+- [ ] The Livewire key inside `ManageProgram::content()` is now `manage-program-teams` (was `manage-program-projects`). Apps that override `content()` and reuse the key should update it, and pass the new class to `Livewire::make()`.
+- [ ] The tab label is no longer the hardcoded "Projects": it is `Str::plural(config('filament-team-management.names.team'))`, capitalised, so a default install shows "Teams". Apps that call teams "projects" should set `names.team` to `project` in their published config rather than overriding the page. `ManageProgram::getLabel()` and its name field likewise read `names.program` instead of the model class name.
+- [ ] `groundswell_platform` subclasses `ManageProgramProjects` in `app/Filament/Program/ManageProgram/` and reuses the `manage-program-projects` key in its own `ManageProgram::content()`; both must be updated.
+
+### Removed classes and files
+
+Dead code that nothing in the package used has been deleted. None of the five active consuming apps reference any of it in application code (checked 2026-09-11); notes on the two incidental hits are inline.
+
+- [ ] `Stats4sd\FilamentTeamManagement\FilamentTeamManagement` and its facade `Stats4sd\FilamentTeamManagement\Facades\FilamentTeamManagement` (both were empty), plus the `FilamentTeamManagement` alias in `composer.json` `extra.laravel.aliases`. `apni-research` has a generated reference in `_ide_helper.php`; regenerate it with `php artisan ide-helper:generate` after updating.
+- [ ] `Stats4sd\FilamentTeamManagement\FilamentTeamManagementPlugin` (an empty Filament plugin). If a panel called `->plugin(FilamentTeamManagementPlugin::make())`, remove that line; the package registers nothing through it.
+- [ ] `Stats4sd\FilamentTeamManagement\Filament\Auth\RegisterResponse`. `Register` uses `Http\Responses\RegisterResponse`, which stays.
+- [ ] `Stats4sd\FilamentTeamManagement\Models\ProgramInvite` and `ProgramInviteFactory`. Program invites have been rows in `invites` with a `program_id` since 2.0; this model pointed at the long-gone `program_invites` table.
+- [ ] `routes/team-management.php` (contained only commented-out routes) and the provider's `hasRoute()` / `getRoutes()`. The package registers no routes of its own; Filament panels own the auth routes.
+- [ ] The view `filament-team-management::filament.app.pages.manage-team` (a placeholder never rendered). `ManageTeam` uses Filament's default tenant-profile view.
+- [ ] `Team::team()` and `Program::program()`, self-referencing `hasOne` relations declared on `TeamInterface` / `ProgramInterface`. If a custom Team/Program model implements the interface and declared these methods, they can be deleted; if anything eager-loaded `->with('team')` on a Team, use the model itself.
+
+### Verify after upgrade
+
+- [ ] Log in as a seeded admin and reach the Admin panel (permission wiring).
+- [ ] Register a new team, then open Manage Team → Members and confirm the creator is listed.
+- [ ] Invite a new address and an existing user from each entry point (App Members, Admin Team Users, Admin Users, Admin Program Users, Program Members); confirm role/team/program land on the correct user class.
+- [ ] Follow an invite link while logged in, then logged out, then with a bad token.
+- [ ] Program panel: attach/detach a team, invite a member, confirm they can enter the panel.

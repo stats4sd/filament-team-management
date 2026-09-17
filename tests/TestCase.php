@@ -127,23 +127,32 @@ class TestCase extends Orchestra
             $this->vendorPath('spatie/laravel-permission/database/migrations/create_permission_tables.php.stub')
         );
 
-        // Package default migrations.
-        foreach (['1_create_teams_table', '2_create_team_members_table', '3_create_invites_table'] as $migration) {
+        // Package default migrations. These always create the (unconstrained)
+        // program columns on invites and users, so they never depend on
+        // use_programs and can run before the program set.
+        foreach (['1_create_teams_table', '2_create_team_members_table', '3_create_invites_table', '9_add_column_to_users_table'] as $migration) {
             $this->runStubMigration($this->migrationPath($migration));
         }
 
-        // Program migrations, when this test case opts into programs. They must
-        // run before the users column migration so latest_program_id can be
-        // constrained against the programs table.
+        // Program migrations (tables + the foreign keys on the program columns),
+        // when this test case opts into programs.
         if ($this->usePrograms) {
-            foreach (['5_create_programs_table', '6_create_program_members_table', '7_create_program_team_table'] as $migration) {
-                $this->runStubMigration($this->migrationPath($migration));
-            }
+            $this->runProgramMigrations();
         }
 
-        $this->runStubMigration($this->migrationPath('9_add_column_to_users_table'));
-
         $this->seedRolesAndPermissions();
+    }
+
+    /**
+     * Run the program migration set in order: the three program tables, then
+     * the foreign-key constraints on invites.program_id / users.latest_program_id
+     * (which the default set already created as plain nullable columns).
+     */
+    protected function runProgramMigrations(): void
+    {
+        foreach (['5_create_programs_table', '6_create_program_members_table', '7_create_program_team_table', '10_add_program_foreign_keys'] as $migration) {
+            $this->runStubMigration($this->migrationPath($migration));
+        }
     }
 
     protected function runStubMigration(string $path): void
@@ -188,20 +197,18 @@ class TestCase extends Orchestra
 
     /**
      * Flip the harness into program mode at runtime: enable the config flag and
-     * create the program tables. Call at the top of a test that needs the
-     * program tables present.
+     * run the full program migration set (tables + foreign keys; the program
+     * columns themselves already exist from the default set). Call at the top
+     * of a test that needs the program tables present.
      *
-     * Note: behaviour that depends on the program columns existing at
-     * migration time (invites.program_id, users.latest_program_id) requires a
-     * dedicated program-mode test case that sets $usePrograms = true.
+     * Note: the Program panel is registered at boot, so tests that need it
+     * still require a dedicated program-mode test case (ProgramTestCase).
      */
     public function withPrograms(): static
     {
         config()->set('filament-team-management.use_programs', true);
 
-        foreach (['5_create_programs_table', '6_create_program_members_table', '7_create_program_team_table'] as $migration) {
-            $this->runStubMigration($this->migrationPath($migration));
-        }
+        $this->runProgramMigrations();
 
         return $this;
     }
