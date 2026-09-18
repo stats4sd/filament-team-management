@@ -25,5 +25,5 @@ it('builds the UpdateUser envelope subject and body from a membership snapshot',
     config()->set('app.name', 'Test App');
     $team = Team::factory()->create(['name' => 'Research']);
     $mailable = new UpdateUser(MembershipMail::snapshot($team, null));
-    expect($mailable->envelope()->subject)->toBe('Test App: Membership updated')->and($mailable->render())->toContain('Research')->and($mailable->render())->toContain('A site administrator');
+    expect($mailable->envelope()->subject)->toBe('Test App: Membership updated')->and($mailable->render())->toContain('Research')->and($mailable->render())->toContain('Someone');
 });
