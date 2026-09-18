@@ -10,10 +10,12 @@ use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Programs\Pages\View
 use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Programs\Schemas\ProgramForm;
 use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Programs\Schemas\ProgramInfolist;
 use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Programs\Tables\ProgramTable;
+use Stats4sd\FilamentTeamManagement\Filament\Traits\AuthorizesHostResource;
 use Stats4sd\FilamentTeamManagement\Filament\Traits\HasTeamManagementNavigationGroup;
 
 class ProgramResource extends Resource
 {
+    use AuthorizesHostResource;
     use HasTeamManagementNavigationGroup;
 
     protected static string | null | \BackedEnum $navigationIcon = 'heroicon-o-building-library';
@@ -25,7 +27,7 @@ class ProgramResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return config('filament-team-management.use_programs');
+        return config('filament-team-management.use_programs') && static::canViewAny();
     }
 
     public static function form(Schema $schema): Schema

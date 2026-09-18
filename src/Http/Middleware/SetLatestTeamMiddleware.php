@@ -5,30 +5,21 @@ namespace Stats4sd\FilamentTeamManagement\Http\Middleware;
 use Closure;
 use Filament\Facades\Filament;
 use Illuminate\Http\Request;
-use Stats4sd\FilamentTeamManagement\Models\User;
 use Symfony\Component\HttpFoundation\Response;
 
 class SetLatestTeamMiddleware
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  Closure(Request): (Response)  $next
-     */
     public function handle(Request $request, Closure $next): Response
     {
-        $user = auth()->user();
-
-        // check the user has a latestTeam method
-        if (! method_exists($user, 'latestTeam')) {
-            return $next($request);
+        $user = Filament::auth()->user();
+        $tenant = Filament::getTenant();
+        $model = config('filament-team-management.models.team');
+        if ($user && method_exists($user, 'latestTeam') && $tenant instanceof $model) {
+            $user->latestTeam()->associate($tenant);
+            if ($user->isDirty('latest_team_id')) {
+                $user->save();
+            }
         }
-
-        if (! Filament::getTenant()) {
-            return $next($request);
-        }
-
-        $user->latestTeam()->associate(Filament::getTenant())->save();
 
         return $next($request);
     }

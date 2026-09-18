@@ -19,16 +19,16 @@ class ProgramTable
                     ->sortable()
                     ->searchable(),
                 TextColumn::make('teams_count')
-                    ->label('# ' . Str::of(config('filament-team-management.models.team')::getModelNameLower())->plural()->ucFirst())
+                    ->label('# ' . Str::of(config('filament-team-management.names.team'))->plural()->ucFirst())
                     ->counts('teams')
                     ->sortable(),
                 TextColumn::make('users_count')
-                    ->label('# Users')
+                    ->label('# ' . ucfirst(Str::plural(config('filament-team-management.names.user'))))
                     ->counts('users')
                     ->sortable(),
                 TextColumn::make('invites_count')
-                    ->label('# Invites')
-                    ->counts('invites')
+                    ->label('# Pending invites')
+                    ->counts(['invites' => fn ($query) => $query->pending()])
                     ->sortable(),
                 TextColumn::make('created_at')
                     ->sortable(),

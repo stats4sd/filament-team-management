@@ -6,17 +6,17 @@ use Filament\Auth\Http\Responses\Contracts\RegistrationResponse;
 use Filament\Facades\Filament;
 use Illuminate\Http\RedirectResponse;
 use Livewire\Features\SupportRedirects\Redirector;
+use Stats4sd\FilamentTeamManagement\Filament\Support\MembershipNavigation;
 use Symfony\Component\HttpFoundation\Response;
 
 class RegisterResponse implements RegistrationResponse
 {
     public function toResponse($request): Response | RedirectResponse | Redirector
     {
-        // always redirect user to app panel, as app panel is the only entry point of this application.
-        // admin user can go to admin panel via Admin panel menu item in sidebar
+        $destination = Filament::auth()->check()
+            ? MembershipNavigation::afterDeparture()
+            : route('filament-team-management.no-memberships');
 
-        $homeUrl = Filament::getHomeUrl();
-
-        return redirect()->intended($homeUrl);
+        return redirect($destination);
     }
 }

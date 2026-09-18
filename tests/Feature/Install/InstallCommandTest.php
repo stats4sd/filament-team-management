@@ -1,7 +1,12 @@
 <?php
 
+use Dotenv\Dotenv;
+use Illuminate\Console\OutputStyle;
 use Illuminate\Support\Facades\File;
 use Stats4sd\FilamentTeamManagement\Commands\InstallFilamentTeamManagement;
+use Stats4sd\FilamentTeamManagement\Tests\Fixtures\Models\ProjectTeam;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\BufferedOutput;
 
 /*
  * The install command writes into the (shared) Testbench skeleton via base_path()
@@ -53,9 +58,9 @@ function runInstall(bool $usePrograms)
     return test()->artisan('filament-team-management:install')
         ->expectsConfirmation('Do you want to continue?', 'yes')
         ->expectsConfirmation('Do you want to use "programs" (groups of teams)?', $usePrograms ? 'yes' : 'no')
-        ->expectsConfirmation('Do you need the roles and permissions tables from the Spatie Permissions package?', 'no')
         ->expectsConfirmation('Do you want to run the migrations now?', 'no')
         ->expectsConfirmation('Do you want to add the recommended package seeders to your DatabaseSeeder file?', 'no')
+        ->expectsConfirmation('Publish deny-default host policy stubs?', 'no')
         ->assertSuccessful();
 }
 
@@ -118,4 +123,79 @@ PHP;
     // file is still syntactically valid and braces remain balanced
     expect(substr_count($result, '{'))->toBe(substr_count($result, '}'))
         ->and(token_get_all($result, TOKEN_PARSE))->toBeArray();
+});
+
+it('round trips namespace values through dotenv and treats each env file independently', function () {
+    File::put(base_path('.env'), "FILAMENT_TEAM_MANAGEMENT_QUEUE_MAIL=false\nAPP_NAME=Test\n");
+    File::put(base_path('.env.example'), "FILAMENT_TEAM_MANAGEMENT_TEAM_MODEL='Example\\Existing'\n");
+    runInstall(true);
+    runInstall(true);
+    $actual = Dotenv::parse(File::get(base_path('.env')));
+    $example = Dotenv::parse(File::get(base_path('.env.example')));
+    expect($actual['FILAMENT_TEAM_MANAGEMENT_TEAM_MODEL'])->toBe(config('filament-team-management.models.team'))
+        ->and($actual['FILAMENT_TEAM_MANAGEMENT_QUEUE_MAIL'])->toBe('false')
+        ->and($example['FILAMENT_TEAM_MANAGEMENT_TEAM_MODEL'])->toBe('Example\\Existing')
+        ->and($example['FILAMENT_TEAM_MANAGEMENT_USER_MODEL'])->toBe(config('auth.providers.users.model'))
+        ->and(substr_count(File::get(base_path('.env')), 'FILAMENT_TEAM_MANAGEMENT_QUEUE_MAIL='))->toBe(1);
+});
+
+it('inserts seed calls idempotently around comments strings interpolation and nested functions', function () {
+    $source = <<<'PHP'
+<?php
+class DatabaseSeeder {
+    public function run () : void {
+        // a closing } is not syntax
+        $value = '{';
+        echo "{$value}";
+        $callback = function () { return '}'; };
+    }
+}
+PHP;
+    $path = base_path('database/seeders/DatabaseSeeder.php');
+    File::put($path, $source);
+    $command = new InstallFilamentTeamManagement;
+    $command->updateDatabaseSeeder(true);
+    $command->updateDatabaseSeeder(true);
+    $result = File::get($path);
+    expect(token_get_all($result, TOKEN_PARSE))->toBeArray()
+        ->and(substr_count($result, 'DatabaseProgramSeeder::class'))->toBe(1)
+        ->and(substr_count($result, 'DatabaseSeeder::class'))->toBe(1)
+        ->and($result)->toContain('        $this->call(');
+});
+
+it('does not rewrite unsupported static or missing seeder run methods', function (string $source) {
+    $path = base_path('database/seeders/DatabaseSeeder.php');
+    File::put($path, $source);
+    $command = new InstallFilamentTeamManagement;
+    $command->setOutput(new OutputStyle(new ArrayInput([]), new BufferedOutput));
+    $command->updateDatabaseSeeder(false);
+    expect(File::get($path))->toBe($source);
+})->with([
+    '<?php class DatabaseSeeder { public static function run(): void {} }',
+    '<?php function run(): void {} class DatabaseSeeder {}',
+    '<?php abstract class DatabaseSeeder { abstract public function run(): void; }',
+]);
+
+it('publishes configured deny-default policies without overwriting host files', function () {
+    $path = app_path('Policies/TeamPolicy.php');
+    $programPath = app_path('Policies/ProgramPolicy.php');
+    $before = File::exists($path) ? File::get($path) : null;
+    $programBefore = File::exists($programPath) ? File::get($programPath) : null;
+    $command = new InstallFilamentTeamManagement;
+    $command->setOutput(new OutputStyle(new ArrayInput([]), new BufferedOutput));
+
+    try {
+        File::delete([$path, $programPath]);
+        config()->set('filament-team-management.models.team', ProjectTeam::class);
+        $command->publishPolicies(false);
+        $policy = File::get($path);
+        expect($policy)->toContain('ProjectTeam $target')->toContain('return false;')
+            ->and(token_get_all($policy, TOKEN_PARSE))->toBeArray()->and(File::exists($programPath))->toBeFalse();
+        File::put($path, '<?php // Host policy');
+        $command->publishPolicies(true);
+        expect(File::get($path))->toBe('<?php // Host policy')->and(File::exists($programPath))->toBeTrue();
+    } finally {
+        $before === null ? File::delete($path) : File::put($path, $before);
+        $programBefore === null ? File::delete($programPath) : File::put($programPath, $programBefore);
+    }
 });

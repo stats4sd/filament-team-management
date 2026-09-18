@@ -2,13 +2,15 @@
 
 use Filament\Facades\Filament;
 use Illuminate\Auth\Events\Registered;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Hash;
 use Livewire\Livewire;
 use Stats4sd\FilamentTeamManagement\Events\RegisteredWithData;
 use Stats4sd\FilamentTeamManagement\Filament\Auth\Register;
 use Stats4sd\FilamentTeamManagement\Models\Invite;
 use Stats4sd\FilamentTeamManagement\Models\Team;
-use Stats4sd\FilamentTeamManagement\Models\User;
+use Stats4sd\FilamentTeamManagement\Tests\Fixtures\Models\HostUser as User;
 
 beforeEach(function () {
     Filament::setCurrentPanel(Filament::getPanel('app'));
@@ -42,14 +44,12 @@ it('redirects an already-authenticated user away from the register page', functi
         ->assertRedirect(Filament::getUrl());
 });
 
-it('creates the user, links the invite role + team, confirms it, and fires events', function () {
+it('creates the user, joins the invited team, confirms it, and fires events', function () {
     Event::fake([Registered::class, RegisteredWithData::class]);
 
-    $role = config('permission.models.role')::findByName('Super Admin', 'web');
     $team = Team::factory()->create();
     $invite = Invite::factory()->forTeam($team)->create([
         'email' => 'joiner@example.test',
-        'role_id' => $role->id,
     ]);
 
     mountRegister($invite)
@@ -64,12 +64,11 @@ it('creates the user, links the invite role + team, confirms it, and fires event
     $user = User::where('email', 'joiner@example.test')->first();
 
     expect($user)->not->toBeNull()
-        ->and($user->hasRole('Super Admin'))->toBeTrue()
         ->and($team->members()->whereKey($user->id)->exists())->toBeTrue()
-        ->and(Invite::withoutGlobalScope('onlyUnconfirmed')->find($invite->id)->is_confirmed)->toBeTrue();
+        ->and(Invite::query()->find($invite->id)->is_confirmed)->toBeTrue();
 
     Event::assertDispatched(Registered::class);
-    Event::assertDispatched(RegisteredWithData::class);
+    Event::assertDispatched(RegisteredWithData::class, fn ($event) => $event->data['original_password'] === 'longenoughpw' && Hash::check('longenoughpw', $event->data['password']));
 });
 
 it('enforces a minimum 10-character password', function () {
@@ -98,4 +97,17 @@ it('surfaces the custom minimum-length validation message', function () {
         ])
         ->call('register')
         ->assertHasFormErrors(['password' => 'Password must be at least 10 characters long.']);
+});
+
+it('does not authenticate an invited account before its outer transaction commits', function () {
+    $team = Team::factory()->create();
+    $invite = Invite::factory()->forTeam($team)->create(['email' => 'rollback@example.test']);
+    DB::beginTransaction();
+    mountRegister($invite)
+        ->fillForm(['name' => 'Rollback', 'password' => 'longenoughpw', 'passwordConfirmation' => 'longenoughpw'])
+        ->call('register')
+        ->assertHasNoFormErrors();
+    expect(Filament::auth()->check())->toBeFalse();
+    DB::rollBack();
+    expect(Filament::auth()->check())->toBeFalse()->and(User::where('email', $invite->email)->exists())->toBeFalse()->and($invite->fresh()->isPending())->toBeTrue();
 });

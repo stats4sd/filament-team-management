@@ -1,43 +1,31 @@
 # Changelog
 
-All notable changes to `filament-team-management` will be documented in this file.
+## 5.0.0 — unreleased
 
-## 5.0.0 - Filament 5 / Livewire 4 / Laravel 13 - unreleased
+Requires PHP ^8.4, Laravel 13, Filament ^5.2 and Livewire ^4. See [UPGRADE.md](UPGRADE.md) and [SETUP.md](SETUP.md).
 
-**Requires Laravel 13, Filament ^5.2, Livewire ^4 and PHP ^8.4.** This is a breaking release. Every change a consuming app must act on is listed in [UPGRADE.md](UPGRADE.md); read it before updating.
+### Membership-only boundary
 
-### Framework
+- Removed `spatie/laravel-permission`, Althinect integration, role resources, role-only invitations, `ModelHasRole`, permission seeders/middleware, role config and the package `is_admin` pivot/API. `spatie/laravel-package-tools` remains.
+- Shared actor-aware actions enforce host policies against actual configured targets. Team/program/member/invitation management, links, bootstrap, user deletion and bulk operations have one transactional boundary. Missing abilities deny.
+- Added synchronous before/after-write host participants for bootstrap grants, revocation, invariants and durable audit; added credential-free after-commit membership/invitation/link events.
+- Base User tenant/panel access now denies until the host implements its access contract. Removed implicit program-derived team access and `getAllAccessibleTeams()`.
+- Shared member/invitation UI supports independent read, edit and leave permissions. App direct attach is removed; Admin/Program pickers require a host-authorized query. Leaving the last team has an authenticated non-tenant destination.
 
-- Upgraded to Filament 5 and Livewire 4 (Laravel 13). `awcodes/shout` is no longer a dependency; the package uses Filament's `Callout` instead.
-- `althinect/filament-spatie-roles-permissions` is now required at `^3.0` stable.
-- `spatie/laravel-permission` is now a direct dependency (`^7.0`); the package extends its models and pivots, so it no longer relies on the transitive requirement. (3.13)
+### Invitations and schema
 
-### Schema
+- New-user acceptance validates persisted identity, target, token and expiry inside one transaction. Existing-user email invitations still add membership immediately, requiring both invite and add abilities, without a synthetic Invite history row.
+- Added expiration, token-rotating resend, cancellation, accepted-history filtering, pending-only counts and explicit outcomes. Mail queues after commit by default, with synchronous opt-out, immutable message snapshots and nullable inviter handling.
+- Fresh membership/link tables have unique pair constraints. Invites have unique tokens, nullable expiry, a nullable inviter with null-on-delete, configured table/FKs and no role column. Default/program publishing order and nullable program columns remain.
+- Installer no longer touches host permission configuration. It offers deny-default host policies, preserves existing files, writes dotenv values correctly and inserts seed calls idempotently with syntax-aware parsing.
 
-- **Program columns are always created.** The default migrations now always add nullable `invites.program_id` and `users.latest_program_id` without a constraint; a new `add_program_foreign_keys` migration in the program tag adds the foreign keys. Enabling programs on an existing 5.0 install is now "publish the program tag and migrate". Published program migrations are timestamped strictly after the default ones so the constraint migration cannot run first. Pre-5.0 installs enabling programs later must add the columns by hand first; see UPGRADE.md "Migrations". (3.12)
-- **Invites migration names its referenced tables.** `team_id` and `role_id` used bare `constrained()`, which guesses the table from the column name and broke fresh installs with a custom teams table or a custom Spatie roles table. Both now read the table name from config.
+### Retained framework and correctness work
 
-### Fixes
-
-- **Config keys ignored under 4.x are now read.** The config read `FILAMENT_TEAM_MANAGEMENT_USERS_TABLE` / `USERS_FOREIGN_KEY` while the installer wrote the singular `USER_TABLE` / `USER_FOREIGN_KEY`, so custom users-table settings never took effect. The config now reads the singular keys the installer writes. `programs_foreign_key` read the wrong env key (`PROGRAM_MODEL`) and now reads `PROGRAMS_FOREIGN_KEY`. The installer now also writes `ROLE_MODEL`. A parity test guards installer-written keys against config-read keys in both directions. (Review 4.1, 4.2)
-- **Team ↔ Program pivot table name was wrong.** `Team::programs()` and `Program::teams()` queried `team_programs` / `program_teams`; the migration creates `program_team`. Both now use the configured `table_names.program_team`. (4.3)
-- **Invites and role tracing now honour the app's User and Role classes.** `sendInvites()` and the role-assignment tracing resolved the package's own `User` / `Role` models, so roles granted to existing users via invite were recorded against the wrong class and never applied. They now resolve through `models.user` / `models.role`. (4.6)
-- **Inviting to a program with no `Program Admin` role no longer crashes.** A missing role now surfaces a warning notification and sends nothing. (4.7)
-- **UI copy no longer renders a blank where the team/program noun should be.** Added the `names` config block that the invite callouts and program delete modal read. Also fixed the program members table using the team word instead of the program word. (2.2)
-- **Invite tables showed an empty "program" column.** The column was bound to a non-existent `project` relationship; it now reads `program.name`. (4.4)
-- **Team admin flag was unreachable.** The admin panel Team → Users relation manager gains an "Edit Role" action to toggle `is_admin`, and the user who registers a team is now attached as its admin. The dead name-edit form on Program → Users was removed. (4.5)
-- **Manage Team → Members tab hid team admins.** The tab was bound to the non-admin-only relationship, so the team creator vanished from their own members list. It now lists all members. (2.3)
-- **Admin Invites relation managers no longer offer Create/Edit.** Invites are system-generated and double as an audit log; hand-authored invites are not supported. Delete remains. (4.8)
-- **Wrong `inverseRelationship` names on tenant tables** (`teams` where the inverse was `program`, `programs` or `team`) corrected. (4.13)
-- **Invite emails now link to a plain (unsigned) URL.** The token is the secret; Livewire stripped the signature parameter anyway. (4.10)
-- **Register page guards.** An already-authenticated user following an invite link is redirected to the panel home; a missing or invalid token redirects to login instead of a 404. (4.10)
-- **Password minimum-length message now displays** (the rule was enforced, the custom message was not). (4.12)
-- Removed an inert `SendEmailVerificationNotification` bind. (4.11)
-- **`CheckIfAdmin` / `CheckIfProgramAdmin` return 403 for guests** instead of a 500 null dereference. (4.14)
-- **Seeded admins can reach the admin panels.** `TestUserSeeder` now creates the four permissions (`access admin panel`, `access program admin panel`, `view all teams`, `view all programs`) and attaches them to the seeded roles, idempotently. (4.9)
-- **Program panel "Projects" classes renamed to what they are.** `ManageProgramProjects` → `ManageProgramTeams`, `ProgramProjectsTable` → `ProgramTeamsTable`, Livewire key `manage-program-teams`. The tab label, the page label and the name field now come from the `names.team` / `names.program` config words instead of a hardcoded string or the model class name. See UPGRADE.md "Renamed classes". (2.5)
-- **Removed dead code** (breaking only if an app imported it; none of ours do): the empty `FilamentTeamManagement` class, its facade and composer alias; the empty `FilamentTeamManagementPlugin`; the unused `Filament\Auth\RegisterResponse`; the `ProgramInvite` model and factory (program invites live in `invites` since 2.0); the empty `routes/team-management.php` and provider route registration; the placeholder `manage-team` view; and the self-referencing `Team::team()` / `Program::program()` relations and their interface declarations. See UPGRADE.md "Removed classes and files". (3.6, 3.9)
-- **Docs:** README navigation examples used an invented `viewAdminPanel` permission; corrected to the real strings and added a canonical Permissions section. `SetLatestTeamMiddleware` / `SetLatestProgramMiddleware` are documented as required tenant middleware. (4.15)
+- Upgraded Filament/Livewire and removed `awcodes/shout`; corrected config env names and program-team relationship wiring.
+- Display labels use `names.team`, `names.program`, `names.user`; configurable panel IDs resolve URLs through host panels. Program links check access and use escaped plain text when unavailable. Deletion redirects refresh the tenant before selecting a destination.
+- Remembered tenant selection uses the supplied panel and current accessible set. Tenant middleware validates configured model types and avoids unchanged saves.
+- User email edits ignore the current record for uniqueness. Program deletion copy now states that associated teams remain.
+- Renamed Program Projects pages/tables to Program Teams; removed unused facade/plugin/model/route remnants from the earlier framework update. Full removal list is in UPGRADE.md.
 
 ## 4.0.7 - Hide Program Invite Info - 2025-12-08
 

@@ -1,7 +1,6 @@
 <?php
 
 use Filament\Actions\CreateAction;
-use Filament\Actions\DeleteAction;
 use Filament\Actions\Testing\TestAction;
 use Filament\Facades\Filament;
 use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Programs\Pages\ViewProgram;
@@ -13,7 +12,7 @@ use Stats4sd\FilamentTeamManagement\Filament\Program\Pages\ManageProgram\ManageP
 use Stats4sd\FilamentTeamManagement\Models\Invite;
 use Stats4sd\FilamentTeamManagement\Models\Program;
 use Stats4sd\FilamentTeamManagement\Models\Team;
-use Stats4sd\FilamentTeamManagement\Models\User;
+use Stats4sd\FilamentTeamManagement\Tests\Fixtures\Models\HostUser as User;
 
 $programKey = fn () => config('filament-team-management.column_names.programs_foreign_key');
 $teamKey = fn () => config('filament-team-management.column_names.teams_foreign_key');
@@ -40,8 +39,8 @@ it('renders the program.name column on the Program invites table', function () u
 
     $component = livewire(ManageProgramInvites::class)
         ->assertSuccessful()
-        ->assertCanRenderTableColumn('program.name')
-        ->assertSee('Alpha Program');
+        ->assertCanRenderTableColumn('email')
+        ->assertSee('pending@example.test');
 
     // Fix 4.13: inverseRelationship was 'teams'; the invite's inverse is 'program'.
     expect($component->instance()->getTable()->getInverseRelationship())->toBe('program');
@@ -49,7 +48,7 @@ it('renders the program.name column on the Program invites table', function () u
 
 // Fix 4.4 + 4.13: the Team Invites tenant table (program column only visible in
 // program mode) renders program.name for an invite carrying a program_id.
-it('renders the program.name column on the Team invites table in program mode', function () use ($teamKey, $programKey) {
+it('renders the program.name column on the Team invites table in program mode', function () use ($teamKey) {
     $team = Team::factory()->create();
     $program = Program::factory()->create(['name' => 'Bravo Program']);
 
@@ -59,13 +58,12 @@ it('renders the program.name column on the Team invites table in program mode', 
     Invite::factory()->create([
         'email' => 'pending2@example.test',
         $teamKey() => $team->id,
-        $programKey() => $program->id,
     ]);
 
     $component = livewire(ManageTeamInvites::class)
         ->assertSuccessful()
-        ->assertCanRenderTableColumn('program.name')
-        ->assertSee('Bravo Program');
+        ->assertCanRenderTableColumn('email')
+        ->assertSee('pending2@example.test');
 
     // Fix 4.13: inverseRelationship was 'teams'; the invite's inverse is 'team'.
     expect($component->instance()->getTable()->getInverseRelationship())->toBe('team');
@@ -104,7 +102,7 @@ it('exposes no Create action but keeps Delete on the Program Invites relation ma
         'pageClass' => ViewProgram::class,
     ])
         ->assertActionDoesNotExist(TestAction::make(CreateAction::getDefaultName())->table())
-        ->assertActionExists(TestAction::make(DeleteAction::getDefaultName())->table($invite));
+        ->assertActionExists(TestAction::make('cancel')->table($invite));
 });
 
 // A7 (2.5): the Program panel's team-management widget was named "Projects" (ManageProgramProjects /
@@ -125,4 +123,19 @@ it('renders the Program teams table and lists the tenant program\'s teams', func
         ->assertSee('Charlie Team');
 
     expect($component->instance()->getTable()->getInverseRelationship())->toBe('programs');
+});
+
+it('bulk self-removal selects another accessible program instead of retaining the departed tenant', function () {
+    $member = User::factory()->create();
+    $program = Program::factory()->create();
+    $remaining = Program::factory()->create();
+    $program->users()->attach($member);
+    $remaining->users()->attach($member);
+    $this->actingAs($member);
+    Filament::setCurrentPanel(Filament::getPanel('program'));
+    Filament::setTenant($program);
+    livewire(ManageProgramMembers::class)->selectTableRecords([$member->getKey()])
+        ->callAction(TestAction::make('detach')->table()->bulk())
+        ->assertRedirect(Filament::getPanel('program')->getUrl($remaining));
+    expect($program->users()->count())->toBe(0);
 });

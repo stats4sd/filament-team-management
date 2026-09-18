@@ -7,10 +7,12 @@ use Filament\Support\Assets\Asset;
 use Filament\Support\Facades\FilamentAsset;
 use Filament\Support\Facades\FilamentIcon;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Facades\Route;
 use Livewire\Features\SupportTesting\Testable;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 use Stats4sd\FilamentTeamManagement\Commands\InstallFilamentTeamManagement;
+use Stats4sd\FilamentTeamManagement\Http\Controllers\NoMembershipsController;
 use Stats4sd\FilamentTeamManagement\Testing\TestsFilamentTeamManagement;
 
 class FilamentTeamManagementServiceProvider extends PackageServiceProvider
@@ -42,6 +44,7 @@ class FilamentTeamManagementServiceProvider extends PackageServiceProvider
      */
     public function packageBooted(): void
     {
+        Route::middleware('web')->get('/membership/no-memberships', NoMembershipsController::class)->name('filament-team-management.no-memberships');
         // Migrations are handled in a custom way, split into a default and a program publish tag.
         // A single clock is shared across both tags so every published program migration gets a
         // timestamp strictly after every default one: 10_add_program_foreign_keys must run after

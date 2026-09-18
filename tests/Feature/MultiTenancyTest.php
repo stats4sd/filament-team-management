@@ -2,10 +2,11 @@
 
 use Filament\Facades\Filament;
 use Stats4sd\FilamentTeamManagement\Models\Team;
-use Stats4sd\FilamentTeamManagement\Models\User;
+use Stats4sd\FilamentTeamManagement\Tests\Fixtures\Models\HostUser as User;
 
 beforeEach(function () {
     $this->appPanel = Filament::getPanel('app');
+    Filament::setCurrentPanel($this->appPanel);
 });
 
 it('returns only the teams a user belongs to', function () {
@@ -21,7 +22,7 @@ it('returns only the teams a user belongs to', function () {
 
 it('returns all teams for a user with the view all teams permission', function () {
     $user = User::factory()->create();
-    $user->givePermissionTo('view all teams');
+    $user->forceFill(['host_admin' => true])->save();
     Team::factory()->count(3)->create();
 
     expect($user->getTenants($this->appPanel)->count())->toBe(3);
@@ -31,7 +32,7 @@ it('grants tenant access to members and to holders of view all teams', function 
     $member = User::factory()->create();
     $stranger = User::factory()->create();
     $superuser = User::factory()->create();
-    $superuser->givePermissionTo('view all teams');
+    $superuser->forceFill(['host_admin' => true])->save();
 
     $team = Team::factory()->create();
     $member->teams()->attach($team);
@@ -68,5 +69,5 @@ it('returns just the direct teams from getAllAccessibleTeams when programs are o
     $team = Team::factory()->create();
     $user->teams()->attach($team);
 
-    expect($user->getAllAccessibleTeams()->pluck('id')->all())->toBe([$team->id]);
+    expect($user->getTenants($this->appPanel)->pluck('id')->all())->toBe([$team->id]);
 });

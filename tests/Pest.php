@@ -5,7 +5,8 @@ use Illuminate\Support\Facades\URL;
 use Livewire\Features\SupportTesting\Testable;
 use Livewire\Livewire;
 use Stats4sd\FilamentTeamManagement\Models\Invite;
-use Stats4sd\FilamentTeamManagement\Models\User;
+use Stats4sd\FilamentTeamManagement\Tests\CustomPanelTestCase;
+use Stats4sd\FilamentTeamManagement\Tests\Fixtures\Models\HostUser as User;
 use Stats4sd\FilamentTeamManagement\Tests\ProgramTestCase;
 use Stats4sd\FilamentTeamManagement\Tests\TestCase;
 
@@ -21,10 +22,6 @@ use Stats4sd\FilamentTeamManagement\Tests\TestCase;
 
 uses(TestCase::class)->in('Unit', 'Smoke', 'Feature');
 
-// Program-mode tests run against a test case with $usePrograms = true, so the
-// program migrations (and the program columns on invites/users) and the Program
-// panel are present from boot. Kept in their own subtree so the directory binds
-// don't overlap (Pest forbids two base test cases for the same file).
 uses(ProgramTestCase::class)->in('ProgramMode');
 
 /*
@@ -34,7 +31,7 @@ uses(ProgramTestCase::class)->in('ProgramMode');
 */
 
 /**
- * Create a Super Admin user and act as them. Returns the user.
+ * Create a host administrator and act as them. Returns the user.
  */
 function actingAsAdmin(): User
 {
@@ -42,7 +39,7 @@ function actingAsAdmin(): User
 }
 
 /**
- * Create a Program Admin user and act as them. Returns the user.
+ * Create a host administrator and act as them. Returns the user.
  */
 function actingAsProgramAdmin(): User
 {
@@ -77,3 +74,5 @@ function signedInviteUrl(Invite $invite): string
 
     return URL::signedRoute($routeName, ['token' => $invite->token]);
 }
+
+uses(CustomPanelTestCase::class)->in('CustomPanels');

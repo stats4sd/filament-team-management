@@ -22,8 +22,6 @@ it('does not create the program tables without programs', function () {
     expect(Schema::hasTable('programs'))->toBeFalse();
 });
 
-// The program columns are always created so the schema never depends on use_programs at
-// migration time; only the foreign keys (stub 10, program tag) are program-only.
 it('creates the program columns without foreign keys when programs are disabled', function () {
     expect(Schema::hasColumn('invites', 'program_id'))->toBeTrue()
         ->and(Schema::hasColumn('users', 'latest_program_id'))->toBeTrue()
@@ -31,15 +29,11 @@ it('creates the program columns without foreign keys when programs are disabled'
         ->and(foreignKeyColumns('users'))->not->toContain('latest_program_id');
 });
 
-// Stub 3 used bare constrained(), which guesses the referenced table from the column name
-// (team_id -> teams, role_id -> roles) and so broke under a custom teams table or Spatie roles
-// table. It now names both tables from config. Under default names the two are indistinguishable,
-// so re-run the stub against non-default table names and check where the keys point.
-it('constrains invites.team_id and invites.role_id against the configured (non-default) tables', function () {
+it('constrains invites.team_id and nullable inviter_id against the configured (non-default) tables', function () {
     Schema::create('custom_teams', fn (Blueprint $table) => $table->id());
-    Schema::create('custom_roles', fn (Blueprint $table) => $table->id());
+    Schema::create('custom_users', fn (Blueprint $table) => $table->id());
     config()->set('filament-team-management.table_names.teams', 'custom_teams');
-    config()->set('permission.table_names.roles', 'custom_roles');
+    config()->set('filament-team-management.table_names.users', 'custom_users');
 
     Schema::drop('invites');
     $migration = include dirname(__DIR__, 2) . '/database/migrations/3_create_invites_table.php.stub';
@@ -49,5 +43,5 @@ it('constrains invites.team_id and invites.role_id against the configured (non-d
         ->mapWithKeys(fn (array $fk) => [$fk['columns'][0] => $fk['foreign_table']]);
 
     expect($foreignTables->get('team_id'))->toBe('custom_teams')
-        ->and($foreignTables->get('role_id'))->toBe('custom_roles');
+        ->and($foreignTables->get('inviter_id'))->toBe('custom_users');
 });

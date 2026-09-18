@@ -2,83 +2,97 @@
 
 namespace Stats4sd\FilamentTeamManagement\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Spatie\Permission\Models\Role;
+use Illuminate\Support\Carbon;
+use Stats4sd\FilamentTeamManagement\Support\Membership;
 
 /**
  * @property string $email
- * @property int $inviter_id
- * @property int $role_id
  * @property string $token
  * @property bool $is_confirmed
- * @property ?Team $team
- * @property ?Role $role
- * @property ?Program $program
+ * @property ?Carbon $expires_at
+ * @property ?Model $inviter
  */
 class Invite extends Model
 {
     use HasFactory;
 
-    protected $table = 'invites';
-
     protected $guarded = ['id'];
 
-    protected $casts = [
-        'is_confirmed' => 'boolean',
-    ];
+    protected $casts = ['is_confirmed' => 'boolean', 'expires_at' => 'datetime'];
 
-    protected static function booted()
+    public function getTable()
     {
-        self::addGlobalScope('onlyUnconfirmed', function ($query) {
-            $query->where('is_confirmed', false);
-        });
+        return config('filament-team-management.table_names.invites', 'invites');
     }
 
-    // *********** RELATIONSHIPS ************ //
+    public function setEmailAttribute(string $email): void
+    {
+        $this->attributes['email'] = Membership::email($email);
+    }
 
-    /** @return BelongsTo<Model, $this> */
     public function inviter(): BelongsTo
     {
-        return $this->belongsTo(
-            related: config('filament-team-management.models.user'),
-            foreignKey: 'inviter_id'
-        );
+        return $this->belongsTo(config('filament-team-management.models.user'), 'inviter_id');
     }
 
-    /** @return BelongsTo<Model, $this> */
-    public function role(): BelongsTo
-    {
-        return $this->belongsTo(
-            related: config('filament-team-management.models.role'),
-            foreignKey: config('permission.column_names.role_pivot_key') ?? 'role_id'
-        );
-    }
-
-    /** @return BelongsTo<Model, $this> */
     public function program(): BelongsTo
     {
-        return $this->belongsTo(
-            related: config('filament-team-management.models.program'),
-            foreignKey: config('filament-team-management.column_names.programs_foreign_key'),
-        );
+        return $this->belongsTo(config('filament-team-management.models.program'), config('filament-team-management.column_names.programs_foreign_key'));
     }
 
-    /** @return BelongsTo<Model, $this> */
     public function team(): BelongsTo
     {
-        return $this->belongsTo(
-            related: config('filament-team-management.models.team'),
-            foreignKey: config('filament-team-management.column_names.teams_foreign_key'),
-        );
+        return $this->belongsTo(config('filament-team-management.models.team'), config('filament-team-management.column_names.teams_foreign_key'));
     }
 
-    public function confirm(): bool
+    public function target(): Model
     {
-        $this->is_confirmed = true;
-        $this->save();
+        $team = $this->getAttribute(config('filament-team-management.column_names.teams_foreign_key'));
+        $program = $this->getAttribute(config('filament-team-management.column_names.programs_foreign_key'));
+        if (($team === null) === ($program === null)) {
+            Membership::invalid('This invitation has no valid membership target.');
+        }
+        $target = $team !== null ? $this->team()->withoutGlobalScopes()->first() : $this->program()->withoutGlobalScopes()->first();
+        if (! $target) {
+            Membership::invalid('The invitation target is no longer available.');
+        }
+        Membership::type($target);
+        Membership::eligible($target);
 
-        return $this->is_confirmed;
+        return $target;
+    }
+
+    public function isAccepted(): bool
+    {
+        return (bool) $this->is_confirmed;
+    }
+
+    public function isExpired(): bool
+    {
+        return ! $this->isAccepted() && $this->expires_at !== null && $this->expires_at->lte(now());
+    }
+
+    public function isPending(): bool
+    {
+        return ! $this->isAccepted() && ! $this->isExpired();
+    }
+
+    public function scopeUnaccepted(Builder $query): Builder
+    {
+        return $query->where('is_confirmed', false);
+    }
+
+    public function scopeAccepted(Builder $query): Builder
+    {
+        return $query->where('is_confirmed', true);
+    }
+
+    public function scopePending(Builder $query): Builder
+    {
+        return $query->where('is_confirmed', false)->where(fn (Builder $query) => $query->whereNull('expires_at')->orWhere('expires_at', '>', now()));
     }
 }

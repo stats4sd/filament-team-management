@@ -1,10 +1,10 @@
 <?php
 
 use Filament\Facades\Filament;
-use Filament\Schemas\Components\Callout;
 use Filament\Schemas\Schema;
 use Stats4sd\FilamentTeamManagement\Filament\Program\Pages\ManageProgram\ManageProgram;
 use Stats4sd\FilamentTeamManagement\Filament\Program\Pages\ManageProgram\ManageProgramMembers;
+use Stats4sd\FilamentTeamManagement\Filament\Program\Pages\ManageProgram\ManageProgramTeams;
 use Stats4sd\FilamentTeamManagement\Models\Program;
 
 /*
@@ -23,13 +23,9 @@ it('renders the configured program word in the members invite callout (guards 2.
     Filament::setTenant($program);
 
     $widget = livewire(ManageProgramMembers::class)->instance();
-    $action = $widget->getTable()->getAction('Invite');
+    $action = $widget->getTable()->getAction('invite');
 
-    $callout = collect($action->getForm(Schema::make($widget))->getComponents())
-        ->first(fn ($c) => $c instanceof Callout);
-
-    expect($callout)->not->toBeNull()
-        ->and($callout->getDescription())->toContain('invite to this initiative');
+    expect($action->getModalDescription())->toContain('this initiative');
 });
 
 /*
@@ -62,4 +58,16 @@ it('labels the ManageProgram page and name field from the configured program wor
     $this->get(ManageProgram::getUrl(tenant: $program, panel: 'program'))
         ->assertOk()
         ->assertSee('Enter a name for the initiative');
+});
+
+it('uses the configured team noun in the existing-team selector', function () {
+    config()->set('filament-team-management.names.team', 'site');
+    actingAsAdmin();
+    $program = Program::factory()->create();
+    Filament::setCurrentPanel(Filament::getPanel('program'));
+    Filament::setTenant($program);
+    $widget = livewire(ManageProgramTeams::class)->instance();
+    $action = $widget->getTable()->getAction('attach');
+    $field = $action->getSchema(Schema::make($widget))->getComponents()[0];
+    expect($field->getLabel())->toBe('Site');
 });

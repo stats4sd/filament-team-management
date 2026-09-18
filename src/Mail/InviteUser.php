@@ -7,50 +7,30 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
-use Illuminate\Queue\SerializesModels;
 use Stats4sd\FilamentTeamManagement\Models\Invite;
+use Stats4sd\FilamentTeamManagement\Support\MembershipMail;
 
 class InviteUser extends Mailable
 {
     use Queueable;
-    use SerializesModels;
 
-    /**
-     * Create a new message instance.
-     *
-     * @return void
-     */
-    public function __construct(public Invite $invite) {}
+    public array $snapshot;
 
-    /**
-     * Get the message envelope.
-     */
-    public function envelope(): Envelope
+    public string $acceptUrl;
+
+    public function __construct(Invite $invite)
     {
-        return new Envelope(
-            from: config('mail.from.address'),
-            subject: config('app.name') . ': Invitation to register',
-        );
+        $this->snapshot = MembershipMail::snapshot($invite->target(), $invite->inviter);
+        $this->acceptUrl = route(Filament::getDefaultPanel()->generateRouteName('auth.register'), ['token' => $invite->token]);
     }
 
-    /**
-     * Get the message content definition
-     */
+    public function envelope(): Envelope
+    {
+        return new Envelope(subject: config('app.name') . ': Invitation to register');
+    }
+
     public function content(): Content
     {
-
-        $routeName = Filament::getDefaultPanel()->generateRouteName('auth.register');
-
-        return new Content(
-            markdown: 'filament-team-management::emails.invite',
-            with: [
-                'acceptUrl' => route(
-                    $routeName,
-                    [
-                        'token' => $this->invite->token,
-                    ],
-                ),
-            ],
-        );
+        return new Content(markdown: 'filament-team-management::emails.invite');
     }
 }

@@ -2,15 +2,10 @@
 
 namespace Stats4sd\FilamentTeamManagement\Models;
 
-use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Str;
-use Stats4sd\FilamentTeamManagement\Mail\InviteUser;
-use Stats4sd\FilamentTeamManagement\Mail\UpdateUser;
 use Stats4sd\FilamentTeamManagement\Models\Interfaces\ProgramInterface;
 use Stats4sd\FilamentTeamManagement\Models\Traits\HasModelNameLowerString;
 
@@ -31,107 +26,9 @@ class Program extends Model implements ProgramInterface
 
     protected $guarded = ['id'];
 
-    // ****** TEAM MANAGEMENT STUFF ******
-
-    /**
-     * Generate an invitation to join this program for each of the provided email addresses
-     */
-    public function sendInvites(array $emails): void
-    {
-        // Phase 2: this logic is triplicated across User/Team/Program::sendInvites — collapse into an InviteService.
-        // Phase 2: the "Program Admin" role name should come from config rather than being hardcoded here.
-        $programAdminRole = config('filament-team-management.models.role')::where('name', 'Program Admin')->first();
-
-        // Guard against a missing role (the package seeders are optional): surface a warning
-        // and bail out gracefully rather than fataling on a null role further down.
-        if (! $programAdminRole) {
-            Notification::make()
-                ->warning()
-                ->title('Program Admin role missing')
-                ->body('The "Program Admin" role does not exist, so no invitations were sent. Run the package seeders or create the role first.')
-                ->send();
-
-            return;
-        }
-
-        foreach ($emails as $email) {
-            // if email is empty, skip to next email
-            if ($email == null || $email == '') {
-                continue;
-            }
-
-            // check if email address belong to any registered user
-            $user = config('filament-team-management.models.user')::where('email', $email)->first();
-
-            // email address does not belong to any registered user
-            if (! $user) {
-
-                /** @var Invite $invite */
-                $invite = $this->invites()->create([
-                    'email' => $email,
-                    'inviter_id' => auth()->id(),
-                    'role_id' => $programAdminRole->id,
-                    'token' => Str::random(24),
-                ]);
-
-                Mail::to($invite->email)->send(new InviteUser($invite));
-
-                // show notification after sending invitation email to user
-                Notification::make()
-                    ->success()
-                    ->title('Invitation Sent')
-                    ->body('An email invitation has been successfully sent to ' . $email)
-                    ->send();
-
-                // email address belongs to a registered user
-            } else {
-                // add user to program if user does not belong to this program yet
-                if ($this->users->contains($user)) {
-                    // show notification
-                    Notification::make()
-                        ->success()
-                        ->title('User already in this program')
-                        ->body('User ' . $email . ' belongs to this program already')
-                        ->send();
-                } else {
-                    // add invites model for future tracing
-                    $invite = $this->invites()->create([
-                        'email' => $email,
-                        'inviter_id' => auth()->id(),
-                        'role_id' => $programAdminRole->id,
-                        'token' => 'na',
-                        'is_confirmed' => true,
-                    ]);
-
-                    // add user to this program
-                    $this->users()->attach($user);
-
-                    // show notification
-                    Notification::make()
-                        ->success()
-                        ->title('User added')
-                        ->body('User ' . $email . ' has been added to this program')
-                        ->send();
-
-                    // send email notification to inform user that he/she has been added to a program
-                    Mail::to($invite->email)->send(new UpdateUser($invite));
-
-                    // show notification after sending email notification to user
-                    Notification::make()
-                        ->success()
-                        ->title('Email Notification Sent')
-                        ->body('An email notification has been successfully sent to ' . $email)
-                        ->send();
-                }
-
-            }
-
-        }
-    }
-
     public function invites(): HasMany
     {
-        return $this->hasMany(Invite::class);
+        return $this->hasMany(Invite::class, config('filament-team-management.column_names.programs_foreign_key'));
     }
 
     public function users(): BelongsToMany

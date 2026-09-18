@@ -16,8 +16,6 @@ class TestProgramSeeder extends Seeder
     public function run()
     {
 
-        \DB::table(config('filament-team-management.table_names.programs'))->delete();
-
         $program = config('filament-team-management.models.program')::create([
             'name' => 'Test Program',
             'description' => fake()->paragraph(),
@@ -49,8 +47,8 @@ class TestProgramSeeder extends Seeder
             'password' => bcrypt('password'),
         ]);
 
-        $programTeamOne->members()->attach($teamMemberOne->id, ['is_admin' => true]);
-        $programTeamTwo->members()->attach($teamMemberTwo->id, ['is_admin' => true]);
+        $programTeamOne->members()->attach($teamMemberOne->id);
+        $programTeamTwo->members()->attach($teamMemberTwo->id);
 
     }
 }

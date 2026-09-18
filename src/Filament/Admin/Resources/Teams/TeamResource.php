@@ -10,6 +10,7 @@ use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Teams\RelationManag
 use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Teams\Schemas\TeamForm;
 use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Teams\Schemas\TeamInfolist;
 use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Teams\Tables\TeamTable;
+use Stats4sd\FilamentTeamManagement\Filament\Traits\AuthorizesHostResource;
 use Stats4sd\FilamentTeamManagement\Filament\Traits\HasTeamManagementNavigationGroup;
 
 // filament-odk-link package related code are commented as some applications may not require ODK functionalities.
@@ -17,6 +18,7 @@ use Stats4sd\FilamentTeamManagement\Filament\Traits\HasTeamManagementNavigationG
 
 class TeamResource extends Resource
 {
+    use AuthorizesHostResource;
     use HasTeamManagementNavigationGroup;
 
     protected static string | null | \BackedEnum $navigationIcon = 'heroicon-o-building-office-2';

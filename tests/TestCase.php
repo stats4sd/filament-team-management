@@ -15,14 +15,18 @@ use Filament\Support\SupportServiceProvider;
 use Filament\Tables\TablesServiceProvider;
 use Filament\Widgets\WidgetsServiceProvider;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Schema;
 use Livewire\LivewireServiceProvider;
 use Livewire\Mechanisms\DataStore;
 use Orchestra\Testbench\TestCase as Orchestra;
 use RyanChandler\BladeCaptureDirective\BladeCaptureDirectiveServiceProvider;
-use Spatie\Permission\PermissionServiceProvider;
 use Stats4sd\FilamentTeamManagement\FilamentTeamManagementServiceProvider;
 use Stats4sd\FilamentTeamManagement\Models\User;
+use Stats4sd\FilamentTeamManagement\Tests\Fixtures\Models\HostUser;
+use Stats4sd\FilamentTeamManagement\Tests\Fixtures\Policies\MembershipPolicy;
+use Stats4sd\FilamentTeamManagement\Tests\Fixtures\Policies\UserPolicy;
 use Stats4sd\FilamentTeamManagement\Tests\Fixtures\TestPanelProvider;
 
 class TestCase extends Orchestra
@@ -33,23 +37,34 @@ class TestCase extends Orchestra
      */
     protected bool $usePrograms = false;
 
+    protected array $panelIds = ['app' => 'app', 'program' => 'program', 'admin' => 'admin'];
+
+    protected array $panelPaths = ['app' => 'app', 'program' => 'program', 'admin' => 'admin'];
+
+    protected ?string $tenantSlugAttribute = null;
+
+    protected bool $registration = false;
+
     protected function setUp(): void
     {
         // Must be set before parent::setUp() creates the application, so the
         // test panel provider can read it when it registers (which happens
         // before Testbench applies our environment config).
         TestPanelProvider::$usePrograms = $this->usePrograms;
+        TestPanelProvider::$panelIds = $this->panelIds;
+        TestPanelProvider::$panelPaths = $this->panelPaths;
+        TestPanelProvider::$tenantSlugAttribute = $this->tenantSlugAttribute;
+        TestPanelProvider::$registration = $this->registration;
 
         parent::setUp();
 
         Factory::guessFactoryNamesUsing(
-            fn (string $modelName) => 'Stats4sd\\FilamentTeamManagement\\Database\\Factories\\' . class_basename($modelName) . 'Factory'
+            fn (string $modelName) => 'Stats4sd\\FilamentTeamManagement\\Database\\Factories\\' . (is_a($modelName, User::class, true) ? 'User' : class_basename($modelName)) . 'Factory'
         );
 
-        // The package ships no policies; host apps grant Super Admins blanket
-        // access via a Gate::before. Mirror that so authorization-gated Filament
-        // actions (edit/delete/attach in the Admin panel) are reachable in tests.
-        Gate::before(fn ($user) => $user->hasRole('Super Admin') ? true : null);
+        Gate::policy(config('filament-team-management.models.team'), MembershipPolicy::class);
+        Gate::policy(config('filament-team-management.models.program'), MembershipPolicy::class);
+        Gate::policy(config('filament-team-management.models.user'), UserPolicy::class);
     }
 
     protected function getPackageProviders($app)
@@ -68,7 +83,6 @@ class TestCase extends Orchestra
             SupportServiceProvider::class,
             TablesServiceProvider::class,
             WidgetsServiceProvider::class,
-            PermissionServiceProvider::class,
             FilamentTeamManagementServiceProvider::class,
             TestPanelProvider::class,
         ];
@@ -86,17 +100,14 @@ class TestCase extends Orchestra
 
         config()->set('app.key', 'base64:' . base64_encode(random_bytes(32)));
 
-        // Auth defaults — Spatie roles/permissions resolve their guard from
-        // here, and the user provider must point at the configured User model.
+        // The auth provider uses our explicit host integration model.
+        config()->set('filament-team-management.models.user', HostUser::class);
         config()->set('auth.defaults.guard', 'web');
         config()->set('auth.guards.web', ['driver' => 'session', 'provider' => 'users']);
         config()->set('auth.providers.users.model', config('filament-team-management.models.user'));
 
-        // The spatie/laravel-permission sqlite fix; keeps the roles table
-        // schema sane on the in-memory connection.
-        config()->set('permission.testing', true);
-
         config()->set('filament-team-management.use_programs', $this->usePrograms);
+        config()->set('filament-team-management.panels', $this->panelIds);
 
         // Filament's SupportServiceProvider binds Livewire's DataStore with a
         // non-shared bind() (to DataStoreOverride). In a real app Livewire's
@@ -113,7 +124,7 @@ class TestCase extends Orchestra
      * Run the package migrations against the in-memory connection.
      *
      * The package ships `.stub` migrations (so Testbench won't auto-discover
-     * them) and depends on the Spatie permission tables, so we include and run
+     * them), so we include and run
      * each migration by hand in dependency order. Laravel's default migrations
      * (users, cache, jobs, …) are loaded first for the base `users` table.
      */
@@ -121,11 +132,17 @@ class TestCase extends Orchestra
     {
         $this->loadLaravelMigrations();
 
-        // Spatie permission tables (roles, permissions, pivots) — the invites
-        // migration constrains role_id against the roles table.
-        $this->runStubMigration(
-            $this->vendorPath('spatie/laravel-permission/database/migrations/create_permission_tables.php.stub')
-        );
+        Schema::table('users', function (Blueprint $table) {
+            $table->boolean('host_admin')->default(false);
+        });
+        Schema::create('host_grants', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('user_id');
+            $table->string('target_type');
+            $table->unsignedBigInteger('target_id');
+            $table->string('ability');
+            $table->unique(['user_id', 'target_type', 'target_id', 'ability']);
+        });
 
         // Package default migrations. These always create the (unconstrained)
         // program columns on invites and users, so they never depend on
@@ -140,7 +157,6 @@ class TestCase extends Orchestra
             $this->runProgramMigrations();
         }
 
-        $this->seedRolesAndPermissions();
     }
 
     /**
@@ -172,30 +188,6 @@ class TestCase extends Orchestra
     }
 
     /**
-     * Seed the roles and permissions the package's models and middleware refer
-     * to directly. Kept here (not in a Seeder class) so every test starts from
-     * a known authorization baseline.
-     */
-    protected function seedRolesAndPermissions(): void
-    {
-        $roleModel = config('permission.models.role');
-        $permissionModel = config('permission.models.permission');
-
-        foreach (['Super Admin', 'Program Admin'] as $role) {
-            $roleModel::findOrCreate($role, 'web');
-        }
-
-        foreach ([
-            'access admin panel',
-            'access program admin panel',
-            'view all teams',
-            'view all programs',
-        ] as $permission) {
-            $permissionModel::findOrCreate($permission, 'web');
-        }
-    }
-
-    /**
      * Flip the harness into program mode at runtime: enable the config flag and
      * run the full program migration set (tables + foreign keys; the program
      * columns themselves already exist from the default set). Call at the top
@@ -214,13 +206,13 @@ class TestCase extends Orchestra
     }
 
     /**
-     * Create a Super Admin user and act as them.
+     * Create a host administrator and act as them.
      */
     public function actingAsAdmin(): User
     {
         /** @var User $user */
         $user = config('filament-team-management.models.user')::factory()->create();
-        $user->assignRole('Super Admin');
+        $user->forceFill(['host_admin' => true])->save();
 
         $this->actingAs($user);
 
@@ -228,13 +220,13 @@ class TestCase extends Orchestra
     }
 
     /**
-     * Create a Program Admin user and act as them.
+     * Create a host administrator and act as them.
      */
     public function actingAsProgramAdmin(): User
     {
         /** @var User $user */
         $user = config('filament-team-management.models.user')::factory()->create();
-        $user->assignRole('Program Admin');
+        $user->forceFill(['host_admin' => true])->save();
 
         $this->actingAs($user);
 

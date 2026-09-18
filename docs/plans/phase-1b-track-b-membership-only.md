@@ -1,6 +1,6 @@
 # Phase 1b — replacement Track B: membership core with app-owned authorization
 
-**Date:** 2026-09-17 · **Status:** proposed implementation plan; no implementation in this document is complete. · **Replaces:** Track B, its readiness assessment and its suggested implementation order in [the original Phase 1b plan](phase-1b-pre-release-and-review-remainder.md#track-b--remaining-review-items). Track A's completed work remains historical fact.
+**Date:** 2026-09-17 · **Status:** B1–B8 implemented on 2026-09-18; B9 remains deferred. See the [implementation and verification record](../change-logs/phase-1b-track-b-membership-only.md). · **Replaces:** Track B, its readiness assessment and its suggested implementation order in [the original Phase 1b plan](phase-1b-pre-release-and-review-remainder.md#track-b--remaining-review-items). Track A's completed work remains historical fact.
 
 ## 1. Direction and scope
 
@@ -279,7 +279,7 @@ Implementation work uses focused regression/acceptance tests plus `composer test
 - Old existing-install migration requirements and post-5.0 compatibility classification are removed under the user's consumer constraints. Track A's historical merge record is not rewritten.
 - Existing-user pending invitation acceptance, a generic permission engine, a generic audit/outbox system, full Filament scaffold conversion, the monorepo move and B9 drill-down are outside this implementation scope.
 
-## 8. Evidence and handoff
+## 8. Original planning evidence and handoff (2026-09-17)
 
 This plan follows source inspection on 2026-09-17, not runtime confirmation of the proposed implementation. Relevant current code: `src/Models/User.php` (Spatie trait, role pivot, global permission shortcuts and program-derived teams); `src/Models/Team.php` (admin/member filters and immediate-add tracing); `src/Models/Program.php` (automatic Program Admin invite intent and many-to-many teams); `src/Models/ModelHasRole.php`; `src/Models/Invite.php`; `src/Filament/Auth/Register.php`; membership/invites migration stubs 2/3/6 and program FK stub 10; Admin User form/table/actions; installer/config; `tests/TestCase.php` (Super Admin bypass).
 
@@ -288,3 +288,9 @@ Direct Laravel Gate denies an unresolved ability in the installed `vendor/larave
 The comparison also inspected `stats4sd/aec_portfolio` at `a666dc66c2dfe7c5156082ddf4c701e33c0269f7`: its Spatie context is organisation-scoped; membership and scoped role assignment are separate; portfolios do not introduce a second role scope. That is evidence for a host-owned permission adapter, not a ready-made program/team hierarchy to import.
 
 This plan and the linked historical plans are local planning deliverables under `docs/`. This planning revision does not stage, commit or publish them. No runtime code, dependency or migration is changed by this planning revision.
+
+## 9. Implementation decisions (2026-09-18)
+
+The [bounded implementation contract](phase-1b-track-b-implementation.md) and [implementation log](../change-logs/phase-1b-track-b-membership-only.md) record the executed work, the clarity/consistency refinements and runtime evidence. The sections above preserve the original specification and its historical planning evidence; they are not the current verification report.
+
+Self-removal now consistently uses `leave`, including direct/bulk removal callers. Team and program screens share actions/tables/results; program departure selects another accessible program before App fallback. Unconfigured existing-user pickers expose no candidates or actionable picker. Host model/pivot vetoes roll back the entire operation, and structural cleanup bypasses visibility scopes while direct operations still reject soft-deleted actors/members/targets. The chosen deletion wording states what the package actually removes. These refinements follow “keep it clear; keep it consistent” and do not add a package authorization backend.

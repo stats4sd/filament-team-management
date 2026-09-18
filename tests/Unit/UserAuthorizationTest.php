@@ -1,15 +1,13 @@
 <?php
 
+use Filament\Facades\Filament;
 use Stats4sd\FilamentTeamManagement\Models\Program;
 use Stats4sd\FilamentTeamManagement\Models\Team;
-use Stats4sd\FilamentTeamManagement\Models\User;
+use Stats4sd\FilamentTeamManagement\Tests\Fixtures\Models\HostUser as User;
 
-it('reports isAdmin() only for users with the Super Admin role', function () {
-    $admin = User::factory()->create();
-    $admin->assignRole('Super Admin');
-
-    expect($admin->isAdmin())->toBeTrue()
-        ->and(User::factory()->create()->isAdmin())->toBeFalse();
+it('denies panel and tenant access in the unconfigured package base', function () {
+    $user = new Stats4sd\FilamentTeamManagement\Models\User;
+    expect($user->canAccessPanel(Filament::getPanel('app')))->toBeFalse()->and($user->getTenants(Filament::getPanel('app')))->toBeEmpty()->and(method_exists($user, 'isAdmin'))->toBeFalse();
 });
 
 it('reports belongsToTeam() against the user teams relationship', function () {

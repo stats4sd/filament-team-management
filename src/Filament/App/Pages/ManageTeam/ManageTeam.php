@@ -13,27 +13,28 @@ use Filament\Schemas\Schema;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
+use Stats4sd\FilamentTeamManagement\Filament\Support\Access;
+use Stats4sd\FilamentTeamManagement\Filament\Support\MembershipNavigation;
+use Stats4sd\FilamentTeamManagement\Filament\Traits\ManagesMembershipProfile;
 
 class ManageTeam extends EditTenantProfile
 {
+    use ManagesMembershipProfile;
+
     protected static string | null | \BackedEnum $navigationIcon = 'heroicon-o-document-text';
 
     public function getHeading(): string | Htmlable | null
     {
-        return 'Manage ' . config('filament-team-management.models.team')::getModelNameLower() . ': ' . Filament::getTenant()->name;
+        return 'Manage ' . config('filament-team-management.names.team') . ': ' . Filament::getTenant()->name;
     }
 
     public function getSubheading(): string | Htmlable | null
     {
         if (config('filament-team-management.use_programs')) {
 
-            $programTypeName = Str::ucwords(config('filament-team-management.models.program')::getModelNameLower());
+            $programTypeName = Str::ucwords(config('filament-team-management.names.program'));
 
-            $programLinks = Filament::getTenant()?->programs?->map(function ($program) {
-                $url = url('/program/' . $program->id);
-
-                return '<a href="' . $url . '" class="underline text-primary-600 hover:text-primary-700 focus:text-primary-700 transition">' . e($program->name) . '</a>';
-            })->join(', ');
+            $programLinks = MembershipNavigation::programLinks(Filament::getTenant());
 
             return new HtmlString($programTypeName . ': ' . $programLinks);
 
@@ -44,7 +45,7 @@ class ManageTeam extends EditTenantProfile
 
     public static function getLabel(): string
     {
-        $teamTypeName = config('filament-team-management.models.team')::getModelNameLower();
+        $teamTypeName = config('filament-team-management.names.team');
 
         return 'Manage ' . ucfirst($teamTypeName);
     }
@@ -53,10 +54,12 @@ class ManageTeam extends EditTenantProfile
     {
         return $schema->schema([
             TextInput::make('name')
-                ->label('Enter a name for the ' . config('filament-team-management.models.team')::getModelNameLower()),
+                ->disabled(fn () => ! Access::allows('update', $this->tenant))
+                ->label('Enter a name for the ' . config('filament-team-management.names.team')),
             Textarea::make('description')
+                ->disabled(fn () => ! Access::allows('update', $this->tenant))
                 ->rows(5)
-                ->label('Enter a brief description for the ' . config('filament-team-management.models.team')::getModelNameLower()),
+                ->label('Enter a brief description for the ' . config('filament-team-management.names.team')),
         ]);
     }
 
@@ -68,14 +71,14 @@ class ManageTeam extends EditTenantProfile
                     ->schema([
                         $this->getFormContentComponent(),
                     ]),
-                Tabs::make('Team Management')
+                Tabs::make('Memberships')
                     ->contained(false)
                     ->tabs([
-                        Tabs\Tab::make('Members')
+                        Tabs\Tab::make('Members')->visible(fn () => Access::allows('viewMembers', $this->tenant))
                             ->schema([
                                 Livewire::make(ManageTeamMembers::class)->key('manage-team-members'),
                             ]),
-                        Tabs\Tab::make('Invites')
+                        Tabs\Tab::make('Invitations')->visible(fn () => Access::allows('viewInvitations', $this->tenant))
                             ->schema([
                                 Livewire::make(ManageTeamInvites::class)->key('manage-team-invites'),
                             ]),

@@ -23,14 +23,11 @@ function extractConfigEnvKeys(): array
 
 function extractInstallerEnvKeys(): array
 {
-    $packageRoot = dirname(__DIR__, 3);
-    $source = File::get($packageRoot . '/src/Commands/InstallFilamentTeamManagement.php');
+    $source = File::get(dirname(__DIR__, 3) . '/src/Commands/InstallFilamentTeamManagement.php');
+    preg_match_all("/'(FILAMENT_TEAM_MANAGEMENT_[A-Z_]+)'/", $source, $full);
+    preg_match_all("/'([A-Z_]+)' => '(?:models|table_names|column_names)\\.[^']+'/", $source, $suffix);
 
-    // Match the actual "KEY=..." strings the installer appends to .env, which
-    // covers both the array-literal and the $variables['KEY'] = "..." forms.
-    preg_match_all('/"(FILAMENT_TEAM_MANAGEMENT_[A-Z_]+)=/', $source, $matches);
-
-    return collect($matches[1])->unique()->sort()->values()->all();
+    return collect(array_merge($full[1], array_map(fn ($key) => 'FILAMENT_TEAM_MANAGEMENT_' . $key, $suffix[1])))->unique()->sort()->values()->all();
 }
 
 it('reads and writes the same set of env keys across config and installer', function () {

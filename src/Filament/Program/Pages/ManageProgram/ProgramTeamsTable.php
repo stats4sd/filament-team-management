@@ -2,53 +2,14 @@
 
 namespace Stats4sd\FilamentTeamManagement\Filament\Program\Pages\ManageProgram;
 
-use Filament\Actions\AttachAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\CreateAction;
-use Filament\Actions\DetachAction;
-use Filament\Actions\EditAction;
 use Filament\Facades\Filament;
-use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Illuminate\Support\Str;
-use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Teams\Schemas\TeamForm;
+use Stats4sd\FilamentTeamManagement\Filament\Support\ProgramTeams;
 
 class ProgramTeamsTable
 {
     public static function configure(Table $table): Table
     {
-        return $table
-            ->relationship(fn () => Filament::getTenant()->teams())
-            ->inverseRelationship('programs')
-            ->columns([
-                TextColumn::make('name'),
-                TextColumn::make('users_count')
-                    ->label('# Users')
-                    ->counts('users'),
-                TextColumn::make('created_at'),
-            ])
-            ->filters([
-                //
-            ])
-            ->headerActions([
-                CreateAction::make()
-                    ->schema(TeamForm::getFormSchema()),
-
-                AttachAction::make('attach')
-                    ->label('Add Existing ' . Str::ucfirst(Str::plural(config('filament-team-management.names.team'))))
-                    ->recordTitleAttribute('name')
-                    ->multiple(),
-
-            ])
-            ->recordActions([
-                DetachAction::make(),
-                EditAction::make()
-                    ->schema(TeamForm::getFormSchema()),
-            ])
-            ->toolbarActions([
-                BulkActionGroup::make([
-                    //
-                ]),
-            ]);
+        return ProgramTeams::configure($table, fn () => Filament::getTenant());
     }
 }

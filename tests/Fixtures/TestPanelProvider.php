@@ -16,6 +16,7 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Stats4sd\FilamentTeamManagement\Filament\App\Pages\ManageTeam\ManageTeam;
+use Stats4sd\FilamentTeamManagement\Filament\App\Pages\RegisterTeam;
 use Stats4sd\FilamentTeamManagement\Filament\Auth\Login;
 use Stats4sd\FilamentTeamManagement\Filament\Auth\Register;
 use Stats4sd\FilamentTeamManagement\Filament\Program\Pages\ManageProgram\ManageProgram;
@@ -42,6 +43,14 @@ class TestPanelProvider extends PanelProvider
      * too late to read config('filament-team-management.use_programs') here.
      */
     public static bool $usePrograms = false;
+
+    public static array $panelIds = ['app' => 'app', 'program' => 'program', 'admin' => 'admin'];
+
+    public static array $panelPaths = ['app' => 'app', 'program' => 'program', 'admin' => 'admin'];
+
+    public static ?string $tenantSlugAttribute = null;
+
+    public static bool $registration = false;
 
     protected function packagePath(string $path): string
     {
@@ -72,12 +81,13 @@ class TestPanelProvider extends PanelProvider
     {
         return $panel
             ->default()
-            ->id('app')
-            ->path('app')
+            ->id(static::$panelIds['app'])
+            ->path(static::$panelPaths['app'])
             ->login(Login::class)
             ->registration(Register::class)
-            ->tenant(config('filament-team-management.models.team'))
+            ->tenant(config('filament-team-management.models.team'), slugAttribute: static::$tenantSlugAttribute)
             ->tenantProfile(ManageTeam::class)
+            ->tenantRegistration(static::$registration ? RegisterTeam::class : null)
             ->discoverResources(
                 in: $this->packagePath('src/Filament/App/Resources'),
                 for: 'Stats4sd\\FilamentTeamManagement\\Filament\\App\\Resources',
@@ -98,8 +108,8 @@ class TestPanelProvider extends PanelProvider
     protected function adminPanel(Panel $panel): Panel
     {
         return $panel
-            ->id('admin')
-            ->path('admin')
+            ->id(static::$panelIds['admin'])
+            ->path(static::$panelPaths['admin'])
             ->discoverResources(
                 in: $this->packagePath('src/Filament/Admin/Resources'),
                 for: 'Stats4sd\\FilamentTeamManagement\\Filament\\Admin\\Resources',
@@ -113,9 +123,9 @@ class TestPanelProvider extends PanelProvider
     protected function programPanel(Panel $panel): Panel
     {
         return $panel
-            ->id('program')
-            ->path('program')
-            ->tenant(config('filament-team-management.models.program'))
+            ->id(static::$panelIds['program'])
+            ->path(static::$panelPaths['program'])
+            ->tenant(config('filament-team-management.models.program'), slugAttribute: static::$tenantSlugAttribute)
             ->tenantProfile(ManageProgram::class)
             ->discoverPages(
                 in: $this->packagePath('src/Filament/Program/Pages'),

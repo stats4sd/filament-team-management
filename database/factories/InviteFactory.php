@@ -25,7 +25,7 @@ class InviteFactory extends Factory
     }
 
     /**
-     * Mark the invite as confirmed (hidden by the onlyUnconfirmed global scope).
+     * Mark a real invitation as accepted history.
      */
     public function confirmed(): static
     {
