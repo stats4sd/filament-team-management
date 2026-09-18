@@ -3,17 +3,29 @@
 namespace Stats4sd\FilamentTeamManagement\Tests\Concurrency;
 
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Validation\ValidationException;
 use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\Attributes\TestWith;
 use Stats4sd\FilamentTeamManagement\Actions\AcceptMembershipInvitation;
 use Stats4sd\FilamentTeamManagement\Actions\AddMember;
+use Stats4sd\FilamentTeamManagement\Actions\DeleteProgram;
+use Stats4sd\FilamentTeamManagement\Actions\DeleteTeam;
 use Stats4sd\FilamentTeamManagement\Actions\DeleteUser;
 use Stats4sd\FilamentTeamManagement\Actions\LeaveMembership;
 use Stats4sd\FilamentTeamManagement\Actions\LinkTeamToProgram;
+use Stats4sd\FilamentTeamManagement\Actions\RemoveMember;
 use Stats4sd\FilamentTeamManagement\Actions\ResendMembershipInvitation;
 use Stats4sd\FilamentTeamManagement\Actions\SendMembershipInvitation;
+use Stats4sd\FilamentTeamManagement\Actions\UnlinkTeamFromProgram;
 use Stats4sd\FilamentTeamManagement\Contracts\MembershipParticipant;
+use Stats4sd\FilamentTeamManagement\Events\MemberAdded;
+use Stats4sd\FilamentTeamManagement\Events\MemberRemoved;
+use Stats4sd\FilamentTeamManagement\Events\TeamLinkedToProgram;
+use Stats4sd\FilamentTeamManagement\Events\TeamUnlinkedFromProgram;
 use Stats4sd\FilamentTeamManagement\Models\Invite;
 use Stats4sd\FilamentTeamManagement\Models\Program;
 use Stats4sd\FilamentTeamManagement\Models\Team;
@@ -36,6 +48,21 @@ class PreserveFinalAdministrator implements MembershipParticipant
     public function after(MembershipContext $context): void
     {
         if ($context->operation === 'leave') {
+            DB::table('host_grants')->where('target_type', $context->target->getTable())->where('target_id', $context->target->getKey())->where('user_id', $context->user->getKey())->delete();
+        }
+    }
+}
+
+class SynchronizeMembershipGrant implements MembershipParticipant
+{
+    public function before(MembershipContext $context): void {}
+
+    public function after(MembershipContext $context): void
+    {
+        if ($context->operation === 'add_member') {
+            $context->user->grant($context->target);
+        }
+        if ($context->operation === 'remove_member') {
             DB::table('host_grants')->where('target_type', $context->target->getTable())->where('target_id', $context->target->getKey())->where('user_id', $context->user->getKey())->delete();
         }
     }
@@ -145,7 +172,7 @@ class MembershipConcurrencyTest extends TestCase
                             }
                             usleep(1000);
                         }
-                        $result = ['ok' => true, 'value' => $worker()];
+                        $result = ['ok' => true, 'value' => $worker($directory)];
                     } catch (\Throwable $exception) {
                         $result = ['ok' => false, 'exception' => $exception::class, 'message' => $exception->getMessage()];
                     }
@@ -267,6 +294,219 @@ class MembershipConcurrencyTest extends TestCase
         if (! $results[1]['ok']) {
             self::assertSame(ModelNotFoundException::class, $results[1]['exception']);
         }
+    }
+
+    #[Test]
+    #[TestWith(['team', false])]
+    #[TestWith(['program', false])]
+    #[TestWith(['team', true])]
+    #[TestWith(['program', true])]
+    public function target_deletion_cannot_silently_cascade_members_added_after_initial_enumeration(string $type, bool $prelocked): void
+    {
+        $actor = $this->actingAsAdmin();
+        $otherActor = User::factory()->create(['host_admin' => true]);
+        $member = $prelocked ? $actor : User::factory()->create();
+        $target = $type === 'team' ? Team::factory()->create() : Program::factory()->create();
+        $action = $type === 'team' ? DeleteTeam::class : DeleteProgram::class;
+        $pivotTable = $target->users()->getTable();
+        config()->set('filament-team-management.participants', [SynchronizeMembershipGrant::class]);
+        $await = fn (string $signal) => $this->awaitSignal($signal);
+
+        $results = $this->race(
+            function (string $directory) use ($actor, $target, $action, $pivotTable, $await): array {
+                DB::statement('SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ');
+                $paused = false;
+                DB::listen(function (QueryExecuted $query) use (&$paused, $pivotTable, $directory, $await): void {
+                    if (! $paused && str_starts_with($query->sql, 'select ') && str_contains($query->sql, 'inner join `' . $pivotTable . '`')) {
+                        $paused = true;
+                        // The first ordinary relation read has established the InnoDB snapshot.
+                        touch($directory . '/enumerated');
+                        $await($directory . '/addition-committed');
+                    }
+                });
+                $removed = [];
+                Event::listen(MemberRemoved::class, function (MemberRemoved $event) use (&$removed): void {
+                    $removed[] = $event->payload['user_id'];
+                });
+                $deleted = app($action)->handle($actor, $target);
+
+                return ['deleted' => $deleted, 'removed' => $removed];
+            },
+            function (string $directory) use ($otherActor, $target, $member, $await): bool {
+                $await($directory . '/enumerated');
+                $added = app(AddMember::class)->handle($otherActor, $target, $member);
+                touch($directory . '/addition-committed');
+
+                return $added;
+            },
+        );
+
+        self::assertTrue($results[1]['ok'], json_encode($results));
+        self::assertTrue($results[1]['value'], json_encode($results));
+        if (! $prelocked) {
+            self::assertFalse($results[0]['ok'], json_encode($results));
+            self::assertSame(ValidationException::class, $results[0]['exception'], json_encode($results));
+            self::assertNotNull($target->fresh());
+            self::assertTrue($target->users()->whereKey($member->getKey())->exists());
+            self::assertSame(1, DB::table('host_grants')->where('user_id', $member->getKey())->count());
+
+            return;
+        }
+
+        self::assertTrue($results[0]['ok'], json_encode($results));
+        self::assertTrue($results[0]['value']['deleted']);
+        self::assertNull($target->fresh());
+        self::assertSame(0, DB::table($pivotTable)->count());
+        self::assertSame(0, DB::table('host_grants')->where('user_id', $member->getKey())->count(), 'Target deletion cascaded a new member without invoking its grant revocation participant. ' . json_encode($results));
+        self::assertSame([$member->getKey()], $results[0]['value']['removed']);
+    }
+
+    private function awaitSignal(string $signal): void
+    {
+        $deadline = microtime(true) + 10;
+        while (! file_exists($signal)) {
+            if (microtime(true) > $deadline) {
+                throw new \RuntimeException('Timed out waiting for deletion race signal: ' . basename($signal));
+            }
+            usleep(1000);
+        }
+    }
+
+    #[Test]
+    #[TestWith(['team'])]
+    #[TestWith(['program'])]
+    public function account_deletion_rejects_memberships_missing_from_a_callers_older_snapshot(string $type): void
+    {
+        $actor = $this->actingAsAdmin();
+        $otherActor = User::factory()->create(['host_admin' => true]);
+        $member = User::factory()->create();
+        $target = $type === 'team' ? Team::factory()->create() : Program::factory()->create();
+        config()->set('filament-team-management.participants', [SynchronizeMembershipGrant::class]);
+        $results = $this->race(
+            function (string $directory) use ($actor, $member): bool {
+                DB::statement('SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ');
+
+                return DB::transaction(function () use ($directory, $actor, $member): bool {
+                    DB::table('team_members')->count();
+                    touch($directory . '/snapshot');
+                    $this->awaitSignal($directory . '/addition-committed');
+
+                    return app(DeleteUser::class)->handle($actor, $member);
+                });
+            },
+            function (string $directory) use ($otherActor, $target, $member): bool {
+                $this->awaitSignal($directory . '/snapshot');
+                $added = app(AddMember::class)->handle($otherActor, $target, $member);
+                touch($directory . '/addition-committed');
+
+                return $added;
+            },
+        );
+
+        self::assertTrue($results[1]['ok'], json_encode($results));
+        self::assertTrue($results[1]['value']);
+        self::assertFalse($results[0]['ok'], json_encode($results));
+        self::assertSame(ValidationException::class, $results[0]['exception']);
+        self::assertNotNull($member->fresh());
+        self::assertTrue($target->users()->whereKey($member->id)->exists());
+        self::assertSame(1, DB::table('host_grants')->where('user_id', $member->id)->count());
+    }
+
+    #[Test]
+    #[TestWith(['team'])]
+    #[TestWith(['program'])]
+    public function target_deletion_rejects_links_committed_after_advisory_enumeration(string $type): void
+    {
+        $actor = $this->actingAsAdmin();
+        $otherActor = User::factory()->create(['host_admin' => true]);
+        $team = Team::factory()->create();
+        $program = Program::factory()->create();
+        $target = $type === 'team' ? $team : $program;
+        $action = $type === 'team' ? DeleteTeam::class : DeleteProgram::class;
+        $pivotTable = $target->users()->getTable();
+        $results = $this->race(
+            function (string $directory) use ($actor, $target, $action, $pivotTable): bool {
+                DB::statement('SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ');
+                $paused = false;
+                DB::listen(function (QueryExecuted $query) use (&$paused, $pivotTable, $directory): void {
+                    if (! $paused && str_starts_with($query->sql, 'select ') && str_contains($query->sql, 'inner join `' . $pivotTable . '`')) {
+                        $paused = true;
+                        touch($directory . '/enumerated');
+                        $this->awaitSignal($directory . '/link-committed');
+                    }
+                });
+
+                return app($action)->handle($actor, $target);
+            },
+            function (string $directory) use ($otherActor, $program, $team): bool {
+                $this->awaitSignal($directory . '/enumerated');
+                $linked = app(LinkTeamToProgram::class)->handle($otherActor, $program, $team);
+                touch($directory . '/link-committed');
+
+                return $linked;
+            },
+        );
+
+        self::assertTrue($results[1]['ok'], json_encode($results));
+        self::assertTrue($results[1]['value']);
+        self::assertFalse($results[0]['ok'], json_encode($results));
+        self::assertSame(ValidationException::class, $results[0]['exception']);
+        self::assertNotNull($target->fresh());
+        self::assertTrue($program->teams()->whereKey($team->id)->exists());
+    }
+
+    #[Test]
+    #[TestWith([false, false])]
+    #[TestWith([false, true])]
+    #[TestWith([true, false])]
+    #[TestWith([true, true])]
+    public function mutations_use_current_attachment_state_despite_a_callers_older_snapshot(bool $link, bool $remove): void
+    {
+        $actor = $this->actingAsAdmin();
+        $otherActor = User::factory()->create(['host_admin' => true]);
+        $member = User::factory()->create();
+        $team = Team::factory()->create();
+        $program = Program::factory()->create();
+        $action = $link
+            ? ($remove ? UnlinkTeamFromProgram::class : LinkTeamToProgram::class)
+            : ($remove ? RemoveMember::class : AddMember::class);
+        $event = $link
+            ? ($remove ? TeamUnlinkedFromProgram::class : TeamLinkedToProgram::class)
+            : ($remove ? MemberRemoved::class : MemberAdded::class);
+        $results = $this->race(
+            function (string $directory) use ($actor, $member, $team, $program, $link, $action, $event): array {
+                DB::statement('SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ');
+                $observations = 0;
+                Event::listen($event, function () use (&$observations): void {
+                    $observations++;
+                });
+                $changed = DB::transaction(function () use ($directory, $actor, $member, $team, $program, $link, $action): bool {
+                    DB::table('team_members')->count();
+                    touch($directory . '/snapshot');
+                    $this->awaitSignal($directory . '/attachment-committed');
+
+                    return app($action)->handle($actor, $link ? $program : $team, $link ? $team : $member);
+                });
+
+                return ['changed' => $changed, 'observations' => $observations];
+            },
+            function (string $directory) use ($otherActor, $member, $team, $program, $link): bool {
+                $this->awaitSignal($directory . '/snapshot');
+                $added = $link
+                    ? app(LinkTeamToProgram::class)->handle($otherActor, $program, $team)
+                    : app(AddMember::class)->handle($otherActor, $team, $member);
+                touch($directory . '/attachment-committed');
+
+                return $added;
+            },
+        );
+
+        self::assertTrue($results[1]['ok'], json_encode($results));
+        self::assertTrue($results[1]['value']);
+        self::assertTrue($results[0]['ok'], json_encode($results));
+        self::assertSame($remove, $results[0]['value']['changed']);
+        self::assertSame($remove ? 1 : 0, $results[0]['value']['observations']);
+        self::assertSame(! $remove, $link ? $program->teams()->whereKey($team->id)->exists() : $team->users()->whereKey($member->id)->exists());
     }
 
     #[Test]

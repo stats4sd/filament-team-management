@@ -7,7 +7,7 @@ use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Gate;
-use Stats4sd\FilamentTeamManagement\Contracts\UserPicker;
+use Stats4sd\FilamentTeamManagement\Support\MembershipCandidates;
 
 class Access
 {
@@ -31,16 +31,7 @@ class Access
 
     public static function users(Model $target): Builder
     {
-        $picker = config('filament-team-management.user_picker');
-        if (! $picker) {
-            return config('filament-team-management.models.user')::query()->whereRaw('1 = 0');
-        }
-        $picker = app($picker);
-        if (! $picker instanceof UserPicker) {
-            throw new \LogicException('user_picker must implement UserPicker.');
-        }
-
-        return $picker->query(static::actor(), $target);
+        return app(MembershipCandidates::class)->query(static::actor(), $target);
     }
 
     public static function visibleQuery(Builder $query): Builder

@@ -39,7 +39,7 @@ final class MembershipMail
         return [
             'targetName' => (string) $target->getAttribute('name'),
             'targetLabel' => (string) config('filament-team-management.names.' . Membership::type($target)),
-            'senderName' => (string) ($sender?->getAttribute('name') ?? 'A site administrator'),
+            'senderName' => (string) ($sender?->getAttribute('name') ?? 'Someone'),
             'senderEmail' => (string) ($sender?->getAttribute('email') ?? ''),
         ];
     }

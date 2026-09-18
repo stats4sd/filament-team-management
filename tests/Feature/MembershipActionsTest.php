@@ -257,7 +257,7 @@ it('retains safe sender snapshots and can resend after inviter deletion', functi
     expect($invite->fresh()->inviter_id)->toBeNull()->and($mail->snapshot['senderName'])->toBe($senderName);
     $renewed = app(ResendMembershipInvitation::class)->handle($manager, $team, $invite->fresh());
     $renewedMail = new InviteUser($renewed);
-    expect($renewedMail->snapshot['senderName'])->toBe('A site administrator')->and($renewedMail->render())->toContain('A site administrator');
+    expect($renewedMail->snapshot['senderName'])->toBe('Someone')->and($renewedMail->render())->toContain('Someone');
 });
 
 class MembershipCustomTeam extends Team {}

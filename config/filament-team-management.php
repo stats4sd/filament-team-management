@@ -39,10 +39,8 @@ return [
         'programs_foreign_key' => env('FILAMENT_TEAM_MANAGEMENT_PROGRAMS_FOREIGN_KEY', 'program_id'),
     ],
 
-    // Human-readable words used in UI copy (lowercase singular, e.g. "…invite to this team.").
-    // Deliberately plain literals, NOT env-backed: these are display-only and must not add env
-    // keys the installer doesn't write, or the installer<->config parity test would break.
-    // Phase 2: may become env-overridable (Decision 4) with matching installer writes + a parity allowlist.
+    // Lowercase singular display words shared by UI labels and email snapshots.
+    // Plain config literals; these do not add environment settings or installer writes.
     'names' => [
         'user' => 'user',
         'team' => 'team',

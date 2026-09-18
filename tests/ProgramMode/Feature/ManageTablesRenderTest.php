@@ -3,8 +3,11 @@
 use Filament\Actions\CreateAction;
 use Filament\Actions\Testing\TestAction;
 use Filament\Facades\Filament;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Programs\Pages\ViewProgram;
 use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Programs\RelationManagers\InvitesRelationManager as ProgramInvitesRelationManager;
+use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Programs\RelationManagers\TeamsRelationManager;
 use Stats4sd\FilamentTeamManagement\Filament\App\Pages\ManageTeam\ManageTeamInvites;
 use Stats4sd\FilamentTeamManagement\Filament\Program\Pages\ManageProgram\ManageProgramInvites;
 use Stats4sd\FilamentTeamManagement\Filament\Program\Pages\ManageProgram\ManageProgramMembers;
@@ -138,4 +141,31 @@ it('bulk self-removal selects another accessible program instead of retaining th
         ->callAction(TestAction::make('detach')->table()->bulk())
         ->assertRedirect(Filament::getPanel('program')->getUrl($remaining));
     expect($program->users()->count())->toBe(0);
+});
+
+it('creates and links a team through each program teams surface', function (bool $management) {
+    $program = Program::factory()->create();
+    Filament::setCurrentPanel(Filament::getPanel($management ? 'admin' : 'program'));
+    Filament::setTenant($management ? null : $program);
+    $component = $management
+        ? livewire(TeamsRelationManager::class, ['ownerRecord' => $program, 'pageClass' => ViewProgram::class])
+        : livewire(ManageProgramTeams::class);
+    $component->callAction(TestAction::make('create')->table(), data: ['name' => 'Created through UI', 'description' => 'Linked atomically'])
+        ->assertHasNoActionErrors();
+    $team = Team::where('name', 'Created through UI')->sole();
+    expect($team->description)->toBe('Linked atomically')
+        ->and($team->users()->whereKey($this->admin->id)->exists())->toBeTrue()
+        ->and($program->teams()->whereKey($team->id)->exists())->toBeTrue();
+})->with([false, true]);
+
+it('rolls back team creation when a mounted program teams action is denied link permission', function () {
+    $program = Program::factory()->create();
+    Filament::setCurrentPanel(Filament::getPanel('program'));
+    Filament::setTenant($program);
+    $component = livewire(ManageProgramTeams::class)->mountAction(TestAction::make('create')->table())
+        ->fillForm(['name' => 'Denied UI creation']);
+    Gate::before(fn ($actor, $ability) => $ability === 'linkProgram' ? false : null);
+    $component->callMountedAction()->assertForbidden();
+    expect(Team::count())->toBe(0)->and(DB::table('team_members')->count())->toBe(0)
+        ->and(DB::table('program_team')->count())->toBe(0);
 });

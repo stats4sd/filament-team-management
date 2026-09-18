@@ -25,6 +25,8 @@ $result = app(SendMembershipInvitation::class)->handle($actor, $team, 'member@ex
 
 A missing policy or ability denies the operation. Filament uses the same ability arguments for presentation; shared actions reauthorize after locking. Read-only members can view permitted member lists and leave without permission to edit the tenant. App member management uses email invitations; Admin and Program screens also support a host-scoped existing-user picker.
 
+Use `app(CreateTeamForProgram::class)->handle($actor, $program, $data)` (in the `Actions` namespace) to create a team and link it atomically, including creator bootstrap and both link-policy checks. Non-Filament selectors can use `Support\MembershipCandidates::query($actor, $target)` and `resolveSelection($actor, $target, $ids)` through the container to share scoped discovery and submitted-ID validation. Membership mutation authorization remains separate.
+
 The [authorization and workflow guide](docs/membership-contract.md) contains the full abilities table, simple administrator/member policy, scoped-permission recipe, transactional participants, events and lifecycle rules.
 
 ## Invitations and mail
@@ -33,7 +35,7 @@ An email invitation to a new user creates a pending Invite and queues mail after
 
 `InvitationResult::status` is `invitation_created`, `member_added`, `duplicate_pending`, `expired_pending`, `already_member` or `skipped_blank`. Invalid input and denied actions throw. Expired pending invitations can be renewed with Resend; it rotates the token. Cancel deletes only pending invitations. Accepted invitations remain history. Pending counts exclude accepted and expired invitations.
 
-Mail is queued by default; run your application's queue worker. Set `queue_mail` to false for synchronous transport, still after commit. A saved invitation is not proof of delivery. Results expose `mailStatus` (`pending_commit`, `queued`, `sent`, `failed`) and an error on dispatch failure. A failed resend dispatch raises `InvitationDeliveryFailed` after the new token is saved. Queue retries and provider delivery are host operational responsibilities. Message snapshots retain their original token/link and sender text; a later resend does not rewrite an older queued message. Rotated/cancelled links remain invalid even if old mail arrives later.
+Mail is queued by default; run your application's queue worker. Set `queue_mail` to false for synchronous transport, still after commit. A saved invitation is not proof of delivery. Results expose `mailStatus` (`pending_commit`, `queued`, `sent`, `failed`) and an error on dispatch failure. A failed resend dispatch raises `InvitationDeliveryFailed` after the new token is saved. Queue retries and provider delivery are host operational responsibilities. If the sender is unavailable when a message snapshot is created, mail identifies them as “Someone”. Message snapshots retain their original token/link and sender text; a later resend does not rewrite an older queued message. Rotated/cancelled links remain invalid even if old mail arrives later.
 
 ## Configuration
 
@@ -77,4 +79,4 @@ The test host explicitly implements policies and tenant access without a permiss
 FTM_TEST_MYSQL_HOST=127.0.0.1 FTM_TEST_MYSQL_PORT=3306 FTM_TEST_MYSQL_USER=root vendor/bin/pest tests/Concurrency --compact --colors=never
 ```
 
-Set `FTM_TEST_MYSQL_PASSWORD` if the test account requires a password. The host defaults to `127.0.0.1` and the user to `root`; setting `FTM_TEST_MYSQL_PORT` enables the tests. Without it, the four concurrency tests are skipped. See `tests/Concurrency/MembershipConcurrencyTest.php` and the [implementation log](docs/change-logs/phase-1b-track-b-membership-only.md) for coverage and verification results.
+Set `FTM_TEST_MYSQL_PASSWORD` if the test account requires a password. The host defaults to `127.0.0.1` and the user to `root`; setting `FTM_TEST_MYSQL_PORT` enables the tests. Without it, the concurrency tests are skipped. See `tests/Concurrency/MembershipConcurrencyTest.php` and the [Phase 2 implementation log](docs/change-logs/phase-2-bounded-hardening-closeout.md) for coverage and verification results.

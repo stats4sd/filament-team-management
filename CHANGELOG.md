@@ -12,6 +12,15 @@ Requires PHP ^8.4, Laravel 13, Filament ^5.2 and Livewire ^4. See [UPGRADE.md](U
 - Base User tenant/panel access now denies until the host implements its access contract. Removed implicit program-derived team access and `getAllAccessibleTeams()`.
 - Shared member/invitation UI supports independent read, edit and leave permissions. App direct attach is removed; Admin/Program pickers require a host-authorized query. Leaving the last team has an authenticated non-tenant destination.
 
+### Bounded hardening closeout
+
+- Added `CreateTeamForProgram` for atomic team creation and program linking with creator bootstrap, both link policies and existing after-commit observations; both program teams UI surfaces delegate to it.
+- Added explicit-actor `MembershipCandidates` queries and complete submitted-ID resolution outside Filament. Selectors retain scoped visibility and batches retain per-user mutation authorization.
+- Missing-sender mail uses “Someone”; display-name config comments now describe shared UI/email use without promising new environment settings.
+
+- Target/account deletion validates current membership/link pivots before cleanup, including under caller-owned InnoDB repeatable-read snapshots; unexpected graph growth fails before participants.
+- Program-only members can reach an authorized Program panel after registration or final-Team departure.
+
 ### Invitations and schema
 
 - New-user acceptance validates persisted identity, target, token and expiry inside one transaction. Existing-user email invitations still add membership immediately, requiring both invite and add abilities, without a synthetic Invite history row.

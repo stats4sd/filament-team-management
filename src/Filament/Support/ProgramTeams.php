@@ -11,8 +11,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
-use Stats4sd\FilamentTeamManagement\Actions\CreateTeam;
-use Stats4sd\FilamentTeamManagement\Actions\LinkTeamToProgram;
+use Stats4sd\FilamentTeamManagement\Actions\CreateTeamForProgram;
 use Stats4sd\FilamentTeamManagement\Actions\MembershipBatch;
 use Stats4sd\FilamentTeamManagement\Actions\UnlinkTeamFromProgram;
 use Stats4sd\FilamentTeamManagement\Actions\UpdateTeam;
@@ -41,10 +40,7 @@ class ProgramTeams
                 Action::make('create')->label('Create ' . config('filament-team-management.names.team'))
                     ->authorize(fn () => Access::allows('create', config('filament-team-management.models.team')))
                     ->schema([TextInput::make('name')->required()->maxLength(255), Textarea::make('description')])
-                    ->action(fn (array $data) => Access::actor()->getConnection()->transaction(function () use ($data, $program) {
-                        $team = app(CreateTeam::class)->handle(Access::actor(), $data);
-                        app(LinkTeamToProgram::class)->handle(Access::actor(), $program(), $team);
-                    })),
+                    ->action(fn (array $data) => app(CreateTeamForProgram::class)->handle(Access::actor(), $program(), $data)),
             ])
             ->recordActions([
                 Action::make('edit')->authorize(fn (Model $record) => Access::allows('update', $record))->fillForm(fn (Model $record) => $record->only(['name', 'description']))->schema([TextInput::make('name')->required()->maxLength(255), Textarea::make('description')])

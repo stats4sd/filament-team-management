@@ -105,8 +105,12 @@ $panel = Filament::getPanels()[config('filament-team-management.panels.admin')] 
 $url = $panel && auth()->user()->canAccessPanel($panel) ? $panel->getUrl() : null;
 ```
 
-Program links additionally check each tenant and policy `view`; unavailable/denied panels render escaped plain names. After leaving the final team, the package uses a permitted App registration page or its authenticated `/membership/no-memberships` route. If you configure `no_memberships_route`, that named route must be accessible to the departing user without a tenant and enforce authentication itself.
+Program links additionally check each tenant and policy `view`; unavailable/denied panels render escaped plain names. After leaving the final team, the package considers permitted App registration and an accessible Program fallback before its authenticated `/membership/no-memberships` route. If you configure `no_memberships_route`, that named route must be accessible to the departing user without a tenant and enforce authentication itself.
 
 ## 5. Configure notification delivery and host lifecycle rules
 
 Run `php artisan queue:work` for the default queued mail behavior. Configure mail transport, retries and failed-job monitoring in the application. Participants provide same-transaction bootstrap, grant revocation and durable audit writes; observation events and transport run after commit. See [membership-contract.md](docs/membership-contract.md) before using these extension points.
+
+## Calling the shared operations
+
+No additional installation or policy ability is needed for `Actions\CreateTeamForProgram::handle($actor, $program, $data)`: it composes team creation, creator bootstrap and dual-policy linking in one transaction. Hosts using custom selectors can resolve `Support\MembershipCandidates` from the container, call `query($actor, $target)` for discovery and `resolveSelection($actor, $target, $ids)` before an `add_member` batch. The configured `UserPicker` interface is unchanged, and the batch still enforces each user's `addMember` policy. See the [public contract](docs/membership-contract.md) for signatures, rollback and commit ordering.

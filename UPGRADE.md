@@ -18,6 +18,10 @@ The configured App panel must be the default authentication panel. `panels.app|p
 
 `names.team`, `names.program` and `names.user` are plain display config. New config includes `queue_mail`, `invite_expiry_days`, `participants`, `user_picker`, `no_memberships_route` and `table_names.invites`. `FILAMENT_TEAM_MANAGEMENT_QUEUE_MAIL` and `FILAMENT_TEAM_MANAGEMENT_INVITES_TABLE` are new environment keys. Existing users keys are singular `USER_TABLE` / `USER_FOREIGN_KEY`; programs use `PROGRAMS_FOREIGN_KEY`. Review your published config rather than retaining obsolete role keys.
 
+## Additional shared APIs
+
+`Actions\CreateTeamForProgram::handle($actor, $program, $data)` exposes the existing atomic UI create-and-link operation to other callers. `Support\MembershipCandidates` centralizes explicit-actor candidate queries and selected-ID resolution; `UserPicker`, policies, participants and events keep their existing contracts. These extractions add no schema, permission, config or installation requirement. Missing-sender mail now uses “Someone”.
+
 ## Fresh schema and lifecycle
 
 Fresh membership pivots have no administrator flag. Fresh invites have exactly one application-validated team/program target, unique bearer tokens, nullable expiry, nullable inviter with null-on-delete and no role FK. The optional program columns remain present in the default schema; constraints belong to the program publish tag. Custom model/table/FK names are supported. The installer does not implement a legacy migration program.
