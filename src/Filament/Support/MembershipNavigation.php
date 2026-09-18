@@ -21,7 +21,7 @@ class MembershipNavigation
         $previousPanel = Filament::getCurrentPanel();
 
         try {
-            foreach ($departedType === 'program' ? ['program', 'app'] : ['app'] as $panelType) {
+            foreach ($departedType === 'program' ? ['program', 'app'] : ['app', 'program'] as $panelType) {
                 $modelType = $panelType === 'program' ? 'program' : 'team';
                 if ($modelType === 'program' && ! config('filament-team-management.use_programs')) {
                     continue;
