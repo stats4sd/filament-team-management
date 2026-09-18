@@ -13,6 +13,7 @@ use Stats4sd\FilamentTeamManagement\Actions\MembershipBatch;
 use Stats4sd\FilamentTeamManagement\Actions\RemoveMember;
 use Stats4sd\FilamentTeamManagement\Actions\SendMembershipInvitation;
 use Stats4sd\FilamentTeamManagement\Support\Membership;
+use Stats4sd\FilamentTeamManagement\Support\MembershipCandidates;
 
 class MemberActions
 {
@@ -52,13 +53,15 @@ class MemberActions
         return Action::make('attach')->label('Add existing members')
             ->authorize(fn () => Access::allows('viewMembers', $target()) && Access::users($target())->get()->contains(fn (Model $member) => Access::allows('addMember', [$target(), $member])))
             ->schema([Select::make('recordId')->label('Members')->multiple()->required()->searchable()
-                ->getSearchResultsUsing(fn (string $search) => Access::users($target())->where(fn ($query) => $query->where('name', 'like', '%' . $search . '%')->orWhere('email', 'like', '%' . $search . '%'))->limit(50)->get()->filter(fn (Model $user) => Access::allows('addMember', [$target(), $user]))->pluck('email', 'id')->all())
-                ->getOptionLabelsUsing(fn (array $values) => Access::users($target())->whereKey($values)->get()->filter(fn (Model $user) => Access::allows('addMember', [$target(), $user]))->pluck('email', 'id')->all())])
+                // Label filtering is presentation; shared resolution and batch authorization validate submitted IDs.
+                ->in(fn (Select $component) => $component->getState() ?? [])
+                ->getSearchResultsUsing(fn (string $search) => Access::users($target())->where(fn ($query) => $query->where('name', 'like', '%' . $search . '%')->orWhere('email', 'like', '%' . $search . '%'))->limit(50)->get()->filter(fn (Model $user) => Access::allows('addMember', [$target(), $user]))->mapWithKeys(fn (Model $user) => [$user->getKey() => $user->email])->all())
+                ->getOptionLabelsUsing(fn (array $values) => Access::users($target())->whereKey($values)->get()->filter(fn (Model $user) => Access::allows('addMember', [$target(), $user]))->mapWithKeys(fn (Model $user) => [$user->getKey() => $user->email])->all())])
             ->action(function (array $data) use ($target) {
-                $ids = array_unique((array) $data['recordId']);
-                $users = Access::users($target())->whereKey($ids)->get();
-                abort_unless($users->count() === count($ids), 403);
-                app(MembershipBatch::class)->handle(Access::actor(), 'add_member', $users, $target());
+                $actor = Access::actor();
+                $record = $target();
+                $users = app(MembershipCandidates::class)->resolveSelection($actor, $record, (array) $data['recordId']);
+                app(MembershipBatch::class)->handle($actor, 'add_member', $users, $record);
             });
     }
 
