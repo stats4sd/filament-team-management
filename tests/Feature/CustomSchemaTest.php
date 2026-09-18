@@ -2,11 +2,20 @@
 
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Schema;
 use Stats4sd\FilamentTeamManagement\Actions\AcceptMembershipInvitation;
+use Stats4sd\FilamentTeamManagement\Actions\CreateTeamForProgram;
 use Stats4sd\FilamentTeamManagement\Actions\SendMembershipInvitation;
+use Stats4sd\FilamentTeamManagement\Models\Program;
+use Stats4sd\FilamentTeamManagement\Models\Team;
 use Stats4sd\FilamentTeamManagement\Tests\Fixtures\Models\HostUser;
+use Stats4sd\FilamentTeamManagement\Tests\Fixtures\Policies\MembershipPolicy;
+
+class CustomSchemaCompositeTeam extends Team {}
+
+class CustomSchemaCompositeProgram extends Program {}
 
 it('migrates custom tables and keys in both modes and reverses the fresh schema', function (bool $programs) {
     config()->set('database.connections.custom_schema', ['driver' => 'sqlite', 'database' => ':memory:', 'prefix' => '', 'foreign_key_constraints' => true]);
@@ -39,7 +48,23 @@ it('migrates custom tables and keys in both modes and reverses the fresh schema'
     }
     Mail::fake();
     $actor = HostUser::factory()->create(['host_admin' => true]);
+    if ($programs) {
+        config()->set('filament-team-management.models.team', CustomSchemaCompositeTeam::class);
+        config()->set('filament-team-management.models.program', CustomSchemaCompositeProgram::class);
+        Gate::policy(CustomSchemaCompositeTeam::class, MembershipPolicy::class);
+        Gate::policy(CustomSchemaCompositeProgram::class, MembershipPolicy::class);
+    }
     $target = config('filament-team-management.models.' . ($programs ? 'program' : 'team'))::create(['name' => 'Custom target']);
+    if ($programs) {
+        $team = app(CreateTeamForProgram::class)->handle($actor, $target, ['name' => 'Custom linked team']);
+        expect($target)->toBeInstanceOf(CustomSchemaCompositeProgram::class)
+            ->and($team)->toBeInstanceOf(CustomSchemaCompositeTeam::class)
+            ->and($team->getTable())->toBe('sites')
+            ->and($team->users()->whereKey($actor->id)->exists())->toBeTrue()
+            ->and($target->teams()->whereKey($team->id)->exists())->toBeTrue()
+            ->and(DB::table('site_people')->where('site_key', $team->id)->where('person_key', $actor->id)->exists())->toBeTrue()
+            ->and(DB::table('initiative_sites')->where('initiative_key', $target->id)->where('site_key', $team->id)->exists())->toBeTrue();
+    }
     $invite = app(SendMembershipInvitation::class)->handle($actor, $target, 'new@example.test')->invite;
     $user = app(AcceptMembershipInvitation::class)->handle($invite->token, ['name' => 'New member', 'email' => 'new@example.test', 'password' => 'long-password']);
     expect($target->users()->whereKey($user->getKey())->exists())->toBeTrue()->and($invite->getTable())->toBe('membership_requests');
