@@ -24,6 +24,8 @@ The stack landed through merge `58dab86`. Phase 1b A1 ([#78](https://github.com/
 
 Verification on 2026-09-17: `composer test` **119 passed, 320 assertions**; `composer analyse` **no errors**; `vendor/bin/pint --test` **passed**. Local and GitHub `dev` both resolve to `e5e98df`. Latest published GitHub release remains `v4.0.7`; no 5.0 release is claimed here. These checks establish the merged baseline, not closure of the remaining Track B findings.
 
+> **Current scope (2026-09-18):** Phase 1 implementation is complete. Replacement Track B B1–B8 is implemented at `b40c711`; its [log](../change-logs/phase-1b-track-b-membership-only.md) supersedes role/admin behavior below. Historical verification and merge statements above are dated evidence, not refreshed remote claims. The constraints, decisions and original PR sequence below describe the historical implementation only. Follow [Phase 2 closeout](phase-2-bounded-hardening-closeout.md), then full review and separate Phase 3 planning. A8/release remains separate.
+
 ## Historical starting baseline (before PRs #70–#75, ahead of the review's `2dc82ac`)
 
 The review was written against `2dc82ac`. The one `src/` change since is [Register.php](../../src/Filament/Auth/Register.php) (redirect-to-login when the register page is hit without a valid invite token), and `tests/Feature/RegistrationTest.php` has been updated to match. Every section-4 finding was re-verified against live code and **all remain present**, except:
@@ -130,26 +132,28 @@ Fixes in [README.md](../../README.md):
 
 ## Original deferrals — current ownership
 
-Phase 1b now carries the detailed follow-up to the meta-plan’s Phase 2. Dead-code removal and self-relations (3.6/3.9) are **closed by A4**, program-column migration stability (3.12) by **A6**, and the direct Spatie dependency (3.13) by **A5**. Do not reimplement these in Phase 2. Remaining work is mapped below.
+The former Phase 2 deferrals are closed or superseded by replacement Track B B1–B8, implemented at `b40c711`:
 
-- `InviteService` extraction / de-triplicating `sendInvites` (3.1) — **B2**; Phase 1 fixed each copy minimally.
-- Moving Filament `Notification`s/mail out of models (3.2), membership events (1.6), explicit role-assignment and invite-acceptance actions replacing the `ModelHasRole::created` heuristic (3.7) — **B2/B3**.
-- `is_admin` **enforcement** / intra-team authorization, default policies (1.1, 1.4) — **B1**; Phase 1 only makes the flag *settable* and the creator an admin.
-- Invite lifecycle (expiry/resend/cancel/duplicate-guard) (1.2), five-entry-point consolidation (2.1) — **B2/B4**.
-- FK-derivation unification (3.4), `latest*` dirty-check/type-guard (3.5), tenancy edge cases (3.10) — **B5**.
-- `table_names.invites` (3.3), installer robustness (3.11), explicit string conversion (3.8) — **B8**. Track B also carries remaining authorization, UX and account-lifecycle findings; see its readiness table before implementation.
+- Invitation orchestration, feedback separation, membership events and acceptance: **B2/B3 implemented**; role-assignment heuristics removed.
+- `is_admin` enforcement and shipped privilege rules: **superseded by B1 host-owned policies**, not future package-admin work.
+- Invitation lifecycle and shared presentation: **B2/B4 implemented**.
+- FK indirection, latest-tenant guards and host-owned tenant access: **B5 implemented**.
+- Configured invites table, installer and display conversion: **B8 implemented**.
+- Dead code/self-relations: **A4 complete**; program schema: **A6 followed by the fresh membership schema**; A5's direct permission dependency: **intentionally reversed by B1**.
+
+The only current closeout queue is [Phase 2](phase-2-bounded-hardening-closeout.md). B9 and existing-account pending acceptance remain deferred. Historical criteria below preserve evidence gaps and release tracking; they do not reopen removed privilege APIs.
 
 ## Exit criteria (updated 2026-09-17)
 
 - [x] All original section-4 findings closed by #70–#75; no section-4 deferral remains.
 - [ ] Every regression test demonstrated red on pre-fix code, green after: #71–#74 describe red/green verification in their PR bodies; #70 describes regression coverage but does not demonstrate the historical red run. Current green tests do not prove this universal historical criterion; retained as an evidence gap, not a newly reproduced defect.
-- [x] `ConfigIndirectionTest` exercises each existing `models.*`, `table_names.*`, `column_names.*`, and `names.*` key. This is key coverage, not coverage of every consumer; the `invites()` FK consumers remain B5.
+- [x] `ConfigIndirectionTest` exercises each existing `models.*`, `table_names.*`, `column_names.*`, and `names.*` key. This is key coverage, not coverage of every consumer; the `invites()` FK consumers were subsequently covered by replacement B5.
 - [x] Installer↔config parity test present and green.
-- [x] Current merged baseline: 119 tests / 320 assertions, PHPStan clean, Pint check clean.
+- [x] Historical September 17 merged baseline: 119 tests / 320 assertions, PHPStan clean, Pint check clean.
 - [x] README/SETUP/CLAUDE.md corrected; four permission strings documented. Phase 1b A2/A3 add the upgrade guide, changelog and env reference.
 - [ ] **Release published**: superseded patch boundary now belongs to Phase 1b A8 (`v5.0.0`); `dev` → `main`, tag and GitHub release remain pending.
 
-## Decisions made (confirmed 2026-07-06; closure updated 2026-09-17)
+## Historical decisions made (confirmed 2026-07-06; closure updated 2026-09-17)
 
 - Signed invite URL: **DROP** — plain `route()`, token is the secret.
 - Admin Invites Create/Edit actions: **REMOVED** (keep Delete) — hand-authored invites are Phase 3.

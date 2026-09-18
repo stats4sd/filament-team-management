@@ -2,20 +2,20 @@
 
 > **Track B superseded (2026-09-17):** use [Replacement Track B — membership core with app-owned authorization](phase-1b-track-b-membership-only.md) for the current proposal, unchanged-item mapping, implementation order and verification requirements. The original Track B and decisions below are retained as historical context. Track A completion records remain valid; the replacement proposes the new breaking boundary before A8. Older-app compatibility and incremental upgrade migrations are not requirements under the user's latest consumer constraints.
 
-**Date:** 2026-09-11 · **Updated:** 2026-09-17 · **Status:** A1–A7 merged; A8 release pending. Track B not implemented; readiness reviewed below. · **Base:** `dev` at `e5e98df` (local and GitHub verified; Phase 1 #70–#75 also merged).
+**Date:** 2026-09-11 · **Updated:** 2026-09-18 · **Status:** A1–A7 historically complete; replacement B1–B8 implemented at `b40c711`, with [verification recorded](../change-logs/phase-1b-track-b-membership-only.md). A8 integration/release remains separate. Historical remote/verification records below have not been refreshed by this status edit.
 **Inputs:** [2026-09-11-pr75-stack-re-review.md](../code-reviews/2026-09-11-pr75-stack-re-review.md) §3–§4, [2026-07-06-package-review.md](../code-reviews/2026-07-06-package-review.md), [meta-plan-monorepo-migration.md](meta-plan-monorepo-migration.md) Phase 2.
 
-Two tracks. **Track A** records the 5.0 preparation; A1–A7 are complete. **Track B** groups the remaining review work, but is not an unconditional queue of backwards-compatible 5.x minors. Its changed authorization and mail defaults need release classification before A8; see the readiness review and suggested order.
+The current sequence is completed Phase 1/1b implementation → [Phase 2 closeout](phase-2-bounded-hardening-closeout.md) → full package review → separate Phase 3 plan. Track A records historical preparation; the original Track B is historical only. Package roles/admins, compatibility wrappers and legacy migrations are superseded by the fresh-install membership contract.
 
-Ground rules unchanged: one PR per group, red→green test per fix, `composer test / analyse / format` green, README/SETUP in the same PR as any public change.
+**Historical preparation rules:** one PR per group, red→green test per fix, `composer test / analyse / format` green, README/SETUP in the same PR as any public change.
 
-**General rule for this release: every breaking change we already know about ships in 5.0, not later.** If a fix touches a file that has another known-breaking defect in it (e.g. a migration stub), fix that too in the same PR rather than deferring to 6.0.
+**Historical release rule: every breaking change we already know about ships in 5.0, not later.** If a fix touches a file that has another known-breaking defect in it (e.g. a migration stub), fix that too in the same PR rather than deferring to 6.0.
 
 ---
 
 ## Consuming apps (all in the `stats4sd` GitHub org)
 
-Used by A4/A7 for the "grep before deleting/renaming" step, and by UPGRADE.md to know who has to act.
+Historical constraints, preserved without a new consumer audit. Used by A4/A7 for the "grep before deleting/renaming" step, and by UPGRADE.md to know who has to act.
 
 | App                               | Constraint      | Status             | Action for 5.0                                                                                      |
 | --------------------------------- | --------------- | ------------------ | --------------------------------------------------------------------------------------------------- |
@@ -27,7 +27,7 @@ Used by A4/A7 for the "grep before deleting/renaming" step, and by UPGRADE.md to
 | `wcd-track`                       | `^1.0`          | published, locked  | no action; will update later                                                                        |
 | `team-management-dev-no-programs` | `*` (path repo) | throwaway test app | ignore; to be deleted                                                                               |
 
-"grep the consuming apps" means: for each class/name being deleted or renamed, search the applicable consuming repos above and record which refs were checked (clone or `gh search code --owner stats4sd`). Anything found gets an explicit line in UPGRADE.md. If nothing is found the deletion/rename is still listed in UPGRADE.md, just without an app-specific note.
+The historical "grep the consuming apps" instruction meant: for each class/name being deleted or renamed, search the applicable consuming repos above and record which refs were checked (clone or `gh search code --owner stats4sd`). Anything found gets an explicit line in UPGRADE.md. If nothing is found the deletion/rename is still listed in UPGRADE.md, just without an app-specific note.
 
 ---
 
@@ -66,7 +66,9 @@ Removed the unused `Filament\Auth\RegisterResponse`, empty package class/facade/
 
 ### A5. Declare `spatie/laravel-permission` (3.13) — merged #82
 
-`composer.json` directly requires `spatie/laravel-permission: ^7.0`, consistent with the installed dependency graph. The earlier `^6.0` proposal was incompatible with althinect ^3.
+A5 added `spatie/laravel-permission: ^7.0` at that time. Replacement B1 intentionally removed it and Althinect; hosts now own privilege storage. Do not restore the dependency.
+
+> **Historical A6 schema record:** role FKs and existing-install migration guidance below were superseded by replacement Track B’s accepted fresh-install contract.
 
 ### A6. Program columns always created (3.12) + explicit constraint targets — merged #83, ships in 5.0
 
@@ -86,11 +88,12 @@ Removed the unused `Filament\Auth\RegisterResponse`, empty package class/facade/
 
 ### A8. Release — pending
 
-- [x] A1–A7 merged and current local tests, analysis and formatting checks green.
-- [x] Consuming-app pin/readiness note recorded below; do not reopen the obsolete `holpa-platform` Composer-pin blocker without new evidence.
-- [ ] Resolve the Track B compatibility classification below before promising that all remaining work can ship after 5.0 as minors. Any retained breaking default belongs before the tag under the existing release rule; compatible opt-in work can follow later.
-- [ ] Final read-through of UPGRADE.md against A4/A6/A7, including A6’s existing-install paths and A7’s class, Livewire-key and attach-action names; confirm consuming-app upgrade changes are scheduled.
-- [ ] Set the CHANGELOG release date, merge `dev` → `main` through a green PR, tag `v5.0.0`, and publish the GitHub release using the CHANGELOG entry.
+- [x] A1–A7 completion and historical verification recorded; A5 intentionally reversed by membership-only B1.
+- [x] Consuming-app constraints retained below; no legacy-consumer migration audit is required.
+- [ ] Integrate the actual replacement B1–B8 and Phase 2 work through the normal PR process; verify the integrated revision.
+- [ ] Finish full package review and required fixes, then reconcile README, SETUP, UPGRADE, CHANGELOG and the membership contract with the accepted fresh schema, host policies, removed APIs and retained class/action names.
+- [ ] Record final tests, analysis and formatting evidence; choose eventual release scope/version and date separately from Phase 2 completion.
+- [ ] When release is explicitly authorized, merge the release branch through a green PR, tag and publish using the final CHANGELOG. This closeout does not authorize release publishing.
 
 User-recorded update 2026-09-17: `holpa-platform` still declares `*`, but is pinned through submodules and is not affected by release tags. Other consuming apps are pinned or ready to update. This refresh preserves that statement; it did not independently re-audit the consuming repos.
 
