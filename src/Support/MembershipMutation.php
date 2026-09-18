@@ -4,6 +4,7 @@ namespace Stats4sd\FilamentTeamManagement\Support;
 
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Stats4sd\FilamentTeamManagement\Events\MemberAdded;
 use Stats4sd\FilamentTeamManagement\Events\MemberRemoved;
 use Stats4sd\FilamentTeamManagement\Events\TeamLinkedToProgram;
@@ -91,34 +92,59 @@ final class MembershipMutation
             foreach ($eligibleTargets as $target) {
                 Membership::eligible($lockedTargets[Membership::key($target)]);
             }
-            // A graph changed before locks were acquired: abort before invoking any participant.
-            foreach ($deletingTargets as $original) {
-                $target = $lockedTargets[Membership::key($original)];
-                foreach ($target->users()->withoutGlobalScopes()->get() as $user) {
-                    if (! isset($lockedUsers[Membership::key($user)])) {
-                        Membership::invalid('Membership changed while this operation was starting. Please try again.');
+            // Ordinary discovery reads are advisory under repeatable read. Current pivot reads
+            // validate the complete deletion graph without acquiring users after target locks.
+            $deletionGraphs = [];
+            foreach ($operations as $index => $operation) {
+                if (! in_array($operation[0], ['delete_user', 'delete_team', 'delete_program'], true)) {
+                    continue;
+                }
+                $key = Membership::key($operation[1]);
+                $target = $lockedTargets[$key] ?? $lockedUsers[$key];
+                $graph = ['users' => [], 'teams' => [], 'programs' => []];
+                if ($operation[0] === 'delete_user') {
+                    $graph['teams'] = $this->lockedRelated($target->teams(), $lockedTargets);
+                    if (config('filament-team-management.use_programs')) {
+                        $graph['programs'] = $this->lockedRelated($target->programs(), $lockedTargets);
+                    }
+                } else {
+                    $graph['users'] = $this->lockedRelated($target->users(), $lockedUsers);
+                    if (Membership::type($target) === 'program') {
+                        $graph['teams'] = $this->lockedRelated($target->teams(), $lockedTargets);
+                    } elseif (config('filament-team-management.use_programs')) {
+                        $graph['programs'] = $this->lockedRelated($target->programs(), $lockedTargets);
                     }
                 }
-                $links = Membership::type($target) === 'program' ? $target->teams()->withoutGlobalScopes()->get() : (config('filament-team-management.use_programs') ? $target->programs()->withoutGlobalScopes()->get() : collect());
-                foreach ($links as $link) {
-                    if (! isset($lockedTargets[Membership::key($link)])) {
-                        Membership::invalid('Associations changed while this operation was starting. Please try again.');
-                    }
-                }
+                $deletionGraphs[$index] = $graph;
             }
             $results = [];
-            foreach ($operations as $operation) {
+            foreach ($operations as $index => $operation) {
                 [$name, $target, $record, $data] = array_pad($operation, 4, []);
                 $target = $target instanceof Model ? ($lockedTargets[Membership::key($target)] ?? $lockedUsers[Membership::key($target)]) : $target;
                 $record = $record instanceof Model ? ($lockedTargets[Membership::key($record)] ?? $lockedUsers[Membership::key($record)]) : null;
-                $results[] = $this->apply($actor, $name, $target, $record, $data);
+                $results[] = $this->apply($actor, $name, $target, $record, $data, $deletionGraphs[$index] ?? []);
             }
 
             return $results;
         }, 1);
     }
 
-    private function apply(Authenticatable $actor, string $operation, ?Model $target, ?Model $record, array $data): mixed
+    /** Resolve only models locked earlier; an expanded graph must abort before participants. */
+    private function lockedRelated(BelongsToMany $relation, array $locked): array
+    {
+        $models = [];
+        foreach ($relation->newPivotQuery()->lockForUpdate()->pluck($relation->getRelatedPivotKeyName()) as $id) {
+            $key = $relation->getRelated()->getTable() . ':' . $id;
+            if (! isset($locked[$key])) {
+                Membership::invalid('Membership or associations changed while this operation was starting. Please try again.');
+            }
+            $models[] = $locked[$key];
+        }
+
+        return $models;
+    }
+
+    private function apply(Authenticatable $actor, string $operation, ?Model $target, ?Model $record, array $data, array $deletionGraph): mixed
     {
         if (str_starts_with($operation, 'create_')) {
             $type = substr($operation, 7);
@@ -185,24 +211,24 @@ final class MembershipMutation
             $context = new MembershipContext($operation, $actor, $target, $operation === 'delete_user' ? $target : null);
             Membership::participant('before', $context);
             if ($operation === 'delete_user') {
-                foreach ($target->teams()->withoutGlobalScopes()->get() as $team) {
+                foreach ($deletionGraph['teams'] as $team) {
                     $this->membership($actor, $team, $target, false, 'remove_member', 'account_deleted');
                 }
                 if (config('filament-team-management.use_programs')) {
-                    foreach ($target->programs()->withoutGlobalScopes()->get() as $program) {
+                    foreach ($deletionGraph['programs'] as $program) {
                         $this->membership($actor, $program, $target, false, 'remove_member', 'account_deleted');
                     }
                 }
             } else {
-                foreach ($target->users()->withoutGlobalScopes()->get() as $user) {
+                foreach ($deletionGraph['users'] as $user) {
                     $this->membership($actor, $target, $user, false, 'remove_member', 'target_deleted');
                 }
                 if (Membership::type($target) === 'program') {
-                    foreach ($target->teams()->withoutGlobalScopes()->get() as $team) {
+                    foreach ($deletionGraph['teams'] as $team) {
                         $this->link($actor, $target, $team, false, 'target_deleted');
                     }
                 } elseif (config('filament-team-management.use_programs')) {
-                    foreach ($target->programs()->withoutGlobalScopes()->get() as $program) {
+                    foreach ($deletionGraph['programs'] as $program) {
                         $this->link($actor, $program, $target, false, 'target_deleted');
                     }
                 }
@@ -221,7 +247,7 @@ final class MembershipMutation
 
     private function membership(Authenticatable $actor, Model $target, Model $user, bool $add, string $operation, string $origin = 'direct_add'): bool
     {
-        $exists = $target->users()->withoutGlobalScopes()->whereKey($user->getKey())->exists();
+        $exists = Membership::attached($target->users(), $user);
         if ($exists === $add) {
             return false;
         }
@@ -242,7 +268,7 @@ final class MembershipMutation
 
     private function link(Authenticatable $actor, Model $program, Model $team, bool $add, string $origin = 'direct'): bool
     {
-        if ($program->teams()->withoutGlobalScopes()->whereKey($team->getKey())->exists() === $add) {
+        if (Membership::attached($program->teams(), $team) === $add) {
             return false;
         }
         $context = new MembershipContext($add ? 'link_team' : 'unlink_team', $actor, $program, team: $team, origin: $origin);

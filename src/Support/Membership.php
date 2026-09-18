@@ -94,9 +94,17 @@ final class Membership
         }
     }
 
+    /** Read the current pivot row without taking related-model locks after target locks. */
+    public static function attached(BelongsToMany $relation, Model $related): bool
+    {
+        return $relation->newPivotQuery()
+            ->where($relation->getRelatedPivotKeyName(), $related->getAttribute($relation->getRelatedKeyName()))
+            ->lockForUpdate()->first([$relation->getRelatedPivotKeyName()]) !== null;
+    }
+
     public static function assertAttachment(BelongsToMany $relation, Model $related, bool $attached): void
     {
-        if ($relation->withoutGlobalScopes()->whereKey($related->getKey())->exists() !== $attached) {
+        if (self::attached($relation, $related) !== $attached) {
             self::invalid('The membership or association change was cancelled. No changes were saved.');
         }
     }
