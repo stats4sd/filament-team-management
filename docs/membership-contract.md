@@ -60,6 +60,10 @@ A richer host can replace `manages()` with a scoped grant query keyed by the sup
 
 Implement `Contracts\UserPicker::query(Authenticatable $actor, Model $target): Builder` and set `user_picker` to the class name. Return an Eloquent query of configured users the actor may discover for this target. The package returns zero candidates without it. Search results and selected labels use this query; submitted IDs are revalidated, and `addMember` is still checked on every selected user inside the transaction. Do not return a global user directory merely because the actor can invite by email.
 
+`Support\MembershipCandidates` is container-resolvable and independent of Filament authentication, panels and tenants. `query(Authenticatable $actor, Model $target): Builder` passes the supplied context to the existing `UserPicker`; an invalid picker implementation raises a configuration error. `resolveSelection(Authenticatable $actor, Model $target, array $ids): Collection` returns an Eloquent collection of configured users only when every distinct submitted ID is still present in that scoped query. It preserves model key semantics, deduplicates IDs and accepts an empty selection. Missing or excluded IDs raise an authorization exception (403 in HTTP adapters) before the membership batch starts. Eligibility is rechecked at submission, without a cross-query locking/snapshot guarantee.
+
+Filament keeps search text, email labels, the 50-result limit and `addMember` option filtering. The resolved collection still goes to `MembershipBatch::handle($actor, 'add_member', $users, $target)`, which checks every user's mutation authorization inside its transaction. Direct `AddMember`, batch and email-invitation callers retain their own action contracts; picker eligibility is a discovery boundary, not a new prerequisite for all mutations.
+
 ## Actions
 
 All actions are container-resolvable classes in `Stats4sd\FilamentTeamManagement\Actions`, with an instance `handle()` method. Management actor parameters implement `Authenticatable` and must be persisted configured User models; targets are actual configured Eloquent models.
@@ -67,6 +71,7 @@ All actions are container-resolvable classes in `Stats4sd\FilamentTeamManagement
 | Action | Arguments | Result |
 |---|---|---|
 | `CreateTeam`, `CreateProgram`, `CreateUser` | actor, data | Model |
+| `CreateTeamForProgram` | actor, program, data | Newly created configured Team Model |
 | `UpdateTeam`, `UpdateProgram`, `UpdateUser` | actor, target, data | Model |
 | `DeleteTeam`, `DeleteProgram`, `DeleteUser` | actor, target | boolean |
 | `AddMember`, `RemoveMember` | actor, target, member | changed boolean |
@@ -77,6 +82,10 @@ All actions are container-resolvable classes in `Stats4sd\FilamentTeamManagement
 | `CancelMembershipInvitation` | actor, target, invite | changed boolean |
 | `AcceptMembershipInvitation` | token, registration data | Created configured User |
 | `MembershipBatch` | actor, operation, records, optional owner target | Results array |
+
+`CreateTeamForProgram::handle(Authenticatable $actor, Model $program, array $data): Model` creates the team and links it to the supplied program in one enclosing transaction on the actor's connection. Preflight requires a persisted configured actor, an enabled configured program target with a persisted identity, and the same connection. Existing actions retain authoritative locked-row existence/eligibility validation. The action delegates to `CreateTeam` then `LinkTeamToProgram`; it checks `create` on the configured Team class, then `linkTeam(program, team)` and `linkProgram(team, program)` after creator bootstrap. Program membership is not an additional prerequisite.
+
+The existing `create_team` before/write/after participant sequence creates the creator membership and permits same-connection host grant bootstrap before `link_team` authorization and participants. No composite operation or event is added. `MemberAdded` and `TeamLinkedToProgram` wait for successful outer commit. Denial, participant exceptions, vetoes or caller rollback undo team, membership, association and transactional host writes together. The first action locks the actor before creating the new team; the second reuses that held actor lock before obtaining existing program/new-team locks. No retries or program-before-actor locks are added. Preflight does not prevent concurrent program deletion from reaching bootstrap participants; participant writes must remain rollback-safe and obey the existing lock/connection obligations.
 
 Batch operations are `add_member`, `remove_member`, `delete_team`, `delete_program`, `delete_user`, `link_team` and `unlink_team`. Authorization or participant failure rolls back the entire batch. UI email lists are processed per address and report each result; they are not an atomic batch promise.
 
@@ -90,7 +99,7 @@ Set `participants` to an ordered list of classes implementing `Contracts\Members
 
 Context contains `operation`, `actor` (null for capability acceptance), `target`, optional `user`, `invite` and `team`, `origin`, `acceptance`, and `changed`. Before a change, `changed` is false; after persistence it is true. Models expose their original/dirty attributes for host update validation. During creation, the target is unsaved in `before` and has its key in `after`. No-op membership/link changes invoke no participants or observation events. Operation names include `create_team`, `create_program`, `update_team`, `delete_user`, `add_member`, `remove_member`, `leave`, `link_team`, `unlink_team` and invitation transitions; inspect the public context in your integration tests.
 
-Typical host uses are creator grant bootstrap, durable audit rows, grant revocation and a last-manager invariant. Validate in `before`; write transactional integration records in `after`. Do not perform network I/O or cross-database writes there. Package operations do not automatically retry participant execution. If a deletion graph changes before it is locked, the operation fails before participants and asks the caller to retry.
+Typical host uses are creator grant bootstrap, durable audit rows, grant revocation and a last-manager invariant. Validate in `before`; write transactional integration records in `after`. Do not perform network I/O or cross-database writes there. Package operations do not automatically retry participant execution. Deletion graph discovery is advisory. After locking the precomputed users and targets, current pivot reads validate the graph even when a caller-owned transaction has an older repeatable-read snapshot. Newly discovered records outside the held locks cause failure before participants and ask the caller to retry; cleanup uses the validated current graph. Membership/link existence and persistence postconditions also read current pivot state. No newly discovered User lock is taken after target locks.
 
 All existing affected User rows are locked before targets; rows are sorted deterministically within each lock group. Invite/membership mutations follow target locks. Batch operations gather the complete user/target set before applying changes. Account deletion takes the affected User lock before enumerating membership targets, so an addition to a previously unrelated team cannot bypass cleanup. Host privilege-demotion paths enforcing the same last-manager invariant must follow this user-first discipline too. Models participating in an operation must share a connection. Database unique constraints protect duplicate memberships, associations and invitation tokens.
 

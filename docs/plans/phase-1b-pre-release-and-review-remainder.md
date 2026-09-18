@@ -1,11 +1,11 @@
 # Phase 1b — Pre-release hardening + remaining review items
 
-> **Track B superseded (2026-09-17):** use [Replacement Track B — membership core with app-owned authorization](phase-1b-track-b-membership-only.md) for the current proposal, unchanged-item mapping, implementation order and verification requirements. The original Track B and decisions below are retained as historical context. Track A completion records remain valid; the replacement proposes the new breaking boundary before A8. Older-app compatibility and incremental upgrade migrations are not requirements under the user's latest consumer constraints.
+> **Track B superseded (2026-09-17):** use [Replacement Track B — membership core with app-owned authorization](phase-1b-track-b-membership-only.md) for the accepted boundary, unchanged-item mapping and historical implementation requirements. The original Track B and decisions below are retained as historical context. Track A completion records remain valid; the replacement implemented the new breaking boundary before A8. Older-app compatibility and incremental upgrade migrations are not requirements under the user's latest consumer constraints.
 
 **Date:** 2026-09-11 · **Updated:** 2026-09-18 · **Status:** A1–A7 historically complete; replacement B1–B8 implemented at `b40c711`, with [verification recorded](../change-logs/phase-1b-track-b-membership-only.md). A8 integration/release remains separate. Historical remote/verification records below have not been refreshed by this status edit.
 **Inputs:** [2026-09-11-pr75-stack-re-review.md](../code-reviews/2026-09-11-pr75-stack-re-review.md) §3–§4, [2026-07-06-package-review.md](../code-reviews/2026-07-06-package-review.md), [meta-plan-monorepo-migration.md](meta-plan-monorepo-migration.md) Phase 2.
 
-The current sequence is completed Phase 1/1b implementation → [Phase 2 closeout](phase-2-bounded-hardening-closeout.md) → full package review → separate Phase 3 plan. Track A records historical preparation; the original Track B is historical only. Package roles/admins, compatibility wrappers and legacy migrations are superseded by the fresh-install membership contract.
+The current sequence is completed Phase 1/1b implementation → completed [Phase 2 closeout and full review](phase-2-bounded-hardening-closeout.md) → separate Phase 3 plan. Track A records historical preparation; the original Track B is historical only. Package roles/admins, compatibility wrappers and legacy migrations are superseded by the fresh-install membership contract.
 
 **Historical preparation rules:** one PR per group, red→green test per fix, `composer test / analyse / format` green, README/SETUP in the same PR as any public change.
 

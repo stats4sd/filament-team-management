@@ -1,6 +1,6 @@
 # Meta-plan: membership package closeout, review and later scaffold work
 
-**Updated:** 2026-09-18. **Current sequence:** completed Phase 1/1b implementation → [bounded Phase 2 closeout](phase-2-bounded-hardening-closeout.md) → full package review → separate Phase 3 plan. Implementation, verification, integration and release are separate statuses; A8 owns eventual release preparation. No phase boundary requires a tag.
+**Updated:** 2026-09-18. **Current sequence:** completed Phase 1/1b implementation → completed [bounded Phase 2 closeout and full review](phase-2-bounded-hardening-closeout.md) → separate Phase 3 plan. Implementation, verification, integration and release are separate statuses; A8 owns eventual release preparation. No phase boundary requires a tag.
 
 ## Completed Phase 1 and Phase 1b implementation
 
@@ -15,7 +15,9 @@ Historical role-bearing invitations, package administrator policies/events, mode
 
 ## Phase 2 — Bounded closeout
 
-Execute [the closeout plan](phase-2-bounded-hardening-closeout.md): extract atomic program-team creation and explicit-actor candidate discovery, finish neutral sender copy/config comments, reconcile status, inventory residual boundaries, and verify. Keep each extraction and behavioral coverage together in a reviewable commit. The package remains one installable Laravel/Filament package.
+**Status:** implemented and independently verified, full-package review completed with both demonstrated defects corrected; see the [closeout log](../change-logs/phase-2-bounded-hardening-closeout.md) and [full review](../code-reviews/2026-09-18-phase-2-membership-package-review.md). Separate Phase 3 planning is next; A8 release remains independent.
+
+Scope was defined by [the closeout plan](phase-2-bounded-hardening-closeout.md): extract atomic program-team creation and explicit-actor candidate discovery, finish neutral sender copy/config comments, reconcile status, inventory residual boundaries, and verify. Keep each extraction and behavioral coverage together in a reviewable commit. The package remains one installable Laravel/Filament package.
 
 Completion means verified implementation and a full-review handoff, not a published release. The full review must cover the entire membership package and distinguish architectural findings, code/documentation gotchas and demonstrated runtime bugs. Detailed Phase 3 planning follows that review and any required fixes.
 

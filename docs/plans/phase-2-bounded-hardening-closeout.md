@@ -1,6 +1,6 @@
 # Phase 2 — Bounded closeout of completed hardening
 
-**Date:** 2026-09-18. **Status:** implementation plan; work below has not been implemented by writing this document. **Planning baseline:** `membership-only` at `b40c711`, following replacement Track B B1–B8. Recheck the checkout and preserve existing work when implementation begins.
+**Date:** 2026-09-18. **Status:** Phase 2 reviewed; ready for separate Phase 3 planning. Implemented on the continuing `membership-only` branch, including the bounded review corrections in section 6. See the [implementation log](../change-logs/phase-2-bounded-hardening-closeout.md), [inventory](phase-2-boundary-inventory.md) and [full review](../code-reviews/2026-09-18-phase-2-membership-package-review.md) for executed evidence. **Planning baseline:** `membership-only` at `b40c711`, following replacement Track B B1–B8. Recheck the checkout and preserve existing work when implementation begins.
 
 **Outcome:** finish the small, known shared-behavior extractions, reconcile the operative roadmap, and assemble evidence for a full review of the resulting membership package. Stop after implementation and verification for that review. Write the detailed Phase 3 scaffold plan separately, using the review's findings.
 
@@ -173,13 +173,13 @@ Check links, referenced symbols, Markdown formatting and current-status consiste
 
 ## 3. Completion and stopping criteria
 
-- [ ] P2.1: current roadmap/status reconciled; old role/admin/minor-refactor requirements are historical only.
-- [ ] P2.2: the shared composite action is implemented, both UI callers delegate, and rollback/authorization/outer-commit coverage passes.
-- [ ] P2.3: candidate query and submitted-ID validation are shared; actual crafted-submission and per-user denial coverage passes.
-- [ ] P2.4: sender fallback and stale config comment cleaned up without behavior/config expansion.
-- [ ] P2.5: the finite boundary inventory and residual audit are complete, with concrete evidence and deferred decisions.
-- [ ] P2.6: focused/full checks and independent verification recorded; public docs and implementation log reflect the delivered behavior.
-- [ ] The implementation is ready for full review, with no unresolved demonstrated defect hidden as a Phase 3 design question.
+- [x] P2.1: current roadmap/status reconciled; old role/admin/minor-refactor requirements are historical only.
+- [x] P2.2: the shared composite action is implemented, both UI callers delegate, and rollback/authorization/outer-commit coverage passes.
+- [x] P2.3: candidate query and submitted-ID validation are shared; actual crafted-submission and per-user denial coverage passes.
+- [x] P2.4: sender fallback and stale config comment cleaned up without behavior/config expansion.
+- [x] P2.5: the finite boundary inventory and residual audit are complete, with concrete evidence and deferred decisions.
+- [x] P2.6: focused/full checks and independent verification recorded; public docs and implementation log reflect the delivered behavior.
+- [x] The implementation is ready for full review, with no unresolved demonstrated defect hidden as a Phase 3 design question.
 
 At that point mark **“Phase 2 implementation complete; full review pending”** and stop implementation. After the full review and any required fixes, record **“Phase 2 reviewed; ready for separate Phase 3 planning”**. Do not silently treat review readiness as review completion or start scaffold conversion. A8 release is a separate status throughout.
 
@@ -192,3 +192,14 @@ No scaffold generation, UI publishing/removal, new panel topology, navigation/au
 ## 5. Planning evidence and limits
 
 This plan was prepared from the September 18 review and live inspection of the action/support/UI boundaries and existing tests at `b40c711`. The earlier review ran **167 passing tests, 637 assertions and four expected opt-in concurrency skips**; those are prior baseline results, not verification of the work proposed here. No runtime code was changed and no runtime checks were rerun while drafting this plan. Mechanical document checks and independent plan review should be recorded with delivery of the plan.
+
+## 6. Review-driven bounded corrections (2026-09-18)
+
+Full-package review during execution identified two pre-existing behaviors requiring focused verification. These are recorded additions under P2.5's demonstrated-defect rule, not scaffold or navigation-contract redesign:
+
+- **InnoDB deletion graph integrity:** a deterministic `REPEATABLE READ` probe pauses team/program deletion after its initial member query, lets another actor commit AddMember plus a host grant, then resumes deletion. Both cases failed: the target/pivot disappeared, the host grant remained, and no MemberRemoved event fired. Correct `Support/Membership.php` and `Support/MembershipMutation.php` to read authoritative pivot state under the existing user-first/target lock discipline, validate graph growth before participants, and consume current state for cleanup. Preserve no retries, same-connection participants and existing events. Retain and extend database-backed regressions in `tests/Concurrency/MembershipConcurrencyTest.php`; SQLite is not evidence of this race.
+- **Program-only landing:** regression tests using actual invited registration and final-Team departure reached the no-memberships page despite an authorized Program membership. Let the existing `MembershipNavigation` selection also consider the configured Program panel after App fallback, keeping admission, tenant, policy and program-mode checks. Cover success and denied/disabled fallback in `tests/CustomPanels/NavigationTest.php`. No host URL, guard or panel topology contract changes.
+
+The first is a demonstrated integrity blocker; the second is a reproduced navigation bug. Both must be fixed and reviewed before this run claims reviewed completion. Exact red/green evidence and delivered commits belong in the closeout log and full-review report.
+
+**Completion evidence:** final runtime revision `6643ebf` passed independent verification: 206 tests / 924 assertions with 16 expected opt-in skips, clean PHPStan/Pint/diff checks, and a separate real MySQL run of 16 tests / 96 assertions. Both review corrections were independently re-reviewed without blocking findings. Full review is complete; separate Phase 3 planning and A8 release remain pending. The original planning evidence in section 5 remains historical.
