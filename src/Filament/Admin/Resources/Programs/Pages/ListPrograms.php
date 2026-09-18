@@ -4,7 +4,9 @@ namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Programs\Page
 
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
+use Stats4sd\FilamentTeamManagement\Actions\CreateProgram;
 use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Programs\ProgramResource;
+use Stats4sd\FilamentTeamManagement\Filament\Support\Access;
 
 class ListPrograms extends ListRecords
 {
@@ -13,7 +15,7 @@ class ListPrograms extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            Actions\CreateAction::make()->using(fn (array $data) => app(CreateProgram::class)->handle(Access::actor(), $data)),
         ];
     }
 }

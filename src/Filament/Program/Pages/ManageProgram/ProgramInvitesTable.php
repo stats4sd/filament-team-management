@@ -2,49 +2,14 @@
 
 namespace Stats4sd\FilamentTeamManagement\Filament\Program\Pages\ManageProgram;
 
-use Filament\Actions\BulkActionGroup;
 use Filament\Facades\Filament;
-use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Enums\FiltersLayout;
-use Filament\Tables\Filters\Filter;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
+use Stats4sd\FilamentTeamManagement\Filament\Support\MembershipTables;
 
 class ProgramInvitesTable
 {
     public static function configure(Table $table): Table
     {
-        return $table
-            ->relationship(fn () => Filament::getTenant()->invites())
-            ->inverseRelationship('program')
-            ->columns([
-                TextColumn::make('email'),
-                TextColumn::make('role.name')->label('Roles assigned'),
-                TextColumn::make('team.name')->label(config('filament-team-management.table_names.teams') . ' assigned'),
-                TextColumn::make('program.name')->label(config('filament-team-management.table_names.programs') . ' assigned'),
-                TextColumn::make('created_at')->dateTime(),
-                IconColumn::make('is_confirmed')->boolean(),
-
-            ])
-            ->filtersLayout(FiltersLayout::AboveContent)
-            ->deferFilters(false)
-            ->filters([
-                Filter::make('only_unconfirmed')
-                    ->label('Show accepted invites')
-                    ->baseQuery(fn (Builder $query) => $query->withoutGlobalScope('onlyUnconfirmed'))
-                    ->toggle(),
-            ])
-            ->headerActions([
-                //
-            ])
-            ->recordActions([
-                //
-            ])
-            ->toolbarActions([
-                BulkActionGroup::make([
-                    //
-                ]),
-            ]);
+        return MembershipTables::invites($table, fn () => Filament::getTenant());
     }
 }

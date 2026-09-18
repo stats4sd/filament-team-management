@@ -10,10 +10,8 @@ use Filament\Forms;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Component;
-use Illuminate\Auth\Events\Registered;
-use Illuminate\Support\Facades\Hash;
 use Livewire\Attributes\Url;
-use Stats4sd\FilamentTeamManagement\Events\RegisteredWithData;
+use Stats4sd\FilamentTeamManagement\Actions\AcceptMembershipInvitation;
 use Stats4sd\FilamentTeamManagement\Http\Responses\RegisterResponse;
 use Stats4sd\FilamentTeamManagement\Models\Invite;
 
@@ -36,7 +34,8 @@ class Register extends BaseRegister
 
         $this->invite = Invite::where('token', $this->token)->first();
 
-        if (! $this->invite) {
+        if (! $this->invite || ! $this->invite->isPending()) {
+            Notification::make()->warning()->title('Invitation unavailable')->body('This invitation is invalid, expired or already accepted. Contact the person who invited you.')->send();
             $this->redirect(Filament::getLoginUrl());
 
             return;
@@ -73,45 +72,12 @@ class Register extends BaseRegister
 
         $data = $this->form->getState();
 
-        $data['original_password'] = $data['password'];
-        $data['password'] = Hash::make($data['password']);
+        $user = app(AcceptMembershipInvitation::class)->handle($this->token, $data);
 
-        $user = $this->getUserModel()::create(
-            collect($data)
-                ->except('original_password')
-                ->toArray()
-        );
-
-        if ($this->invite instanceof Invite) {
-
-            // Question: If we do not delete team_invites record, can it be used for registration again?
-            // $this->invite->delete();
-            $this->invite->is_confirmed = true;
-            $this->invite->save();
-
-            // If the invite was linked to a role, team or program, link the user to those entries:
-            if ($this->invite->role) {
-                $role = config('filament-team-management.models.role')::find($this->invite->role_id);
-                $user->assignRole($role);
-            }
-
-            if ($this->invite->team) {
-                $this->invite->team->members()->attach($user);
-            }
-
-            if ($this->invite->program) {
-                $this->invite->program->members()->attach($user);
-            }
-
-        }
-
-        // pass in the registered form data to the event for extensibility
-        event(new Registered($user));
-        event(new RegisteredWithData($user, $data));
-
-        Filament::auth()->login($user);
-
-        session()->regenerate();
+        $user->getConnection()->afterCommit(function () use ($user): void {
+            Filament::auth()->login($user);
+            session()->regenerate();
+        });
 
         // redirect new user to app panel
         return app(RegisterResponse::class);

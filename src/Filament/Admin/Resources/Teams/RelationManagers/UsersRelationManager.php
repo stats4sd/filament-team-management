@@ -2,119 +2,33 @@
 
 namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Teams\RelationManagers;
 
-use Filament\Actions\Action;
-use Filament\Actions\AttachAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DetachAction;
-use Filament\Actions\DetachBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Forms;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Schemas\Components\Callout;
-use Filament\Schemas\Schema;
-use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\HtmlString;
-use Illuminate\Support\Str;
-use Stats4sd\FilamentTeamManagement\Models\Interfaces\TeamInterface;
-use Stats4sd\FilamentTeamManagement\Models\User;
+use Stats4sd\FilamentTeamManagement\Filament\Support\Access;
+use Stats4sd\FilamentTeamManagement\Filament\Support\MembershipTables;
 
 class UsersRelationManager extends RelationManager
 {
-    // hardcode relationship names, so we can use the relationships defined in the base models.
     protected static string $relationship = 'users';
 
-    protected static ?string $inverseRelationship = 'teams';
+    public function isReadOnly(): bool
+    {
+        return false;
+    }
 
     public static function getTitle(Model $ownerRecord, string $pageClass): string
     {
-        return Str::ucfirst(Str::plural(config('filament-team-management.table_names.users')));
+        return 'Members';
     }
 
-    // turn on Edit mode so that "Add Existing User to team" button will be shown when viewing team record
-    public function isReadOnly(): bool
+    public static function canViewForRecord(Model $ownerRecord, string $pageClass): bool
     {
-        $team = $this->getOwnerRecord();
-
-        if (auth()->user()->can('update', $team)) {
-            return false;
-        }
-
-        return true;
-    }
-
-    public function form(Schema $schema): Schema
-    {
-        return $schema
-            ->schema([
-                Callout::make("Edit user's role within this team")
-                    ->description(fn (User $record) => new HtmlString("$record->name ($record->email)")),
-                Forms\Components\Checkbox::make('is_admin')
-                    ->label(fn (User $record): string => "$record->name is a Team Admin")
-                    ->helperText('Team Admins have full access to all team settings and can manage all team members. They can edit or delete data. Non-admins can only collect data and view data.'),
-            ])->columns(1);
+        return Access::allows('viewMembers', $ownerRecord);
     }
 
     public function table(Table $table): Table
     {
-        return $table
-            ->recordTitleAttribute('name')
-            ->columns([
-                Tables\Columns\TextColumn::make('name')
-                    ->searchable()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('email')
-                    ->searchable()
-                    ->sortable(),
-
-                Tables\Columns\TextColumn::make('created_at'),
-            ])
-            ->filters([
-            ])
-            ->headerActions([
-                Action::make('invite users')
-                    ->visible(! $this->isReadOnly())
-                    ->schema([
-                        Callout::make('Invitation')
-                            ->info()
-                            ->description('Add the email address(es) of the user(s) you would like to invite to this ' . config('filament-team-management.table_names.teams') . '. An invitation will be sent to each address.')
-                            ->columnSpanFull(),
-                        Forms\Components\Repeater::make('users')
-                            ->label('Email Addresses to Invite')
-                            ->simple(
-                                Forms\Components\TextInput::make('email')
-                                    ->email()
-                                    ->required()
-                            )
-                            ->reorderable(false)
-                            ->addActionLabel('Add Another Email Address'),
-                    ])
-                    ->action(fn (array $data, RelationManager $livewire) => $this->handleInvitation($data, $livewire->getOwnerRecord())),
-                AttachAction::make()
-                    ->label('Add Existing User to ' . config('filament-team-management.table_names.teams')),
-            ])
-            ->recordActions([
-                // Exposes the is_admin pivot form defined in form() above so the
-                // team-admin flag is actually settable through the UI.
-                // Phase 2: is_admin is only *settable* here; enforcement (intra-team
-                // authorization based on the flag) is deferred to Phase 2.
-                EditAction::make()->label('Edit Role'),
-                DetachAction::make()->label('Remove User')
-                    ->modalSubmitActionLabel('Remove User')
-                    ->modalHeading('Remove User from ' . Str::ucfirst(config('filament-team-management.table_names.teams'))),
-            ])
-            ->groupedBulkActions([
-                BulkActionGroup::make([
-                    DetachBulkAction::make()->label('Remove selected')
-                        ->modalSubmitActionLabel('Remove Selected Users')
-                        ->modalHeading('Remove Selected Users from ' . Str::ucfirst(config('filament-team-management.table_names.teams'))),
-                ]),
-            ]);
-    }
-
-    public function handleInvitation(array $data, TeamInterface $team): void
-    {
-        $team->sendInvites($data['users']);
+        return MembershipTables::members($table, fn () => $this->getOwnerRecord(), true);
     }
 }

@@ -18,6 +18,7 @@ return new class extends Migration {
             $table->foreignId(config('filament-team-management.column_names.users_foreign_key'))
                 ->constrained(config('filament-team-management.table_names.users'))
                 ->cascadeOnDelete()->cascadeOnUpdate();
+            $table->unique([config('filament-team-management.column_names.programs_foreign_key'), config('filament-team-management.column_names.users_foreign_key')]);
             $table->timestamps();
         });
     }

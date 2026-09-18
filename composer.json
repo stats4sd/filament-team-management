@@ -1,6 +1,6 @@
 {
     "name": "stats4sd/filament-team-management",
-    "description": "Package for an opinionated 'teams' setup, including invites and integration with Laravel Filament + Spatie User Roles",
+    "description": "Teams, optional programs and membership invitations for Laravel Filament with host-owned authorization",
     "keywords": [
         "stats4sd",
         "laravel",
@@ -23,9 +23,7 @@
         "php": "^8.4",
         "filament/filament": "^5.2",
         "spatie/laravel-package-tools": "^1.15.0",
-        "althinect/filament-spatie-roles-permissions": "^3.0",
-        "livewire/livewire": "^4.0",
-        "spatie/laravel-permission": "^7.0"
+        "livewire/livewire": "^4.0"
     },
     "require-dev": {
         "larastan/larastan": "^3.10",

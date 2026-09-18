@@ -5,7 +5,7 @@ use Filament\Facades\Filament;
 use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Programs\Pages\ListPrograms;
 use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Users\Pages\ListUsers;
 use Stats4sd\FilamentTeamManagement\Models\Program;
-use Stats4sd\FilamentTeamManagement\Models\User;
+use Stats4sd\FilamentTeamManagement\Tests\Fixtures\Models\HostUser as User;
 
 beforeEach(function () {
     actingAsAdmin();

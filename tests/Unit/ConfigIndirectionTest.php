@@ -3,10 +3,9 @@
 use Stats4sd\FilamentTeamManagement\Models\Invite;
 use Stats4sd\FilamentTeamManagement\Models\Program;
 use Stats4sd\FilamentTeamManagement\Models\Team;
-use Stats4sd\FilamentTeamManagement\Models\User;
 use Stats4sd\FilamentTeamManagement\Tests\Fixtures\Models\CustomProgram;
-use Stats4sd\FilamentTeamManagement\Tests\Fixtures\Models\CustomRole;
 use Stats4sd\FilamentTeamManagement\Tests\Fixtures\Models\CustomUser;
+use Stats4sd\FilamentTeamManagement\Tests\Fixtures\Models\HostUser as User;
 use Stats4sd\FilamentTeamManagement\Tests\Fixtures\Models\ProjectTeam;
 
 // ---------------------------------------------------------------------------
@@ -54,12 +53,6 @@ it('resolves models.program on the Invite program relation', function () {
     config()->set('filament-team-management.models.program', CustomProgram::class);
 
     expect((new Invite)->program()->getRelated())->toBeInstanceOf(CustomProgram::class);
-});
-
-it('resolves models.role on the Invite role relation', function () {
-    config()->set('filament-team-management.models.role', CustomRole::class);
-
-    expect((new Invite)->role()->getRelated())->toBeInstanceOf(CustomRole::class);
 });
 
 // ---------------------------------------------------------------------------

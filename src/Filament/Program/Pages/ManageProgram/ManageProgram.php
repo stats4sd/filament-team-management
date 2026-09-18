@@ -9,9 +9,13 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Str;
+use Stats4sd\FilamentTeamManagement\Filament\Support\Access;
+use Stats4sd\FilamentTeamManagement\Filament\Traits\ManagesMembershipProfile;
 
 class ManageProgram extends EditTenantProfile
 {
+    use ManagesMembershipProfile;
+
     protected static string | null | \BackedEnum $navigationIcon = 'heroicon-o-document-text';
 
     public static function getLabel(): string
@@ -24,6 +28,7 @@ class ManageProgram extends EditTenantProfile
         return $schema
             ->schema([
                 TextInput::make('name')
+                    ->disabled(fn () => ! Access::allows('update', $this->tenant))
                     ->label('Enter a name for the ' . config('filament-team-management.names.program')),
             ]);
     }
@@ -36,20 +41,20 @@ class ManageProgram extends EditTenantProfile
                     ->schema([
                         $this->getFormContentComponent(),
                     ]),
-                Tabs::make('User Management')
+                Tabs::make('Memberships')
                     ->contained(false)
                     ->tabs([
-                        Tabs\Tab::make(Str::ucfirst(Str::plural(config('filament-team-management.names.team'))))
+                        Tabs\Tab::make(Str::ucfirst(Str::plural(config('filament-team-management.names.team'))))->visible(fn () => Access::allows('viewTeams', $this->tenant))
                             ->schema([
                                 Livewire::make(ManageProgramTeams::class)
                                     ->key('manage-program-teams'),
                             ]),
-                        Tabs\Tab::make('Members')
+                        Tabs\Tab::make('Members')->visible(fn () => Access::allows('viewMembers', $this->tenant))
                             ->schema([
                                 Livewire::make(ManageProgramMembers::class)
                                     ->key('manage-program-members'),
                             ]),
-                        Tabs\Tab::make('Invites')
+                        Tabs\Tab::make('Invitations')->visible(fn () => Access::allows('viewInvitations', $this->tenant))
                             ->schema([
                                 Livewire::make(ManageProgramInvites::class)
                                     ->key('manage-program-invites'),

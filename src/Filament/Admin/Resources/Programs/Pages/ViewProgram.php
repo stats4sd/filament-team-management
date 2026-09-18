@@ -4,28 +4,22 @@ namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Programs\Page
 
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
-use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
+use Stats4sd\FilamentTeamManagement\Actions\DeleteProgram;
+use Stats4sd\FilamentTeamManagement\Actions\UpdateProgram;
 use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Programs\ProgramResource;
-use Stats4sd\FilamentTeamManagement\Models\Program;
+use Stats4sd\FilamentTeamManagement\Filament\Support\Access;
 
-/** @method Program getRecord() */
 class ViewProgram extends ViewRecord
 {
     protected static string $resource = ProgramResource::class;
 
-    public function getTitle(): string | Htmlable
-    {
-        return $this->getRecord()->name;
-    }
-
     protected function getHeaderActions(): array
     {
-        $modelName = config('filament-team-management.names.program');
-
         return [
-            Actions\EditAction::make(),
-            Actions\DeleteAction::make()
-                ->modalDescription("WARNING: This will permanently delete this $modelName and all associated teams and data. This action cannot be undone."),
+            Actions\EditAction::make()->using(fn (Model $record, array $data) => app(UpdateProgram::class)->handle(Access::actor(), $record, $data)),
+            Actions\DeleteAction::make()->using(fn (Model $record) => app(DeleteProgram::class)->handle(Access::actor(), $record))->modalDescription('Deleting this ' . config('filament-team-management.names.program') . ' is irreversible. Memberships and invitations will be removed. Associated ' . Str::plural(config('filament-team-management.names.team')) . ' remain.'),
         ];
     }
 }

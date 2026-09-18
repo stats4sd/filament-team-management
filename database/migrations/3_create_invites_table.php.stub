@@ -10,7 +10,7 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('invites', function (Blueprint $table) {
+        Schema::create(config('filament-team-management.table_names.invites'), function (Blueprint $table) {
             $table->id();
             $table->string('email');
 
@@ -25,13 +25,9 @@ return new class extends Migration {
                 ->constrained(config('filament-team-management.table_names.teams'))
                 ->cascadeOnDelete();
 
-            $table->foreignId(config('permission.column_names.role_pivot_key') ?? 'role_id')
-                ->nullable()
-                ->constrained(config('permission.table_names.roles') ?? 'roles')
-                ->cascadeOnDelete();
-
-            $table->foreignId('inviter_id');
-            $table->string('token');
+            $table->foreignId('inviter_id')->nullable()->constrained(config('filament-team-management.table_names.users'))->nullOnDelete();
+            $table->string('token')->unique();
+            $table->timestamp('expires_at')->nullable();
             $table->tinyInteger('is_confirmed')->default(0);
             $table->timestamps();
         });
@@ -42,6 +38,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('invites');
+        Schema::dropIfExists(config('filament-team-management.table_names.invites'));
     }
 };

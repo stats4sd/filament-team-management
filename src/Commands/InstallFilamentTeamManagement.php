@@ -3,223 +3,203 @@
 namespace Stats4sd\FilamentTeamManagement\Commands;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Str;
-use Stats4sd\FilamentTeamManagement\Models\Program;
-use Stats4sd\FilamentTeamManagement\Models\Team;
+use Stats4sd\FilamentTeamManagement\FilamentTeamManagementServiceProvider;
 
 class InstallFilamentTeamManagement extends Command
 {
     public $signature = 'filament-team-management:install';
 
-    public $description = 'Runs the setup script for Filament Team Management package';
+    public $description = 'Install membership tables and optional host policy stubs';
 
     public function handle(): int
     {
-        // confirm continue;
-        $this->info('It is recommended to make a git commit before running this command. That way you can easily review the git diff to see what changes were made by the script.');
+        $this->info('Commit your work first so you can review the installation changes.');
         if (! $this->confirm('Do you want to continue?')) {
             return self::SUCCESS;
         }
-
-        // Ask do you want to use 'programs' (groups of teams)?
-
-        $usePrograms = $this->confirm('Do you want to use "programs" (groups of teams)?');
-
-        // set .env variable
-        $this->updateEnv($usePrograms);
-
-        $this->info('This package requires the Spatie Permissions package. If you have not already installed it and published the migrations, please do so now:');
-        if ($this->confirm('Do you need the roles and permissions tables from the Spatie Permissions package?', true)) {
-
-            $this->call('vendor:publish', [
-                '--provider' => "Spatie\Permission\PermissionServiceProvider",
-            ]);
+        $programs = $this->confirm('Do you want to use "programs" (groups of teams)?');
+        $this->updateEnv($programs);
+        foreach ($programs ? ['default', 'program'] : ['default'] as $tag) {
+            $this->call('vendor:publish', ['--provider' => FilamentTeamManagementServiceProvider::class, '--tag' => 'filament-team-management-migrations-' . $tag]);
         }
-
-        $this->info('publishing default migrations');
-        $this->call('vendor:publish', [
-            '--provider' => "Stats4sd\FilamentTeamManagement\FilamentTeamManagementServiceProvider",
-            '--tag' => 'filament-team-management-migrations-default',
-        ]);
-
-        if ($usePrograms) {
-
-            $this->info('publishing program-related migrations');
-            $this->call('vendor:publish', [
-                '--provider' => "Stats4sd\FilamentTeamManagement\FilamentTeamManagementServiceProvider",
-                '--tag' => 'filament-team-management-migrations-program',
-            ]);
-
-        }
-
         if ($this->confirm('Do you want to run the migrations now?')) {
             $this->call('migrate');
         }
-
         if ($this->confirm('Do you want to add the recommended package seeders to your DatabaseSeeder file?')) {
-            $this->updateDatabaseSeeder($usePrograms);
+            $this->updateDatabaseSeeder($programs);
         }
-
-        $this->info('Installation complete!');
-        $this->info('Please make sure that your User model extends the FilamentTeamManagement User model.');
+        if ($this->confirm('Publish deny-default host policy stubs?')) {
+            $this->publishPolicies($programs);
+        }
+        $this->info('Installation complete. Register host policies and implement User panel/tenant access before enabling management. See SETUP.md.');
 
         return self::SUCCESS;
     }
 
-    public function updateDatabaseSeeder(bool $usePrograms): void
+    public function publishPolicies(bool $programs): void
     {
-        // find the DatabaseSeeder file and add the seeders
-        $databaseSeederPath = base_path('database/seeders/DatabaseSeeder.php');
+        foreach ($programs ? ['team', 'program'] : ['team'] as $type) {
+            $path = app_path('Policies/' . ucfirst($type) . 'Policy.php');
+            if (File::exists($path)) {
+                $this->warn($path . ' already exists; preserved.');
 
-        if (! file_exists($databaseSeederPath)) {
-            $this->error('DatabaseSeeder.php file not found. Please add the following seeders to your seeder file manually:');
-
-            $this->comment('Stats4sd\FilamentTeamManagement\Database\Seeders\DatabaseSeeder::class');
-
-            return;
-        }
-
-        $databaseSeederContents = File::get($databaseSeederPath);
-
-        // find the end of the run() method
-        $runMethodStartPos = strpos($databaseSeederContents, 'public function run()');
-
-        if ($runMethodStartPos === false) {
-            $this->error('Could not find the run() method in DatabaseSeeder.php. Please add the following seeders to your seeder file manually:');
-            $this->comment('Stats4sd\FilamentTeamManagement\Database\Seeders\DatabaseSeeder::class');
-
-            return;
-        }
-
-        // keep track of open and closing curly braces
-        $runMethodStartBrace = strpos($databaseSeederContents, '{', $runMethodStartPos);
-
-        if ($runMethodStartBrace === false) {
-            $this->error('Could not find the run() method in DatabaseSeeder.php. Please add the following seeders to your seeder file manually:');
-            $this->comment('Stats4sd\FilamentTeamManagement\Database\Seeders\DatabaseSeeder::class');
-
-            return;
-        }
-
-        $braceStack = [];
-        $length = strlen($databaseSeederContents);
-
-        // go through the entire function until we get to the end } (keeping track of open and closing braces)
-        for ($i = $runMethodStartBrace; $i < $length; $i++) {
-            if ($databaseSeederContents[$i] === '{') {
-                $braceStack[] = '{';
-            } elseif ($databaseSeederContents[$i] === '}') {
-                array_pop($braceStack);
+                continue;
             }
-
-            if (empty($braceStack)) {
-                $runMethodEndPos = $i;
-
-                break;
-            }
+            $stub = File::get(__DIR__ . '/../../stubs/MembershipPolicy.php.stub');
+            $stub = str_replace(['{{ policy }}', '{{ target }}', '{{ user }}', '{{ counterpart }}', '{{ link }}'], [ucfirst($type) . 'Policy', '\\' . ltrim(config('filament-team-management.models.' . $type), '\\'), '\\' . ltrim(config('filament-team-management.models.user'), '\\'), '\\' . ltrim(config('filament-team-management.models.' . ($type === 'team' ? 'program' : 'team')), '\\'), $type === 'team' ? 'Program' : 'Team'], $stub);
+            File::ensureDirectoryExists(dirname($path));
+            File::put($path, $stub);
         }
-
-        if (! isset($runMethodEndPos)) {
-            $this->error('Could not find the end of the run() method in DatabaseSeeder.php. Please add the following seeders to your seeder file manually:');
-            $this->comment('\Stats4sd\FilamentTeamManagement\Database\Seeders\DatabaseSeeder::class');
-
-            if ($usePrograms) {
-                $this->comment('\Stats4sd\FilamentTeamManagement\Database\Seeders\DatabaseProgramSeeder::class');
-            }
-
-            return;
-        }
-
-        if ($usePrograms) {
-            $databaseSeederContents = substr_replace($databaseSeederContents, '$this->call(\Stats4sd\FilamentTeamManagement\Database\Seeders\DatabaseProgramSeeder::class);' . PHP_EOL, $runMethodEndPos, 0);
-        }
-
-        // add the seeders to the run() method
-        $databaseSeederContents = substr_replace($databaseSeederContents, PHP_EOL . PHP_EOL . '$this->call(\Stats4sd\FilamentTeamManagement\Database\Seeders\DatabaseSeeder::class);' . PHP_EOL, $runMethodEndPos, 0);
-
-        file_put_contents($databaseSeederPath, $databaseSeederContents);
-
     }
 
-    // copied shamelessly from the Laravel Reverb Install command
-    private function updateEnv($usePrograms): void
+    public function updateDatabaseSeeder(bool $usePrograms): void
     {
-        if (File::missing($env = app()->environmentFile())) {
-            $this->warn('.env file not found. Please add the following variables to your .env file manually:');
+        $path = database_path('seeders/DatabaseSeeder.php');
+        if (! File::exists($path)) {
+            $this->warn('DatabaseSeeder.php not found; no seeder changes made.');
 
             return;
         }
+        $source = File::get($path);
 
-        $contents = File::get($env);
+        try {
+            $tokens = token_get_all($source, TOKEN_PARSE);
+        } catch (\ParseError) {
+            $this->warn('DatabaseSeeder.php is not valid PHP; no changes made.');
 
-        $useProgramsString = $usePrograms ? 'true' : 'false';
+            return;
+        }
+        $end = $this->findRunEnd($tokens);
+        if ($end === null) {
+            $this->warn('Could not identify a supported run() method; no changes made.');
 
-        $teamClass = Team::class;
-        $programClass = Program::class;
-        $userClass = config('auth.providers.users.model');
+            return;
+        }
+        $code = implode('', array_map(fn ($token) => is_array($token) ? (in_array($token[0], [T_COMMENT, T_DOC_COMMENT, T_CONSTANT_ENCAPSED_STRING], true) ? '' : $token[1]) : $token, $tokens));
+        $calls = [];
+        foreach ($usePrograms ? ['DatabaseSeeder', 'DatabaseProgramSeeder'] : ['DatabaseSeeder'] as $class) {
+            $name = '\\Stats4sd\\FilamentTeamManagement\\Database\\Seeders\\' . $class;
+            if (! str_contains($code, $name . '::class')) {
+                $calls[] = '        $this->call(' . $name . '::class);';
+            }
+        }
+        if ($calls) {
+            $before = rtrim(substr($source, 0, $end));
+            File::put($path, $before . "\n\n" . implode("\n", $calls) . "\n    " . substr($source, $end));
+        }
+    }
 
-        $teamTable = (new $teamClass)->getTable();
-        $programTable = (new $programClass)->getTable();
-        $userTable = (new $userClass)->getTable();
+    /** Locate the actual non-static DatabaseSeeder::run body without interpreting strings/comments as braces. */
+    private function findRunEnd(array $tokens): ?int
+    {
+        $offsets = [];
+        $offset = 0;
+        foreach ($tokens as $index => $token) {
+            $offsets[$index] = $offset;
+            $offset += strlen(is_array($token) ? $token[1] : $token);
+        }
+        $depth = 0;
+        $classDepth = null;
+        $awaitingClass = false;
+        foreach ($tokens as $index => $token) {
+            if (is_array($token) && $token[0] === T_CLASS) {
+                for ($next = $index + 1; isset($tokens[$next]); $next++) {
+                    $name = $tokens[$next];
+                    if (is_array($name) && in_array($name[0], [T_WHITESPACE, T_COMMENT, T_DOC_COMMENT], true)) {
+                        continue;
+                    }
+                    $awaitingClass = is_array($name) && $name[0] === T_STRING && $name[1] === 'DatabaseSeeder';
 
-        $teamForeignKey = Str::singular($teamTable) . '_id';
-        $programForeignKey = Str::singular($programTable) . '_id';
-        $userForeignKey = Str::singular($userTable) . '_id';
+                    break;
+                }
+            }
+            if ($token === '{' || (is_array($token) && in_array($token[0], [T_CURLY_OPEN, T_DOLLAR_OPEN_CURLY_BRACES], true))) {
+                $depth++;
+                if ($awaitingClass) {
+                    $classDepth = $depth;
+                    $awaitingClass = false;
+                }
+            } elseif ($token === '}') {
+                if ($classDepth === $depth) {
+                    $classDepth = null;
+                }
+                $depth--;
+            }
+            if (! is_array($token) || $token[0] !== T_FUNCTION || $depth !== $classDepth) {
+                continue;
+            }
+            for ($next = $index + 1; isset($tokens[$next]); $next++) {
+                $name = $tokens[$next];
+                if (is_array($name) && in_array($name[0], [T_WHITESPACE, T_COMMENT, T_DOC_COMMENT, T_AMPERSAND_NOT_FOLLOWED_BY_VAR_OR_VARARG], true)) {
+                    continue;
+                }
+                if (! is_array($name) || $name[0] !== T_STRING || strtolower($name[1]) !== 'run') {
+                    break;
+                }
+                for ($previous = $index - 1; $previous >= 0; $previous--) {
+                    $modifier = $tokens[$previous];
+                    if (in_array($modifier, ['{', '}', ';'], true)) {
+                        break;
+                    }
+                    if (is_array($modifier) && $modifier[0] === T_STATIC) {
+                        return null;
+                    }
+                }
+                $bodyDepth = 0;
+                for ($body = $next + 1; isset($tokens[$body]); $body++) {
+                    $part = $tokens[$body];
+                    if ($part === ';' && $bodyDepth === 0) {
+                        return null;
+                    }
+                    if ($part === '{' || (is_array($part) && in_array($part[0], [T_CURLY_OPEN, T_DOLLAR_OPEN_CURLY_BRACES], true))) {
+                        $bodyDepth++;
+                    }
+                    if ($part === '}' && --$bodyDepth === 0) {
+                        return $offsets[$body];
+                    }
+                }
 
-        $teamManagementMembersTable = Str::snake(Str::singular($teamTable)) . '_members';
-        $programManagementMembersTable = Str::snake(Str::singular($programTable)) . '_members';
-        $programTeamTable = Str::snake(Str::singular($programTable)) . '_' . Str::snake(Str::singular($teamTable));
+                return null;
+            }
+        }
 
-        $roleModel = config('permission.models.role');
+        return null;
+    }
 
-        $variables = [
-            'FILAMENT_TEAM_MANAGEMENT_USE_PROGRAMS' => "FILAMENT_TEAM_MANAGEMENT_USE_PROGRAMS={$useProgramsString}",
-
-            'FILAMENT_TEAM_MANAGEMENT_ROLE_MODEL' => "FILAMENT_TEAM_MANAGEMENT_ROLE_MODEL={$roleModel}",
-
-            'FILAMENT_TEAM_MANAGEMENT_USER_MODEL' => "FILAMENT_TEAM_MANAGEMENT_USER_MODEL={$userClass}",
-            'FILAMENT_TEAM_MANAGEMENT_USER_TABLE' => "FILAMENT_TEAM_MANAGEMENT_USER_TABLE={$userTable}",
-            'FILAMENT_TEAM_MANAGEMENT_USER_FOREIGN_KEY' => "FILAMENT_TEAM_MANAGEMENT_USER_FOREIGN_KEY={$userForeignKey}",
-
-            'FILAMENT_TEAM_MANAGEMENT_TEAM_MODEL' => "FILAMENT_TEAM_MANAGEMENT_TEAM_MODEL={$teamClass}",
-            'FILAMENT_TEAM_MANAGEMENT_TEAMS_TABLE' => "FILAMENT_TEAM_MANAGEMENT_TEAMS_TABLE={$teamTable}",
-            'FILAMENT_TEAM_MANAGEMENT_TEAMS_FOREIGN_KEY' => "FILAMENT_TEAM_MANAGEMENT_TEAMS_FOREIGN_KEY={$teamForeignKey}",
-
-            'FILAMENT_TEAM_MANAGEMENT_TEAM_MEMBERS_TABLE' => "FILAMENT_TEAM_MANAGEMENT_TEAM_MEMBERS_TABLE={$teamManagementMembersTable}",
-
+    private function updateEnv(bool $usePrograms): void
+    {
+        $variables = ['FILAMENT_TEAM_MANAGEMENT_USE_PROGRAMS' => $usePrograms ? 'true' : 'false', 'FILAMENT_TEAM_MANAGEMENT_QUEUE_MAIL' => config('filament-team-management.queue_mail') ? 'true' : 'false'];
+        $map = [
+            'USER_MODEL' => 'models.user', 'TEAM_MODEL' => 'models.team', 'PROGRAM_MODEL' => 'models.program',
+            'USER_TABLE' => 'table_names.users', 'TEAMS_TABLE' => 'table_names.teams', 'PROGRAMS_TABLE' => 'table_names.programs', 'INVITES_TABLE' => 'table_names.invites',
+            'TEAM_MEMBERS_TABLE' => 'table_names.team_members', 'PROGRAM_MEMBERS_TABLE' => 'table_names.program_members', 'PROGRAM_TEAM_TABLE' => 'table_names.program_team',
+            'USER_FOREIGN_KEY' => 'column_names.users_foreign_key', 'TEAMS_FOREIGN_KEY' => 'column_names.teams_foreign_key', 'PROGRAMS_FOREIGN_KEY' => 'column_names.programs_foreign_key',
         ];
-
-        if ($usePrograms) {
-            $variables['FILAMENT_TEAM_MANAGEMENT_PROGRAM_MODEL'] = "FILAMENT_TEAM_MANAGEMENT_PROGRAM_MODEL={$programClass}";
-            $variables['FILAMENT_TEAM_MANAGEMENT_PROGRAMS_TABLE'] = "FILAMENT_TEAM_MANAGEMENT_PROGRAMS_TABLE={$programTable}";
-            $variables['FILAMENT_TEAM_MANAGEMENT_PROGRAMS_FOREIGN_KEY'] = "FILAMENT_TEAM_MANAGEMENT_PROGRAMS_FOREIGN_KEY={$programForeignKey}";
-            $variables['FILAMENT_TEAM_MANAGEMENT_PROGRAM_MEMBERS_TABLE'] = "FILAMENT_TEAM_MANAGEMENT_PROGRAM_MEMBERS_TABLE={$programManagementMembersTable}";
-            $variables['FILAMENT_TEAM_MANAGEMENT_PROGRAM_TEAM_TABLE'] = "FILAMENT_TEAM_MANAGEMENT_PROGRAM_TEAM_TABLE={$programTeamTable}";
+        foreach ($map as $key => $config) {
+            $value = (string) config('filament-team-management.' . $config);
+            if ($key === 'USER_MODEL') {
+                $value = config('auth.providers.users.model', $value);
+            }
+            // Single-quoted dotenv values preserve namespace backslashes literally.
+            $variables['FILAMENT_TEAM_MANAGEMENT_' . $key] = "'" . str_replace("'", "\\'", $value) . "'";
         }
+        foreach ([app()->environmentFilePath(), base_path('.env.example')] as $path) {
+            if (! File::exists($path)) {
+                $this->warn(basename($path) . ' not found; preserved.');
 
-        $variables = Arr::where($variables, function ($value, $key) use ($contents) {
-            return ! Str::contains($contents, PHP_EOL . $key); // check if the key is already in the .env file
-        });
-
-        $variables = trim(implode(PHP_EOL, $variables));
-
-        File::append(
-            $env,
-            Str::endsWith($contents, PHP_EOL) ? PHP_EOL . $variables . PHP_EOL : PHP_EOL . PHP_EOL . $variables . PHP_EOL,
-        );
-
-        // find and update env.example file
-        $envExample = base_path('.env.example');
-        if (file_exists($envExample)) {
-            $contents = File::get($envExample);
-
-            File::append(
-                $envExample,
-                Str::endsWith($contents, PHP_EOL) ? PHP_EOL . $variables . PHP_EOL : PHP_EOL . PHP_EOL . $variables . PHP_EOL,
-            );
+                continue;
+            }
+            $contents = File::get($path);
+            $lines = [];
+            foreach ($variables as $key => $value) {
+                if (! preg_match('/^\s*(?:export\s+)?' . preg_quote($key, '/') . '\s*=/m', $contents)) {
+                    $lines[] = $key . '=' . $value;
+                }
+            }
+            if ($lines) {
+                File::put($path, rtrim($contents) . "\n\n" . implode("\n", $lines) . "\n");
+            }
         }
-
     }
 }

@@ -8,10 +8,12 @@ use Filament\Tables\Table;
 use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Users\Pages\ListUsers;
 use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Users\Schemas\UserForm;
 use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Users\Tables\UserTable;
+use Stats4sd\FilamentTeamManagement\Filament\Traits\AuthorizesHostResource;
 use Stats4sd\FilamentTeamManagement\Filament\Traits\HasTeamManagementNavigationGroup;
 
 class UserResource extends Resource
 {
+    use AuthorizesHostResource;
     use HasTeamManagementNavigationGroup;
 
     protected static string | null | \BackedEnum $navigationIcon = 'heroicon-o-users';
@@ -33,8 +35,6 @@ class UserResource extends Resource
 
     public static function getRelations(): array
     {
-        // Note: It would be nice to have a role invites relation manager to show all role_invites sent
-        // Considering we should have small amount of role_invites, categorise it as "Nice to have" and develop it at later stage when we have time
 
         return [
             //

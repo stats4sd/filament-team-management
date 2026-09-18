@@ -24,8 +24,8 @@ return new class extends Migration
         $usersTable = config('filament-team-management.table_names.users');
         $programKey = config('filament-team-management.column_names.programs_foreign_key');
 
-        if (! $this->hasForeignKeyOn('invites', $programKey)) {
-            Schema::table('invites', function (Blueprint $table) use ($programsTable, $programKey) {
+        if (! $this->hasForeignKeyOn(config('filament-team-management.table_names.invites'), $programKey)) {
+            Schema::table(config('filament-team-management.table_names.invites'), function (Blueprint $table) use ($programsTable, $programKey) {
                 $table->foreign($programKey)
                     ->references('id')
                     ->on($programsTable)
@@ -48,7 +48,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('invites', function (Blueprint $table) {
+        Schema::table(config('filament-team-management.table_names.invites'), function (Blueprint $table) {
             $table->dropForeign([config('filament-team-management.column_names.programs_foreign_key')]);
         });
 

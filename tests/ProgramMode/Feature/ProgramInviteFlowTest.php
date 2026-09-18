@@ -1,43 +1,43 @@
 <?php
 
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Schema;
+use Stats4sd\FilamentTeamManagement\Actions\SendMembershipInvitation;
 use Stats4sd\FilamentTeamManagement\Mail\InviteUser;
 use Stats4sd\FilamentTeamManagement\Mail\UpdateUser;
 use Stats4sd\FilamentTeamManagement\Models\Invite;
 use Stats4sd\FilamentTeamManagement\Models\Program;
-use Stats4sd\FilamentTeamManagement\Models\User;
+use Stats4sd\FilamentTeamManagement\Tests\Fixtures\Models\HostUser as User;
 
 beforeEach(function () {
     Mail::fake();
     $this->inviter = actingAsAdmin();
 });
 
-it('creates a pending Program Admin invite for an unknown email', function () {
+it('creates a pending program membership invite for an unknown email', function () {
     $program = Program::factory()->create();
-    $programAdminRole = config('permission.models.role')::findByName('Program Admin', 'web');
 
-    $program->sendInvites(['programmer@example.test']);
+    app(SendMembershipInvitation::class)->handle($this->inviter, $program, 'programmer@example.test');
 
-    $invite = Invite::withoutGlobalScope('onlyUnconfirmed')->where('email', 'programmer@example.test')->first();
+    $invite = Invite::query()->where('email', 'programmer@example.test')->first();
 
     expect($invite)->not->toBeNull()
         ->and($invite->is_confirmed)->toBeFalse()
-        ->and($invite->program->is($program))->toBeTrue()
-        ->and($invite->role_id)->toBe($programAdminRole->id);
+        ->and($invite->program->is($program))->toBeTrue();
 
-    Mail::assertSent(InviteUser::class);
+    Mail::assertQueued(InviteUser::class);
 });
 
 it('attaches a registered user to the program and mails an update', function () {
     $program = Program::factory()->create();
     $existing = User::factory()->create();
 
-    $program->sendInvites([$existing->email]);
+    app(SendMembershipInvitation::class)->handle($this->inviter, $program, $existing->email);
 
     expect($program->users()->whereKey($existing->id)->exists())->toBeTrue();
 
-    Mail::assertSent(UpdateUser::class);
-    Mail::assertNotSent(InviteUser::class);
+    Mail::assertQueued(UpdateUser::class);
+    Mail::assertNotQueued(InviteUser::class);
 });
 
 it('does not duplicate program membership', function () {
@@ -45,24 +45,16 @@ it('does not duplicate program membership', function () {
     $existing = User::factory()->create();
     $program->users()->attach($existing);
 
-    $program->sendInvites([$existing->email]);
+    app(SendMembershipInvitation::class)->handle($this->inviter, $program, $existing->email);
 
     expect($program->users()->whereKey($existing->id)->count())->toBe(1);
     Mail::assertNothingSent();
 });
 
-// Guards bug 4.7: a missing "Program Admin" role (the package seeders are optional) must
-// not fatal on a null-pointer deep in sendInvites — it should bail out gracefully.
-it('does not fatal when the Program Admin role is missing (guards 4.7)', function () {
-    config('permission.models.role')::findByName('Program Admin', 'web')->delete();
-
+it('creates membership invitations without a permission backend', function () {
+    expect(Schema::hasTable('roles'))->toBeFalse();
     $program = Program::factory()->create();
-
-    // Pre-fix this threw "Attempt to read property id on null"; the fix bails out
-    // gracefully, so reaching the assertions at all proves no fatal occurred.
-    $program->sendInvites(['orphan@example.test']);
-
-    // Early return: no invite created and nothing mailed.
-    expect(Invite::withoutGlobalScope('onlyUnconfirmed')->where('email', 'orphan@example.test')->exists())->toBeFalse();
-    Mail::assertNothingSent();
+    $result = app(SendMembershipInvitation::class)->handle($this->inviter, $program, 'independent@example.test');
+    expect($result->status)->toBe('invitation_created')->and($result->invite->program->is($program))->toBeTrue();
+    Mail::assertQueued(InviteUser::class);
 });

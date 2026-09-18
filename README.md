@@ -1,288 +1,80 @@
 # Filament Team Management
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/stats4sd/filament-team-management.svg?style=flat-square)](https://packagist.org/packages/stats4sd/filament-team-management)
-[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/stats4sd/filament-team-management/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/stats4sd/filament-team-management/actions?query=workflow%3Arun-tests+branch%3Amain)
-[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/stats4sd/filament-team-management/fix-php-code-styling.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/stats4sd/filament-team-management/actions?query=workflow%3A"Fix+PHP+code+styling"+branch%3Amain)
-[![Total Downloads](https://img.shields.io/packagist/dt/stats4sd/filament-team-management.svg?style=flat-square)](https://packagist.org/packages/stats4sd/filament-team-management)
-
-Package for an opinionated 'teams' setup, including invites and integration with Laravel Filament + Spatie User Roles.
-
-
-# Installation
-
-> **Upgrading from 4.x?** 5.0 is a breaking release. Follow [UPGRADE.md](UPGRADE.md) before updating.
-
-You can install the package via composer:
+Teams, optional programs, direct memberships and membership invitations for Laravel 13, Filament 5, Livewire 4 and PHP 8.4+. The package owns membership data and workflows; your application owns authorization, panel admission and tenant access. It does not install a permission backend or define administrator roles.
 
 ```bash
 composer require stats4sd/filament-team-management
-```
-
-Then, run the provided installation script. It's recommended to do a git commit before running this command, as it will update several files in your app. You will want to review these changes after running the command. 
-
-```bash
 php artisan filament-team-management:install
 ```
 
-The script will ask you if you want to use the concept of "programs" in your app. It will then make the following changes: 
+Follow [SETUP.md](SETUP.md) to register your models, policies and panels. Version 5 changes the authorization boundary; see [UPGRADE.md](UPGRADE.md) before adopting it. The installer publishes fresh-install migrations and optionally deny-default host policy stubs. It preserves existing policies and never registers a competing package policy.
 
-1. It will publish the appropriate migration files: the default set (teams, team members, invites, the `latest_team_id` / `latest_program_id` user columns) and, if you opt into programs, the program set (programs, program members, program ↔ team pivot, and the foreign-key constraints on the two program columns). The program columns are always created so you can enable programs later by publishing just the program set: `php artisan vendor:publish --tag=filament-team-management-migrations-program`.
-2. It will update your .env file with the appropriate variables. 
-3. It will offer to add some example Database Seeders to your main `database/seeders/DatabaseSeeder.php` file.
+## Membership and authorization
 
+`Team::users()` and `Program::users()` return all direct members. `members()` is an unfiltered alias. Programs and teams are many-to-many; program membership does not automatically grant access to linked teams. No `admins()`, `isAdmin()`, `is_admin` pivot, role resources or role-only invitations are provided.
 
-
-# Integration into your app
-
-## Models
-
-The package provides 3 Eloquent Models that you can use in your app:
-- `Stats4sd\FilamentTeamManagement\Models\Team` - represents a Team. Teams can have many Users.
-- `Stats4sd\FilamentTeamManagement\Models\Program` - represents a Program. Programs can have many Teams. This model is optional, depending on whether you chose to use Programs during installation.
-- `Stats4sd\FilamentTeamManagement\Models\User` - extends the default Laravel User model to add relationships to Teams (and Programs, if used), and includes traits for Spatie Roles and Filament User functionality.
-
-In theory, you can use these models as-is in your app. However, in practice, you will likely want to extend them to add your own fields and functionality. 
-To do this, create your own Models that extend the package Models. For example, you might create `App\Models\Team` like this:
+Use the shared actions from UI, jobs and application code. Every management action requires an identified actor and authorizes against the actual configured target model, including when an Admin screen is managing a different team from the selected tenant.
 
 ```php
-namespace App\Models;
-use Stats4sd\FilamentTeamManagement\Models\Team as BaseTeam;
+use Stats4sd\FilamentTeamManagement\Actions\AddMember;
+use Stats4sd\FilamentTeamManagement\Actions\SendMembershipInvitation;
 
-class Team extends BaseTeam
-{
-    // Add your customizations and overrides here
-}
-```
-Then, update your .env file to point to your own model:
-
-```
-FILAMENT_TEAM_MANAGEMENT_TEAM_MODEL=App\Models\Team
+app(AddMember::class)->handle($actor, $team, $member);
+$result = app(SendMembershipInvitation::class)->handle($actor, $team, 'member@example.org');
 ```
 
-> [!NOTE] 
-> You are not required to call your custom models `Team`, `Program` or `User`. You can name them whatever you like, as long as you update the .env variables to point to your custom models. Use the other .env variables to point to the correct database tables, foreign key column names and pivot tables if you have changed them. 
+A missing policy or ability denies the operation. Filament uses the same ability arguments for presentation; shared actions reauthorize after locking. Read-only members can view permitted member lists and leave without permission to edit the tenant. App member management uses email invitations; Admin and Program screens also support a host-scoped existing-user picker.
 
-## Environment variables
+The [authorization and workflow guide](docs/membership-contract.md) contains the full abilities table, simple administrator/member policy, scoped-permission recipe, transactional participants, events and lifecycle rules.
 
-Everything the package touches (model classes, table names, foreign-key columns) resolves through `config/filament-team-management.php`, which reads the `FILAMENT_TEAM_MANAGEMENT_*` variables below. The install command writes them all to `.env` / `.env.example`, deriving the table and key names from the configured models, so you normally only edit them when you rename a model or table. A test in the package asserts that the installer writes exactly the keys the config reads.
+## Invitations and mail
 
-| Variable | Default | Controls |
-| --- | --- | --- |
-| `FILAMENT_TEAM_MANAGEMENT_USE_PROGRAMS` | `false` | Enables the Program concept at runtime: program relationships and tenancy, the Program panel pages, program-reachable teams in `getAllAccessibleTeams()`, and the program columns/actions in the UI. It does not decide which migrations you get; that is the publish tag (see Installation). The `program_id` / `latest_program_id` columns exist either way. |
-| `FILAMENT_TEAM_MANAGEMENT_USER_MODEL` | `Stats4sd\FilamentTeamManagement\Models\User` | The User model. Usually your `App\Models\User`, which should extend the package model. |
-| `FILAMENT_TEAM_MANAGEMENT_TEAM_MODEL` | `Stats4sd\FilamentTeamManagement\Models\Team` | The Team model. Extend the package model if you need custom fields. |
-| `FILAMENT_TEAM_MANAGEMENT_PROGRAM_MODEL` | `Stats4sd\FilamentTeamManagement\Models\Program` | The Program model. Only used when programs are enabled. |
-| `FILAMENT_TEAM_MANAGEMENT_ROLE_MODEL` | `Spatie\Permission\Models\Role` | The Spatie Role model used for invite roles and role-assignment tracing. Set it if your app uses a custom role model. |
-| `FILAMENT_TEAM_MANAGEMENT_USER_TABLE` | `users` | The users table. The `latest_team_id` / `latest_program_id` columns are added here. |
-| `FILAMENT_TEAM_MANAGEMENT_TEAMS_TABLE` | `teams` | The teams table. |
-| `FILAMENT_TEAM_MANAGEMENT_PROGRAMS_TABLE` | `programs` | The programs table (programs only). |
-| `FILAMENT_TEAM_MANAGEMENT_TEAM_MEMBERS_TABLE` | `team_members` | The user ↔ team pivot (carries the `is_admin` flag). |
-| `FILAMENT_TEAM_MANAGEMENT_PROGRAM_MEMBERS_TABLE` | `program_members` | The user ↔ program pivot (programs only). |
-| `FILAMENT_TEAM_MANAGEMENT_PROGRAM_TEAM_TABLE` | `program_team` | The program ↔ team pivot (programs only). |
-| `FILAMENT_TEAM_MANAGEMENT_USER_FOREIGN_KEY` | `user_id` | The user foreign-key column on the pivots. |
-| `FILAMENT_TEAM_MANAGEMENT_TEAMS_FOREIGN_KEY` | `team_id` | The team foreign-key column on `team_members`, `program_team` and `invites`. |
-| `FILAMENT_TEAM_MANAGEMENT_PROGRAMS_FOREIGN_KEY` | `program_id` | The program foreign-key column on `program_members`, `program_team` and `invites` (programs only). |
+An email invitation to a new user creates a pending Invite and queues mail after commit. An email invitation to an existing user requires both `inviteMember` and `addMember`, immediately adds membership and sends an update notification. It does not create a synthetic accepted Invite. Existing-user pending acceptance is not implemented.
 
-The `names` block in the config (`names.team`, `names.program`) holds the lowercase singular words used in UI copy ("…invite to this team."). It is deliberately not env-backed: publish the config file and edit it there if your app calls teams or programs something else.
+`InvitationResult::status` is `invitation_created`, `member_added`, `duplicate_pending`, `expired_pending`, `already_member` or `skipped_blank`. Invalid input and denied actions throw. Expired pending invitations can be renewed with Resend; it rotates the token. Cancel deletes only pending invitations. Accepted invitations remain history. Pending counts exclude accepted and expired invitations.
 
-> [!IMPORTANT]
-> **Renamed in 5.0:** the config now reads `FILAMENT_TEAM_MANAGEMENT_USER_TABLE` and `FILAMENT_TEAM_MANAGEMENT_USER_FOREIGN_KEY` (singular `USER_`), which is what the installer has always written. Under 4.x the config read the plural `USERS_TABLE` / `USERS_FOREIGN_KEY`, so those values were silently ignored. If your `.env` or `.env.example` still has the plural names, rename them. See [UPGRADE.md](UPGRADE.md).
+Mail is queued by default; run your application's queue worker. Set `queue_mail` to false for synchronous transport, still after commit. A saved invitation is not proof of delivery. Results expose `mailStatus` (`pending_commit`, `queued`, `sent`, `failed`) and an error on dispatch failure. A failed resend dispatch raises `InvitationDeliveryFailed` after the new token is saved. Queue retries and provider delivery are host operational responsibilities. Message snapshots retain their original token/link and sender text; a later resend does not rewrite an older queued message. Rotated/cancelled links remain invalid even if old mail arrives later.
 
-## Filament Panels
+## Configuration
 
-The package does not provide its own Filament Panel (yet). Instead, you are expected to integrate the package's pages and resources into your own Filament Panels. 
+Publish config with `php artisan vendor:publish --tag=filament-team-management-config`. Display names, panel IDs, participant classes, picker class, expiry and fallback route are plain config values. Panel IDs identify existing host panels and do not set their URL paths or register panels. The configured App panel must also be the default authentication panel.
 
-The package's resources and pages are namespaced into 3 groups, depending on their intended panel:
-- `Stats4sd\FilamentTeamManagement\Filament\Admin` - Resources and pages intended for site-wide administrators to manage users, teams and programs.
-- `Stats4sd\FilamentTeamManagement\Filament\Program` - Resources and pages intended for program managers to manage users and teams within their own program. 
-- `Stats4sd\FilamentTeamManagement\Filament\App` - Resources and pages intended for general users of the application. This includes pages to manage the current team. 
+| Config | Default | Purpose |
+|---|---|---|
+| `names.team`, `names.program`, `names.user` | `team`, `program`, `user` | Singular display words; independent of class/table names |
+| `panels.app`, `panels.program`, `panels.admin` | `app`, `program`, `admin` | Host panel IDs used for links and redirects |
+| `invite_expiry_days` | `null` | No expiry by default; integer days applies to new/resend invitations |
+| `participants` | `[]` | Ordered synchronous `MembershipParticipant` classes |
+| `user_picker` | `null` | `UserPicker` class; no candidates until configured |
+| `no_memberships_route` | `null` | Named authenticated, tenant-independent host landing route; otherwise package no-memberships page |
 
-The default approach is that you will have 2 or 3 different Filament Panels in your app:
-- An "Admin" panel for site-wide admins.
-- An "App" panel for general users of the application.
-- Optionally, a "Program" panel for program managers.
+### Environment variables
 
-### App Panel
+The installer reads your configured values and adds missing keys independently to `.env` and `.env.example`. It preserves existing whole-key assignments, including the first line. Namespace values use dotenv-compatible quoting.
 
-The "App" panel is the main entry point for your application. This is where your users will log in and manage their teams. 
+| Variable suffix after `FILAMENT_TEAM_MANAGEMENT_` | Default |
+|---|---|
+| `USE_PROGRAMS` | `false` |
+| `QUEUE_MAIL` | `true` |
+| `USER_MODEL` | Package `Models\User`; installer uses your auth provider model |
+| `TEAM_MODEL`, `PROGRAM_MODEL` | Package `Models\Team`, `Models\Program` |
+| `USER_TABLE`, `TEAMS_TABLE`, `PROGRAMS_TABLE` | `users`, `teams`, `programs` |
+| `INVITES_TABLE` | `invites` |
+| `TEAM_MEMBERS_TABLE`, `PROGRAM_MEMBERS_TABLE`, `PROGRAM_TEAM_TABLE` | `team_members`, `program_members`, `program_team` |
+| `USER_FOREIGN_KEY`, `TEAMS_FOREIGN_KEY`, `PROGRAMS_FOREIGN_KEY` | `user_id`, `team_id`, `program_id` |
 
-To configure your "App" panel to use the authentication and team management features from this package,, do the following:
+## Development
 
-```php
-
-return $panel
-    ...
-    // Make sure this is the default panel
-    ->default()
-    // Add the authentication pages from the package
-    ->login(Stats4sd\FilamentTeamManagement\Filament\Auth\Login::class)
-    ->registration(Stats4sd\FilamentTeamManagement\Filament\Auth\Register::class)
-    
-    // Add multitenancy (using your 'team' model) and the profile + registration pages
-    ->tenant(App\Models\Team::class) // your team model
-    ->tenantProfile(Stats4sd\FilamentTeamManagement\Filament\App\Pages\ManageTeam\ManageTeam::class)
-    ->tenantRegistration(Stats4sd\FilamentTeamManagement\Filament\App\Pages\RegisterTeam::class)
-
-    // Required: add SetLatestTeamMiddleware to the panel's tenant middleware so the user's most recently used team is recorded. getDefaultTenant() relies on this to send returning users back to their last-used team.
-    ->tenantMiddleware([
-        \Stats4sd\FilamentTeamManagement\Http\Middleware\SetLatestTeamMiddleware::class,
-    ], isPersistent: true)
-
-    // Add the resources and pages from the App namespace
-    ->discoverPages(
-        in: base_path('vendor/stats4sd/filament-team-management/src/Filament/App/Pages'), 
-        for: 'Stats4sd\FilamentTeamManagement\Filament\App\Pages'
-    )
-    
-    // optionally, add a link to the admin panel
-    ->navigationItems([
-        NavigationItem::make('admin')
-            ->url('/admin')
-            ->label('Admin Panel')
-            ->icon('heroicon-o-cog')
-            ->visible(fn () => auth()->user()->can('access admin panel')),
-    ]);
+```bash
+composer test
+composer analyse
+vendor/bin/pint --test
 ```
 
-You can edit any of the pages or resources from the package by creating new classes and extending the package classes. For example, to customize the `ManageTeam` page, create a new class in your app like this:
+The test host explicitly implements policies and tenant access without a permission package. Production row-lock tests are opt-in and use MySQL with InnoDB, matching the primary database used by consuming applications. Each test creates and drops its own uniquely named database; use a test server and credentials with permission to create and drop databases. PHP needs the `pdo_mysql`, `pcntl` and `posix` extensions. SQLite tests do not establish row-lock behavior.
 
-```php
-namespace App\Filament\Pages\ManageTeam;   
-
-use Stats4sd\FilamentTeamManagement\Filament\App\Pages\ManageTeam\ManageTeam as BaseManageTeam;
-
-class ManageTeam extends BaseManageTeam
-{
-    // Add your customizations and overrides here
-}
+```sh
+FTM_TEST_MYSQL_HOST=127.0.0.1 FTM_TEST_MYSQL_PORT=3306 FTM_TEST_MYSQL_USER=root vendor/bin/pest tests/Concurrency --compact --colors=never
 ```
 
-Then, update the `tenantProfile` method in your panel provider to point to your new class.
-
-### Program Panel
-If you are using the "program" concept in your app, you may want to create a separate Filament Panel for program managers. This panel will allow program managers to manage users and teams within their own program.
-
-To configure your "Program" panel, do the following:
-
-```php
-
-return $panel
-    ...
-    // Add multitenancy (using your 'program' model)
-    ->tenant(App\Models\Program::class) // your program model
-    ->tenantProfile(Stats4sd\FilamentTeamManagement\Filament\Program\Pages\ManageProgram\ManageProgram::class)
-    ->tenantRegistration(Stats4sd\FilamentTeamManagement\Filament\Program\Pages\RegisterProgram::class)
-
-    // Required: add SetLatestProgramMiddleware to the panel's tenant middleware so the user's most recently used program is recorded. getDefaultTenant() relies on this to send returning users back to their last-used program.
-    ->tenantMiddleware([
-        \Stats4sd\FilamentTeamManagement\Http\Middleware\SetLatestProgramMiddleware::class,
-    ], isPersistent: true)
-
-    // Add the resources and pages from the Program namespace
-    ->discoverPages(
-        in: base_path('vendor/stats4sd/filament-team-management/src/Filament/Program/Pages'), 
-        for: 'Stats4sd\FilamentTeamManagement\Filament\Program\Pages'
-    )
-    
-    // the package assumes that all users will register and log in via the 'App' (default) panel, so this panel should not have a `login()` or `registration()` method. To ensure users are redirected to the correct login page, replace the `Authenticate::class` in authMiddleware with the following:
-    ->authMiddleware([
-        \Stats4sd\FilamentTeamManagement\Http\Middleware\AuthenticateThroughDefaultPanel::class,
-    ])
-    
-    // optionally, add links to the other panels
-    ->navigationItems([
-        NavigationItem::make('admin')
-            ->url('/admin')
-            ->label('Admin Panel')
-            ->icon('heroicon-o-cog')
-            ->visible(fn() => auth()->user()->can('access admin panel')),
-        NavigationItem::make('app')
-            ->url('/')
-            ->icon('heroicon-o-arrow-left')
-            ->label('Back to Front End'),
-    ]);
-
-```
-    
-### Admin Panel
-The "Admin" panel is for site-wide administrators to manage users, teams and programs. To configure your "Admin" panel, do the following:
-
-```php
-
-return $panel
-    ...
-    // Add the resources and pages from the Admin namespace
-    ->discoverPages(
-        in: base_path('vendor/stats4sd/filament-team-management/src/Filament/Admin/Pages'), 
-        for: 'Stats4sd\FilamentTeamManagement\Filament\Admin\Pages'
-    )
-    ->discoverResources(
-        in: base_path('vendor/stats4sd/filament-team-management/src/Filament/Admin/Resources'), 
-        for: 'Stats4sd\FilamentTeamManagement\Filament\Admin\Resources'
-    )
-    
-    // the package assumes that all users will register and log in via the 'App' (default) panel, so this panel should not have a `login()` or `registration()` method. To ensure users are redirected to the correct login page, replace the `Authenticate::class` in authMiddleware with the following:
-    ->authMiddleware([
-        \Stats4sd\FilamentTeamManagement\Http\Middleware\AuthenticateThroughDefaultPanel::class,
-    ])
-    
-    // optionally, add links to the other panels
-    ->navigationItems([
-        NavigationItem::make('program')
-            ->url('/program')
-            ->label('Go to program panel')
-            ->icon('heroicon-o-cog')
-            ->visible(fn() => auth()->user()->can('access program admin panel')),
-        NavigationItem::make('app')
-            ->url('/')
-            ->icon('heroicon-o-arrow-left')
-            ->label('Back to Front End'),
-    ]);
-
-```
-
-### Permissions
-
-The package gates panel access and global data visibility on a small set of Spatie permissions. These are the exact permission strings it checks for, so create them (and assign them to the appropriate roles) in your app's seeders:
-
-- `access admin panel` — required to pass `CheckIfAdmin` and enter the Admin panel. This is also the permission the "Admin Panel" navigation links above check with `can(...)`.
-- `access program admin panel` — required to pass `CheckIfProgramAdmin` and enter the Program panel. Only applies when programs are enabled.
-- `view all teams` — grants a user access to every team, bypassing team membership.
-- `view all programs` — grants a user access to every program, bypassing program membership. Only applies when programs are enabled.
-
-The package's example `TestUserSeeder` creates these permissions and attaches them to the `Super Admin` and `Program Admin` roles; use it as a reference for wiring them up in your own app.
-
-### Invitations and User Registration
-
-This package includes the needed setup to let your users invite other users via email. You can invite a new user to join a specific team, a specific program, or with an assigned site-wide role.  
-
-The setup described above uses the package's Auth pages for login and registration through the defualt 'App' panel. These pages include the needed functionality to handle invitations and user registration. Through this default setup: 
-
-- Users can _only_ register via an invitation. Going to the registration page without an invitation code will redirect to the login page.
-- Team members can invite new users to join their team through the "Manage Team" page.
-- Program managers can invite new users to join their program through the "Manage Program" page.
-- Site-wide admins can invite new users to the system through the "Manage Users" resource in the Admin panel. They can also invite users to join specific teams or programs through the Team and Program resources in the Admin panel.
-
-TODO: check how invitation email customisation can work. 
-
-
-## Changelog
-
-Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
-
-## Contributing
-
-Please see [CONTRIBUTING](.github/CONTRIBUTING.md) for details.
-
-## Security Vulnerabilities
-
-Please review [our security policy](../../security/policy) on how to report security vulnerabilities.
-
-## Credits
-
-- [Dan Tang](https://github.com/stats4sd)
-- [All Contributors](../../contributors)
-
-## License
-
-The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
+Set `FTM_TEST_MYSQL_PASSWORD` if the test account requires a password. The host defaults to `127.0.0.1` and the user to `root`; setting `FTM_TEST_MYSQL_PORT` enables the tests. Without it, the four concurrency tests are skipped. See `tests/Concurrency/MembershipConcurrencyTest.php` and the [implementation log](docs/change-logs/phase-1b-track-b-membership-only.md) for coverage and verification results.

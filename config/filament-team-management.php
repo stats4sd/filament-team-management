@@ -1,7 +1,6 @@
 <?php
 
 // config for Stats4sd/FilamentTeamManagement
-use Spatie\Permission\Models\Role;
 use Stats4sd\FilamentTeamManagement\Models\Program;
 use Stats4sd\FilamentTeamManagement\Models\Team;
 use Stats4sd\FilamentTeamManagement\Models\User;
@@ -9,15 +8,22 @@ use Stats4sd\FilamentTeamManagement\Models\User;
 return [
     'use_programs' => env('FILAMENT_TEAM_MANAGEMENT_USE_PROGRAMS', false),
 
+    'queue_mail' => env('FILAMENT_TEAM_MANAGEMENT_QUEUE_MAIL', true),
+    'invite_expiry_days' => null,
+    'participants' => [],
+    'user_picker' => null,
+    'no_memberships_route' => null,
+    'panels' => ['app' => 'app', 'program' => 'program', 'admin' => 'admin'],
+
     'models' => [
         'user' => env('FILAMENT_TEAM_MANAGEMENT_USER_MODEL', User::class),
         'team' => env('FILAMENT_TEAM_MANAGEMENT_TEAM_MODEL', Team::class),
         'program' => env('FILAMENT_TEAM_MANAGEMENT_PROGRAM_MODEL', Program::class),
-        'role' => env('FILAMENT_TEAM_MANAGEMENT_ROLE_MODEL', Role::class),
     ],
 
     // When using custom table names for your users or teams table, you can set them here
     'table_names' => [
+        'invites' => env('FILAMENT_TEAM_MANAGEMENT_INVITES_TABLE', 'invites'),
         'users' => env('FILAMENT_TEAM_MANAGEMENT_USER_TABLE', 'users'),
         'teams' => env('FILAMENT_TEAM_MANAGEMENT_TEAMS_TABLE', 'teams'),
         'programs' => env('FILAMENT_TEAM_MANAGEMENT_PROGRAMS_TABLE', 'programs'),
@@ -38,6 +44,7 @@ return [
     // keys the installer doesn't write, or the installer<->config parity test would break.
     // Phase 2: may become env-overridable (Decision 4) with matching installer writes + a parity allowlist.
     'names' => [
+        'user' => 'user',
         'team' => 'team',
         'program' => 'program',
     ],

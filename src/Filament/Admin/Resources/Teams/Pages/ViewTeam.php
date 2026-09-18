@@ -4,30 +4,22 @@ namespace Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Teams\Pages;
 
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
-use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Database\Eloquent\Model;
+use Stats4sd\FilamentTeamManagement\Actions\DeleteTeam;
+use Stats4sd\FilamentTeamManagement\Actions\UpdateTeam;
 use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Teams\TeamResource;
-use Stats4sd\FilamentTeamManagement\Models\Team;
+use Stats4sd\FilamentTeamManagement\Filament\Support\Access;
+use Stats4sd\FilamentTeamManagement\Filament\Support\MembershipNavigation;
 
-/** @method Team getRecord() */
 class ViewTeam extends ViewRecord
 {
     protected static string $resource = TeamResource::class;
 
-    public function getTitle(): string | Htmlable
-    {
-        return $this->getRecord()->name;
-    }
-
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make(),
-            Actions\DeleteAction::make()
-                ->modalDescription('WARNING: Please do not delete when there is actual survey data collected, as deletion is unreversable. Are you sure you would like to do this?')
-                // redirect to app panel dashboard after soft deleting a team.
-                // if the deleted team is the last team, user will be prompted to create a new team
-                // Question: why the changes in submodule does not take effect in local env?
-                ->successRedirectUrl('/app'),
+            Actions\EditAction::make()->using(fn (Model $record, array $data) => app(UpdateTeam::class)->handle(Access::actor(), $record, $data)),
+            Actions\DeleteAction::make()->using(fn (Model $record) => app(DeleteTeam::class)->handle(Access::actor(), $record))->modalDescription('Deleting this ' . config('filament-team-management.names.team') . ' is irreversible. Memberships and invitations will be removed.')->successRedirectUrl(fn () => MembershipNavigation::afterDeparture(true)),
         ];
     }
 }

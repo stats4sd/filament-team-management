@@ -2,8 +2,6 @@
 
 use Filament\Actions\DeleteAction;
 use Filament\Facades\Filament;
-use Filament\Schemas\Components\Callout;
-use Filament\Schemas\Schema;
 use Stats4sd\FilamentTeamManagement\Filament\Admin\Resources\Programs\Pages\ViewProgram;
 use Stats4sd\FilamentTeamManagement\Filament\App\Pages\ManageTeam\ManageTeamMembers;
 use Stats4sd\FilamentTeamManagement\Models\Team;
@@ -24,13 +22,9 @@ it('renders the team word in the members invite callout, not a blank gap (guards
     Filament::setTenant($team);
 
     $widget = livewire(ManageTeamMembers::class)->instance();
-    $action = $widget->getTable()->getAction('Invite');
+    $action = $widget->getTable()->getAction('invite');
 
-    $callout = collect($action->getForm(Schema::make($widget))->getComponents())
-        ->first(fn ($c) => $c instanceof Callout);
-
-    expect($callout)->not->toBeNull()
-        ->and($callout->getDescription())->toContain('invite to this team');
+    expect($action->getModalDescription())->toContain('this team');
 });
 
 it('renders the program word in the delete confirmation, not a blank gap (guards 2.2)', function () {
@@ -43,5 +37,5 @@ it('renders the program word in the delete confirmation, not a blank gap (guards
         ->first(fn ($a) => $a instanceof DeleteAction);
 
     expect($delete)->not->toBeNull()
-        ->and($delete->getModalDescription())->toContain('permanently delete this program');
+        ->and($delete->getModalDescription())->toContain('Deleting this program is irreversible');
 });

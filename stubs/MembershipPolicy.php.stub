@@ -1,0 +1,24 @@
+<?php
+
+namespace App\Policies;
+
+// Register this policy for the configured model. Replace each false with your app's rule.
+class {{ policy }}
+{
+    public function viewAny({{ user }} $actor): bool { return false; }
+    public function view({{ user }} $actor, {{ target }} $target): bool { return false; }
+    public function create({{ user }} $actor): bool { return false; }
+    public function update({{ user }} $actor, {{ target }} $target): bool { return false; }
+    public function delete({{ user }} $actor, {{ target }} $target): bool { return false; }
+    public function viewMembers({{ user }} $actor, {{ target }} $target): bool { return false; }
+    public function viewInvitations({{ user }} $actor, {{ target }} $target): bool { return false; }
+    public function inviteMember({{ user }} $actor, {{ target }} $target): bool { return false; }
+    public function addMember({{ user }} $actor, {{ target }} $target, {{ user }} $member): bool { return false; }
+    public function removeMember({{ user }} $actor, {{ target }} $target, {{ user }} $member): bool { return false; }
+    public function leave({{ user }} $actor, {{ target }} $target): bool { return false; }
+    public function resendInvitation({{ user }} $actor, {{ target }} $target, \Stats4sd\FilamentTeamManagement\Models\Invite $invite): bool { return false; }
+    public function cancelInvitation({{ user }} $actor, {{ target }} $target, \Stats4sd\FilamentTeamManagement\Models\Invite $invite): bool { return false; }
+    public function viewTeams({{ user }} $actor, {{ target }} $target): bool { return false; }
+    public function link{{ link }}({{ user }} $actor, {{ target }} $target, {{ counterpart }} $other): bool { return false; }
+    public function unlink{{ link }}({{ user }} $actor, {{ target }} $target, {{ counterpart }} $other): bool { return false; }
+}

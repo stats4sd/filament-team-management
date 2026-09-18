@@ -11,14 +11,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 interface ProgramInterface
 {
-    /**
-     * Generate an invitation to join this program for each of the provided email addresses
-     */
-    public function sendInvites(array $emails): void;
-
     public function invites(): HasMany;
 
     public function users(): BelongsToMany;
+
+    public function members(): BelongsToMany;
 
     public function teams(): BelongsToMany;
 }

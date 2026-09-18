@@ -19,7 +19,7 @@ return new class extends Migration {
                 ->constrained(config('filament-team-management.table_names.users'))
                 ->cascadeOnDelete()->cascadeOnUpdate();
 
-            $table->boolean('is_admin')->default(false);
+            $table->unique([config('filament-team-management.column_names.teams_foreign_key'), config('filament-team-management.column_names.users_foreign_key')]);
             $table->timestamps();
         });
     }

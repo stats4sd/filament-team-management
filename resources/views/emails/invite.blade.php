@@ -1,32 +1,18 @@
 @component('mail::message')
 
-{{ $invite->inviter->name }} ({{ $invite->inviter->email }}) has invited you to join the web platform: {{ config('app.name') }}.
+{{ $snapshot['senderName'] }}@if($snapshot['senderEmail']) ({{ $snapshot['senderEmail'] }})@endif has invited you to {{ config('app.name') }}.
 
-@if($invite->team)
-You have been invited to join the {{ config('filament-team-management.models.team')::getModelNameLower() }}: {{ $invite->team->name }}.
-@endif
+You have been invited to join the {{ $snapshot['targetLabel'] }}: {{ $snapshot['targetName'] }}.
 
-@if($invite->role)
-You will be assigned the role: {{ $invite->role->name }}.
-@endif
+Use the link below to register with the email address that received this invitation and join this {{ $snapshot['targetLabel'] }}.
 
-@if($invite->program)
-You will be assigned to the program: {{ $invite->program->name }}.
-@endif
+<x-mail::button :url="$acceptUrl">Register and join</x-mail::button>
 
-Click the link below to register on the platform. If you use the same email address, you will be automatically given the correct permissions after registration.
+If the button is not working, copy this link into your browser: {{ $acceptUrl }}.
 
-<x-mail::button :url='$acceptUrl'>
-    Register Here
-</x-mail::button>
-
-If the button above is not working, or this email is not displaying correctly, please copy and paste the following link into your browser: {{ $acceptUrl }}.
-
-
-If you do not wish to register, or you have been sent this email by mistake, please ignore this message.
+If you did not expect this invitation, you can ignore this email.
 
 Best regards,
-Site Admin,
 {{ config('app.name') }}
 
 @endcomponent

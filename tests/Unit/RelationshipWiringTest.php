@@ -2,19 +2,18 @@
 
 use Stats4sd\FilamentTeamManagement\Models\Program;
 use Stats4sd\FilamentTeamManagement\Models\Team;
-use Stats4sd\FilamentTeamManagement\Models\User;
+use Stats4sd\FilamentTeamManagement\Tests\Fixtures\Models\HostUser as User;
 
-it('splits team members and admins by the is_admin pivot column', function () {
+it('returns all direct memberships from both relation aliases', function () {
     $team = Team::factory()->create();
     $admin = User::factory()->create();
     $member = User::factory()->create();
 
-    $team->users()->attach($admin, ['is_admin' => 1]);
-    $team->users()->attach($member, ['is_admin' => 0]);
+    $team->users()->attach($admin);
+    $team->users()->attach($member);
 
     expect($team->users()->count())->toBe(2)
-        ->and($team->admins->pluck('id')->all())->toBe([$admin->id])
-        ->and($team->members->pluck('id')->all())->toBe([$member->id]);
+        ->and($team->members->pluck('id')->all())->toBe([$admin->id, $member->id]);
 });
 
 it('aliases members() to users() on Program', function () {

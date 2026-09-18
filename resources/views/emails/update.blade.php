@@ -1,23 +1,12 @@
 @component('mail::message')
 
-{{ $invite->inviter->name }} ({{ $invite->inviter->email }}) has updated your user account on the web platform: {{ config('app.name') }}.
+{{ $snapshot['senderName'] }}@if($snapshot['senderEmail']) ({{ $snapshot['senderEmail'] }})@endif has updated your membership on {{ config('app.name') }}.
 
-@if($invite->team)
-You have been added to {{ config('filament-team-management.models.team')::getModelNameLower() }}: {{ $invite->team->name }}.
-@endif
+You have been added to the {{ $snapshot['targetLabel'] }}: {{ $snapshot['targetName'] }}.
 
-@if($invite->role)
-You have been assigned the role: {{ $invite->role->name }}.
-@endif
-
-@if($invite->program)
-You have been assigned to the program: {{ $invite->program->name }}.
-@endif
-
-If you have been sent this email by mistake, please ignore this message.
+If you did not expect this change, please contact the site administrator.
 
 Best regards,
-Site Admin,
 {{ config('app.name') }}
 
 @endcomponent
